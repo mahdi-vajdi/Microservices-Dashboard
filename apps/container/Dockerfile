@@ -4,10 +4,14 @@ WORKDIR /usr/src/app
 
 COPY package.json ./
 COPY package-lock.json ./
+COPY tsconfig.json tsconfig.json
 
-RUN npm install
+RUN npm install --loglevel verbose
 
-COPY . .
+COPY apps/container apps/container
+COPY libs libs
+
+RUN cd apps/container && npm install --loglevel verbose
 
 RUN npm run build --loglevel verbose
 
