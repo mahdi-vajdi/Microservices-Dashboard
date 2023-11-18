@@ -1,4 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
+import { ContainerSettings } from './ContainerSettings';
 
 export class Container extends AggregateRoot {
   constructor(
@@ -11,7 +12,7 @@ export class Container extends AggregateRoot {
     private readonly _token: string,
     private readonly _isEnabled: boolean,
     private readonly _agents: string[],
-    // private readonly settings: ContainerSettings
+    private readonly _settings: ContainerSettings,
   ) {
     super();
   }
@@ -49,6 +50,10 @@ export class Container extends AggregateRoot {
   }
 
   public get agents() {
-    return this._agents;
+    return [...this._agents];
+  }
+
+  public get settings() {
+    return { ...this._settings };
   }
 }
