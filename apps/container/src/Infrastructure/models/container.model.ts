@@ -39,8 +39,8 @@ export class ContainerModel {
   })
   agents: Types.ObjectId[];
 
-  // @Prop({ type: ContainerSettingsSchema, required: true })
-  // settings: ContainerSettingsModel;
+  @Prop({ type: ContainerSettingsSchema, required: true })
+  settings: ContainerSettingsModel;
 }
 
 export const ContainersSchema = SchemaFactory.createForClass(ContainerModel);

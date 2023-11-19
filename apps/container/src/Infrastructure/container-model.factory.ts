@@ -17,6 +17,7 @@ export class ContainerSchemaFactory
       token: container.token,
       isEnabled: container.isEnabled,
       agents: container.agents.map((agent) => new Types.ObjectId(agent)),
+      settings: container.settings,
     };
   }
 
@@ -31,6 +32,7 @@ export class ContainerSchemaFactory
       model.token,
       model.isEnabled,
       model.agents.map((agent) => agent.toHexString()),
+      model.settings,
     );
   }
 }
