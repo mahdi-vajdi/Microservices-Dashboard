@@ -3,6 +3,7 @@ import { UserController } from './Presentation/user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
+import { UserModel, UserSchema } from './Infrastructure/user.model';
 
 @Module({
   imports: [
@@ -18,7 +19,7 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([]),
+    MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
   ],
   controllers: [UserController],
   providers: [],

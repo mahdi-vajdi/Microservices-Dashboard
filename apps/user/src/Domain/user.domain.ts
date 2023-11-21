@@ -2,11 +2,10 @@ import { AggregateRoot } from '@nestjs/cqrs';
 import { UserRoles } from './user-roles.enum';
 
 export class User extends AggregateRoot {
-  private readonly _createdAt: Date;
-  private _updatedAt: Date;
-
   constructor(
     private readonly _id: string,
+    private readonly _createdAt: Date,
+    private _updatedAt: Date,
     private _firstName: string,
     private _lastName: string,
     private _email: string,
