@@ -5,6 +5,8 @@ services:
       dockerfile: ./apps/container/Dockerfile
       target: development
     command: npm run start:dev container
+    env_file:
+      - ./apps/container/.env
     ports:
       - '3000:3000'
     volumes:

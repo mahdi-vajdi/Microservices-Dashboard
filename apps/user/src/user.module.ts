@@ -1,11 +1,13 @@
 import { Module } from '@nestjs/common';
+import { UserController } from './Presentation/user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { MongooseModule } from '@nestjs/mongoose';
 import * as Joi from 'joi';
+import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
+      isGlobal: true,
       validationSchema: Joi.object({
         MONGODB_URI: Joi.string().required(),
       }),
@@ -16,6 +18,9 @@ import * as Joi from 'joi';
       }),
       inject: [ConfigService],
     }),
+    MongooseModule.forFeature([]),
   ],
+  controllers: [UserController],
+  providers: [],
 })
-export class DatabaseModule {}
+export class UserModule {}
