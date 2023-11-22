@@ -1,4 +1,18 @@
 services:
+
+  user:
+    build:
+      context: .
+      dockerfile: ./apps/user/Dockerfile
+      target: development
+    command: npm run start:dev user
+    env_file:
+      - ./apps/user/.env
+    ports:
+      - '3000:3000'
+    volumes:
+      - .:/usr/src/app
+
   container:
     build:
       context: .
@@ -8,7 +22,7 @@ services:
     env_file:
       - ./apps/container/.env
     ports:
-      - '3000:3000'
+      - '3002:3002'
     volumes:
       - .:/usr/src/app
 

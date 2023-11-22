@@ -5,6 +5,7 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY package-lock.json ./
 COPY tsconfig.json tsconfig.json
+COPY nest-cli.json nest-cli.json
 
 RUN npm install --loglevel verbose
 
@@ -13,7 +14,7 @@ COPY libs libs
 
 RUN cd apps/container && npm install --loglevel verbose
 
-RUN npm run build --loglevel verbose
+RUN npm run build container --loglevel verbose
 
 FROM node:alpine As production
 

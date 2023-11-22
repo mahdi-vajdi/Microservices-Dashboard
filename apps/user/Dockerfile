@@ -5,15 +5,16 @@ WORKDIR /usr/src/app
 COPY package.json ./
 COPY package-lock.json ./
 COPY tsconfig.json tsconfig.json
+COPY nest-cli.json nest-cli.json
 
 RUN npm install --loglevel verbose
 
-COPY apps/users apps/users
+COPY apps/user apps/user
 COPY libs libs
 
-RUN cd apps/users && npm install --loglevel verbose
+RUN cd apps/user && npm install --loglevel verbose
 
-RUN npm run build --loglevel verbose
+RUN npm run build user --loglevel verbose
 
 FROM node:alpine As production
 
@@ -29,4 +30,4 @@ RUN npm install --omit=dev --loglevel verbose
 
 COPY --from=development /usr/src/app/dist ./dist
 
-CMD ["node", "dist/apps/users/main"]
+CMD ["node", "dist/apps/user/main"]
