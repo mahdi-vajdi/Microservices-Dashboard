@@ -1,5 +1,4 @@
 services:
-
   user:
     build:
       context: .
@@ -13,6 +12,19 @@ services:
     volumes:
       - .:/usr/src/app
 
+  auth:
+    build:
+      context: .
+      dockerfile: ./apps/auth/Dockerfile
+      target: development
+    command: npm run start:dev auth
+    env_file:
+      - ./apps/auth/.env
+    ports:
+      - '3001:3001'
+    volumes:
+      - .:/usr/src/app
+
   container:
     build:
       context: .
@@ -22,7 +34,7 @@ services:
     env_file:
       - ./apps/container/.env
     ports:
-      - '3002:3002'
+      - '3003:3003'
     volumes:
       - .:/usr/src/app
 
