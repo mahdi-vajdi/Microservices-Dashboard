@@ -1,5 +1,4 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { UserRoles } from './user-roles.enum';
 
 export class User extends AggregateRoot {
   constructor(
@@ -10,7 +9,6 @@ export class User extends AggregateRoot {
     private _lastName: string,
     private _email: string,
     private _phone: string,
-    private _role: UserRoles,
     private _password: string,
     private _refreshToken: string,
   ) {
@@ -37,10 +35,6 @@ export class User extends AggregateRoot {
 
   public get phone() {
     return this._phone;
-  }
-
-  public get role() {
-    return this._role;
   }
 
   public get password() {
@@ -80,14 +74,6 @@ export class User extends AggregateRoot {
 
   changePhone(phone: string) {
     this._phone = phone;
-    this._updatedAt = new Date();
-  }
-
-  changeRole(newRole: UserRoles) {
-    if (newRole === UserRoles.OWNER)
-      throw new Error('Owner role cannot be set');
-
-    this._role = newRole;
     this._updatedAt = new Date();
   }
 

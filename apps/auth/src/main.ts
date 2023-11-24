@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { ConfigService } from '@nestjs/config';
-import { Transport } from '@nestjs/microservices';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import * as cookieParser from 'cookie-parser';
 
 async function bootstrap() {
@@ -10,11 +10,10 @@ async function bootstrap() {
 
   app.use(cookieParser());
 
-  app.connectMicroservice({
-    transport: Transport.TCP,
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.NATS,
     options: {
-      host: '0.0.0.0',
-      port: configService.get('TCP_PORT'),
+      servers: [configService.get('NATS_URI')],
     },
   });
   await app.startAllMicroservices();

@@ -1,6 +1,6 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../Domain/user.domain';
-import { UserRepository } from '../Domain/user-repo.abstract';
+import { UserRepository } from '../Domain/abstract-user.repo';
 import { UserModel } from './user.model';
 import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
@@ -11,9 +11,13 @@ export class MongoUserRepository implements UserRepository {
     @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>,
   ) {}
 
-  async save(_user: User): Promise<void> {
-    const user = new this.userModel(this.fromEntity(_user));
-    await user.save();
+  async add(userEntity: User): Promise<User> {
+    const newUser = await this.userModel.create(this.fromEntity(userEntity));
+    if (newUser) return userEntity;
+  }
+
+  async save(user: User): Promise<void> {
+    await new this.userModel(this.fromEntity(user)).save();
   }
 
   async findOneById(id: string): Promise<User> {
@@ -37,7 +41,6 @@ export class MongoUserRepository implements UserRepository {
       lastName: user.lastName,
       email: user.email,
       phone: user.phone,
-      role: user.role,
       password: user.password,
       refreshToken: user.refreshToken,
     };
@@ -52,7 +55,6 @@ export class MongoUserRepository implements UserRepository {
       model.lastName,
       model.email,
       model.phone,
-      model.role,
       model.password,
       model.refreshToken,
     );

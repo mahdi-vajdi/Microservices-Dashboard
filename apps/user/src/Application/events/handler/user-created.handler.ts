@@ -4,6 +4,6 @@ import { UserCreatedEvent } from '../impl/user-created.event';
 @EventsHandler(UserCreatedEvent)
 export class UserCreatedHandler implements IEventHandler<UserCreatedEvent> {
   async handle({ userId }: UserCreatedEvent): Promise<void> {
-    throw new Error('Method not implemented.');
+    console.log('user created; id:' + userId);
   }
 }

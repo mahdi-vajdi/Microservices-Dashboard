@@ -1,5 +1,4 @@
 import { Injectable } from '@nestjs/common';
-import { UserRoles } from './user-roles.enum';
 import { User } from './user.domain';
 import { UserCreatedEvent } from '../Application/events/impl/user-created.event';
 
@@ -11,7 +10,6 @@ export class UserFactory {
     lastName: string,
     email: string,
     phone: string,
-    role: UserRoles,
     password: string,
     refreshToken: string,
   ): User {
@@ -23,7 +21,6 @@ export class UserFactory {
       lastName,
       email,
       phone,
-      role,
       password,
       refreshToken,
     );

@@ -6,8 +6,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { LocalStrategy } from './strategies/local.strategy';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { USER_SERVICE } from '@app/common';
+import { JwtUtils } from './jwt.util';
 
 @Module({
   imports: [
@@ -15,11 +18,23 @@ import * as Joi from 'joi';
       isGlobal: true,
       validationSchema: Joi.object({
         HTTP_PORT: Joi.number().required(),
-        TCP_PORT: Joi.number().required(),
+        NATS_URI: Joi.string().required(),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
       }),
     }),
+    ClientsModule.registerAsync([
+      {
+        name: USER_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [configService.get('NATS_URI')],
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
     JwtModule.register({}),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
@@ -29,6 +44,7 @@ import * as Joi from 'joi';
     LocalStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
+    JwtUtils,
   ],
   exports: [AuthService, JwtModule],
 })

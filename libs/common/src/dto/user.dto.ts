@@ -1,5 +1,3 @@
-import { UserRoles } from './user-roles.enum';
-
 export type UserDto = {
   id: string;
   createdAt: Date;
@@ -8,6 +6,6 @@ export type UserDto = {
   lastName: string;
   email: string;
   phone: string;
-  role: UserRoles;
   password: string;
+  refreshToken?: string;
 };

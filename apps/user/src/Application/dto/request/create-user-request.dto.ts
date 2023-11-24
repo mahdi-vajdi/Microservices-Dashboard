@@ -1,5 +1,3 @@
-import { UserRoles } from 'apps/user/src/Domain/user-roles.enum';
-
 export class CreateUserRequestDto {
   firstName: string;
 
@@ -8,8 +6,6 @@ export class CreateUserRequestDto {
   email: string;
 
   phone: string;
-
-  role: UserRoles;
 
   password: string;
 
