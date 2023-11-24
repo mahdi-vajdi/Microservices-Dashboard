@@ -10,7 +10,7 @@ export class User extends AggregateRoot {
     private _email: string,
     private _phone: string,
     private _password: string,
-    private _refreshToken: string,
+    private _refreshToken: string | null,
   ) {
     super();
   }
@@ -82,7 +82,9 @@ export class User extends AggregateRoot {
     this._updatedAt = new Date();
   }
 
-  changeRefreshToken(token: string) {
+  changeRefreshToken(token: string | null) {
+    // turn undefined arguments to null
+    token === undefined ? null : token;
     this._refreshToken = token;
     this._updatedAt = new Date();
   }

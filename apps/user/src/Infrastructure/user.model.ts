@@ -29,8 +29,8 @@ export class UserModel {
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: false, default: null })
-  refreshToken?: string;
+  @Prop({ type: String, required: false, default: null })
+  refreshToken: string | null;
 }
 
 export const UserSchema = SchemaFactory.createForClass(UserModel);

@@ -29,7 +29,7 @@ import { JwtUtils } from './jwt.util';
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
-            servers: [configService.get('NATS_URI')],
+            servers: [configService.getOrThrow('NATS_URI')],
           },
         }),
         inject: [ConfigService],

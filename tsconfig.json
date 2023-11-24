@@ -12,24 +12,16 @@
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
-    "strictNullChecks": false,
+    "strictNullChecks": true,
     "noImplicitAny": false,
     "strictBindCallApply": false,
     "forceConsistentCasingInFileNames": false,
     "noFallthroughCasesInSwitch": false,
     "paths": {
-      "@app/common": [
-        "libs/common/src"
-      ],
-      "@app/common/*": [
-        "libs/common/src/*"
-      ],
-      "@app/jwt-utils": [
-        "libs/jwt-utils/src"
-      ],
-      "@app/jwt-utils/*": [
-        "libs/jwt-utils/src/*"
-      ]
+      "@app/common": ["libs/common/src"],
+      "@app/common/*": ["libs/common/src/*"],
+      "@app/jwt-utils": ["libs/jwt-utils/src"],
+      "@app/jwt-utils/*": ["libs/jwt-utils/src/*"]
     }
   }
 }

@@ -13,10 +13,10 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.NATS,
     options: {
-      servers: [configService.get('NATS_URI')],
+      servers: [configService.getOrThrow('NATS_URI')],
     },
   });
   await app.startAllMicroservices();
-  await app.listen(configService.get('HTTP_PORT'));
+  await app.listen(configService.getOrThrow('HTTP_PORT'));
 }
 bootstrap();

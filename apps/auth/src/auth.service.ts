@@ -70,11 +70,13 @@ export class AuthService {
         id: userPayload.sub,
       })
       .subscribe(async (user) => {
-        const doesTokenMatch = await bcrypt.compare(
-          refreshToken,
-          user.refreshToken,
-        );
-        if (!doesTokenMatch) throw new ForbiddenException('Access Denied');
+        if (user.refreshToken !== null) {
+          const doesTokenMatch = await bcrypt.compare(
+            refreshToken,
+            user.refreshToken,
+          );
+          if (!doesTokenMatch) throw new ForbiddenException('Access Denied');
+        } else throw new ForbiddenException('Access Denied');
 
         const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
 
@@ -87,7 +89,7 @@ export class AuthService {
       });
   }
 
-  async validateUser(email: string, password: string): Promise<UserDto> {
+  async validateUser(email: string, password: string): Promise<UserDto | null> {
     const user = this.userService
       .send<UserDto>('findOneByEmail', { email })
       .pipe(

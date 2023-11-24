@@ -7,5 +7,5 @@ export type UserDto = {
   email: string;
   phone: string;
   password: string;
-  refreshToken?: string;
+  refreshToken: string | null;
 };

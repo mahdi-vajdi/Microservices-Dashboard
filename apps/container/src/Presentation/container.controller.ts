@@ -9,6 +9,6 @@ export class ContainerController {
   @UseGuards(AccessTokenGuard)
   @Get()
   getHello(@Req() req: Request) {
-    console.log(`constainer service: controller: user: ${req.user}`);
+    console.log(`constainer service: controller: user: ${req.user!}`);
   }
 }

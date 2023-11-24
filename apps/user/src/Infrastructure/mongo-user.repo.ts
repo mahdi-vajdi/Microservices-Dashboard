@@ -13,23 +13,29 @@ export class MongoUserRepository implements UserRepository {
 
   async add(userEntity: User): Promise<User> {
     const newUser = await this.userModel.create(this.fromEntity(userEntity));
-    if (newUser) return userEntity;
+    return this.toEntity(newUser);
   }
 
   async save(user: User): Promise<void> {
-    await new this.userModel(this.fromEntity(user)).save();
+    const updatedUser = await this.userModel
+      .findByIdAndUpdate(user.id, this.fromEntity(user), { lean: true })
+      .exec();
+
+    if (updatedUser) throw new Error('user not found');
   }
 
   async findOneById(id: string): Promise<User> {
     const user = await this.userModel.findById(id, {}, { lean: true }).exec();
-    return this.toEntity(user);
+    if (user) return this.toEntity(user);
+    else throw new Error(`User with id: ${id} does'nt exist`);
   }
 
   async findOneByEmail(email: string): Promise<User> {
     const user = await this.userModel
       .findOne({ email }, {}, { lean: true })
       .exec();
-    return this.toEntity(user);
+    if (user) return this.toEntity(user);
+    else throw new Error(`User with email: ${email} does'nt exist`);
   }
 
   private fromEntity(user: User): UserModel {

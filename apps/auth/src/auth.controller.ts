@@ -33,7 +33,7 @@ export class AuthController {
   @UseGuards(RefreshTokenGuard)
   @Get('refresh')
   refreshTokens(@Req() req: Request) {
-    const refreshToken = req.get('Authorization').replace('Bearer', '').trim();
+    const refreshToken = req.get('Authorization')!.replace('Bearer', '').trim();
     return this.authService.refreshTokens(req.user as JwtPayload, refreshToken);
   }
 

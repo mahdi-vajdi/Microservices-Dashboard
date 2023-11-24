@@ -46,6 +46,7 @@ export class CreateUserHandler
       email: user.email,
       phone: user.phone,
       password: user.password,
+      refreshToken: null,
     };
   }
 }
