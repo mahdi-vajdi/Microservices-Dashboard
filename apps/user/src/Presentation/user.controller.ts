@@ -8,6 +8,8 @@ import { UpdateRefreshTokenDto } from '../Application/dto/request/update-refresh
 import { UpdateRefreshTokenCommand } from '../Application/commands/impl/update-refresh-token.command';
 import { GetByIdDto } from '../Application/dto/request/get-by-id.dto';
 import { GetByIdQuery } from '../Application/queries/impl/find-by-id.query';
+import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query';
+import { GetByEmailDto } from '../Application/dto/request/get-by-email.dto';
 
 @Controller()
 export class UserController {
@@ -35,5 +37,12 @@ export class UserController {
   @MessagePattern('getById')
   async getById(@Payload() { id }: GetByIdDto): Promise<UserDto> {
     return this.queryBus.execute<GetByIdQuery, UserDto>(new GetByIdQuery(id));
+  }
+
+  @MessagePattern('getByEmail')
+  async getByEmail(@Payload() { email }: GetByEmailDto): Promise<UserDto> {
+    return this.queryBus.execute<GetByEmailQuery, UserDto>(
+      new GetByEmailQuery(email),
+    );
   }
 }

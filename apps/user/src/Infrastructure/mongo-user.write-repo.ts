@@ -30,14 +30,6 @@ export class MongoUserWriteRepository implements UserRepository {
     else throw new Error(`User with id: ${id} does'nt exist`);
   }
 
-  async findOneByEmail(email: string): Promise<User> {
-    const user = await this.userModel
-      .findOne({ email }, {}, { lean: true })
-      .exec();
-    if (user) return this.toEntity(user);
-    else throw new Error(`User with email: ${email} does'nt exist`);
-  }
-
   private fromEntity(user: User): UserModel {
     return {
       _id: new Types.ObjectId(user.id),
