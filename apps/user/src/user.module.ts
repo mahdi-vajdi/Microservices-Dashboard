@@ -5,11 +5,13 @@ import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
 import { UserModel, UserSchema } from './Infrastructure/user.model';
 import { CqrsModule } from '@nestjs/cqrs';
-import { MongoUserRepository } from './Infrastructure/mongo-user.repo';
+import { MongoUserWriteRepository } from './Infrastructure/mongo-user.write-repo';
 import { UserRepository } from './Domain/abstract-user.repo';
 import { UserFactory } from './Domain/user.factory';
 import { UserCommandHandlers } from './Application/commands/handlers';
+import { UserQueryHandlers } from './Application/queries/handlers';
 import { UserEventHandlers } from './Application/events/handler';
+import { MongoUserReadRepository } from './Infrastructure/mongo-user.read-repo';
 
 @Module({
   imports: [
@@ -32,10 +34,12 @@ import { UserEventHandlers } from './Application/events/handler';
   ],
   controllers: [UserController],
   providers: [
-    { provide: UserRepository, useClass: MongoUserRepository },
+    MongoUserReadRepository,
+    { provide: UserRepository, useClass: MongoUserWriteRepository },
     UserFactory,
     ...UserCommandHandlers,
     ...UserEventHandlers,
+    ...UserQueryHandlers,
   ],
 })
 export class UserModule {}

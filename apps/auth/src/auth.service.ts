@@ -66,7 +66,7 @@ export class AuthService {
 
   async refreshTokens(userPayload: JwtPayload, refreshToken: string) {
     return this.userService
-      .send<UserDto>('findOneById', {
+      .send<UserDto>('getById', {
         id: userPayload.sub,
       })
       .subscribe(async (user) => {
@@ -90,15 +90,13 @@ export class AuthService {
   }
 
   async validateUser(email: string, password: string): Promise<UserDto | null> {
-    const user = this.userService
-      .send<UserDto>('findOneByEmail', { email })
-      .pipe(
-        map(async (user) => {
-          if (user && (await bcrypt.compare(password, user.password)))
-            return user;
-          else return null;
-        }),
-      );
+    const user = this.userService.send<UserDto>('getByEmail', { email }).pipe(
+      map(async (user) => {
+        if (user && (await bcrypt.compare(password, user.password)))
+          return user;
+        else return null;
+      }),
+    );
 
     return await lastValueFrom(user);
   }

@@ -17,39 +17,39 @@ export class User extends AggregateRoot {
 
   // Getter methods
 
-  public get id() {
+  get id() {
     return this._id;
   }
 
-  public get firstName() {
+  get firstName() {
     return this._firstName;
   }
 
-  public get lastName() {
+  get lastName() {
     return this._lastName;
   }
 
-  public get email() {
+  get email() {
     return this._email;
   }
 
-  public get phone() {
+  get phone() {
     return this._phone;
   }
 
-  public get password() {
+  get password() {
     return this._password;
   }
 
-  public get refreshToken() {
+  get refreshToken() {
     return this._refreshToken;
   }
 
-  public get createdAt() {
+  get createdAt() {
     return this._createdAt;
   }
 
-  public get updatedAt() {
+  get updatedAt() {
     return this._updatedAt;
   }
 

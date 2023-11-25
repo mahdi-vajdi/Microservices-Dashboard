@@ -1,4 +1,4 @@
-import { AccessTokenGuard } from '@app/common';
+import { AccessTokenGuard, JwtPayload } from '@app/common';
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
 import { Request } from 'express';
 
@@ -9,6 +9,8 @@ export class ContainerController {
   @UseGuards(AccessTokenGuard)
   @Get()
   getHello(@Req() req: Request) {
-    console.log(`constainer service: controller: user: ${req.user!}`);
+    console.log(
+      `constainer service: controller: user: ${req.user as JwtPayload}`,
+    );
   }
 }
