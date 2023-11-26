@@ -1,11 +1,11 @@
 import { Module } from '@nestjs/common';
-import { AgentController } from './agent.controller';
-import { AgentService } from './agent.service';
+import { AgentController } from './Presentation/agent.controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
-import { AgentModel, AgentSchema } from './infrastructure/models/agent.model';
+import { AgentModel, AgentSchema } from './Infrastructure/models/agent.model';
+import { AgentWriteRepository } from './Infrastructure/repositories/agent-write.repo';
 
 @Module({
   imports: [
@@ -27,6 +27,6 @@ import { AgentModel, AgentSchema } from './infrastructure/models/agent.model';
     MongooseModule.forFeature([{ name: AgentModel.name, schema: AgentSchema }]),
   ],
   controllers: [AgentController],
-  providers: [AgentService],
+  providers: [{ provide: 'AgentRepository', useClass: AgentWriteRepository }],
 })
 export class AgentModule {}

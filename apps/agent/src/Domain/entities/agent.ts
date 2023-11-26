@@ -1,6 +1,7 @@
+import { AggregateRoot } from '@nestjs/cqrs';
 import { AgentRole } from '../value-objects/agent-roles.enum';
 
-export class Agent {
+export class Agent extends AggregateRoot {
   constructor(
     private readonly _id: string,
     private readonly _createdAt: Date,
@@ -14,7 +15,9 @@ export class Agent {
     private readonly _admin: string,
     private readonly _role: AgentRole,
     private readonly _online: boolean,
-  ) {}
+  ) {
+    super();
+  }
 
   get id() {
     return this._id;
@@ -62,5 +65,34 @@ export class Agent {
 
   get online() {
     return this._online;
+  }
+
+  // Static fatory method
+  static create(
+    id: string,
+    email: string,
+    phone: string,
+    title: string,
+    name: string,
+    password: string,
+    admin: string,
+    role: AgentRole,
+  ): Agent {
+    return new Agent(
+      id,
+      new Date(),
+      new Date(),
+      email,
+      phone,
+      title,
+      name,
+      password,
+      'deafult',
+      admin,
+      role,
+      false,
+    );
+
+    // TODO: you can publish an event here
   }
 }

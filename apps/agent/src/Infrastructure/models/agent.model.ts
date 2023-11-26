@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, SchemaTypes, HydratedDocument } from 'mongoose';
-import { AgentRole } from '../../domain/value-objects/agent-roles.enum';
+import { AgentRole } from '../../Domain/value-objects/agent-roles.enum';
 
 export type AgentDocument = HydratedDocument<AgentModel>;
 
@@ -35,12 +35,6 @@ export class AgentModel {
 
   @Prop({ required: true })
   online: boolean;
-
-  @Prop({
-    type: [{ type: SchemaTypes.ObjectId }],
-    required: true,
-  })
-  channels: Types.ObjectId[];
 
   @Prop({ type: SchemaTypes.ObjectId, required: true })
   admin: Types.ObjectId;
