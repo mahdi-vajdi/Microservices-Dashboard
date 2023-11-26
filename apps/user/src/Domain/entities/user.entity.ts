@@ -1,4 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
+import { UserCreatedEvent } from '../events/user-created.event';
 
 export class User extends AggregateRoot {
   constructor(
@@ -99,5 +100,31 @@ export class User extends AggregateRoot {
     else if (name.length > 15)
       throw new Error('First name cannot be longer than 15 characters');
     else return;
+  }
+
+  // Static factory method
+  static create(
+    id: string,
+    firstName: string,
+    lastName: string,
+    email: string,
+    phone: string,
+    password: string,
+    refreshToken: string,
+  ): User {
+    const user = new User(
+      id,
+      new Date(),
+      new Date(),
+      firstName,
+      lastName,
+      email,
+      phone,
+      password,
+      refreshToken,
+    );
+
+    user.apply(new UserCreatedEvent(user.id));
+    return user;
   }
 }

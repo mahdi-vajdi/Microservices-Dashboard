@@ -3,15 +3,16 @@ import { UserController } from './Presentation/user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
-import { UserModel, UserSchema } from './Infrastructure/user.model';
+import {
+  USER_DB_COLLECTION,
+  UserSchema,
+} from './Infrastructure/models/user.model';
 import { CqrsModule } from '@nestjs/cqrs';
-import { MongoUserWriteRepository } from './Infrastructure/mongo-user.write-repo';
-import { UserRepository } from './Domain/abstract-user.repo';
-import { UserFactory } from './Domain/user.factory';
+import { UserWriteRepository } from './Infrastructure/repositories/user.write-repo';
 import { UserCommandHandlers } from './Application/commands/handlers';
 import { UserQueryHandlers } from './Application/queries/handlers';
-import { UserEventHandlers } from './Application/events/handler';
-import { MongoUserReadRepository } from './Infrastructure/mongo-user.read-repo';
+import { UserEventHandlers } from './Application/events/handlers';
+import { UserReadRepository } from './Infrastructure/repositories/user.read-repo';
 
 @Module({
   imports: [
@@ -30,13 +31,14 @@ import { MongoUserReadRepository } from './Infrastructure/mongo-user.read-repo';
       }),
       inject: [ConfigService],
     }),
-    MongooseModule.forFeature([{ name: UserModel.name, schema: UserSchema }]),
+    MongooseModule.forFeature([
+      { name: USER_DB_COLLECTION, schema: UserSchema },
+    ]),
   ],
   controllers: [UserController],
   providers: [
-    MongoUserReadRepository,
-    { provide: UserRepository, useClass: MongoUserWriteRepository },
-    UserFactory,
+    UserReadRepository,
+    { provide: 'UserRepository', useClass: UserWriteRepository },
     ...UserCommandHandlers,
     ...UserEventHandlers,
     ...UserQueryHandlers,

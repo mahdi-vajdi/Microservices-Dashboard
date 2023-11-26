@@ -1,14 +1,15 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { User } from '../Domain/user.domain';
-import { UserRepository } from '../Domain/abstract-user.repo';
-import { UserModel } from './user.model';
+import { User } from '../../Domain/entities/user.entity';
+import { UserRepository } from '../../Domain/user.repo';
+import { USER_DB_COLLECTION, UserModel } from '../models/user.model';
 import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class MongoUserWriteRepository implements UserRepository {
+export class UserWriteRepository implements UserRepository {
   constructor(
-    @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>,
+    @InjectModel(USER_DB_COLLECTION)
+    private readonly userModel: Model<UserModel>,
   ) {}
 
   async add(userEntity: User): Promise<User> {

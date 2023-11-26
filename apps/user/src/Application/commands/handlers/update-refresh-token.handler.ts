@@ -1,6 +1,6 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateRefreshTokenCommand } from '../impl/update-refresh-token.command';
-import { UserRepository } from 'apps/user/src/Domain/abstract-user.repo';
+import { UserRepository } from 'apps/user/src/Domain/user.repo';
 
 @CommandHandler(UpdateRefreshTokenCommand)
 export class UpdateRefreshTokenHandler

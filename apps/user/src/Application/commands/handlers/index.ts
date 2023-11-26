@@ -1,4 +1,4 @@
-import { CreateUserHandler } from './create-user.handler';
+import { CreateUserHandler } from './CreateUserHandler';
 import { UpdateRefreshTokenHandler } from './update-refresh-token.handler';
 
 export const UserCommandHandlers = [

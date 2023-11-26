@@ -1,14 +1,15 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { UserModel } from './user.model';
+import { USER_DB_COLLECTION, UserModel } from '../models/user.model';
 import { Model } from 'mongoose';
-import { UserResponseDto } from '../Application/dto/response/user-response.dto';
+import { UserResponseDto } from '../../Application/dto/response/user-response.dto';
 import { UserDto } from '@app/common';
 
 @Injectable()
-export class MongoUserReadRepository {
+export class UserReadRepository {
   constructor(
-    @InjectModel(UserModel.name) private readonly userModel: Model<UserModel>,
+    @InjectModel(USER_DB_COLLECTION)
+    private readonly userModel: Model<UserModel>,
   ) {}
   async findOneById(id: string): Promise<UserResponseDto> {
     const user = await this.userModel.findById(id, {}, { lean: true }).exec();
