@@ -13,6 +13,7 @@ import { CreateContainerCommand } from '../Application/commands/impl/create-cont
 import { CreateContainerDto } from '../Application/dto/create-container.dto';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { ContainerModel } from '../Infrastructure/models/container.model';
+import { GetUserContainersQuery } from '../Application/queries/impl/get-by-user.query';
 
 @Controller('container')
 export class ContainerController {
@@ -30,7 +31,7 @@ export class ContainerController {
   }
 
   @UseGuards(AccessTokenGuard)
-  @Get()
+  @Get(':id')
   async getOne(
     @Request() req,
     @Param('id') containerId: string,
@@ -38,5 +39,13 @@ export class ContainerController {
     return await this.queryBus.execute<GetByIdQuery, ContainerModel>(
       new GetByIdQuery(req.user.id, containerId),
     );
+  }
+
+  @UseGuards(AccessTokenGuard)
+  async getUserContainers(@Request() req) {
+    return await this.queryBus.execute<
+      GetUserContainersQuery,
+      ContainerModel[]
+    >(new GetUserContainersQuery(req.user.id as string));
   }
 }

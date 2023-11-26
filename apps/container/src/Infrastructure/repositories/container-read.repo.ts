@@ -13,4 +13,10 @@ export class ContainerReadRepository {
   async findOneById(id: string): Promise<ContainerModel | null> {
     return this.containerModel.findById(id, {}, { lean: true }).exec();
   }
+
+  async findByUser(userId: string): Promise<ContainerModel[]> {
+    return await this.containerModel
+      .find({ owner: userId }, { lean: true })
+      .exec();
+  }
 }
