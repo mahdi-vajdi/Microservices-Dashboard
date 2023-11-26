@@ -1,16 +1,42 @@
-import { AccessTokenGuard, JwtPayload } from '@app/common';
-import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { Request } from 'express';
+import { AccessTokenGuard } from '@app/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Param,
+  Post,
+  Request,
+  UseGuards,
+} from '@nestjs/common';
+import { CommandBus, QueryBus } from '@nestjs/cqrs';
+import { CreateContainerCommand } from '../Application/commands/impl/create-container.command';
+import { CreateContainerDto } from '../Application/dto/create-container.dto';
+import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
+import { ContainerModel } from '../Infrastructure/models/container.model';
 
-@Controller()
+@Controller('container')
 export class ContainerController {
-  constructor() {}
+  constructor(
+    private readonly commandBus: CommandBus,
+    private readonly queryBus: QueryBus,
+  ) {}
+
+  @UseGuards(AccessTokenGuard)
+  @Post()
+  async create(@Request() req, @Body() dto: CreateContainerDto): Promise<void> {
+    await this.commandBus.execute<CreateContainerCommand, void>(
+      new CreateContainerCommand(req.user.sub, dto),
+    );
+  }
 
   @UseGuards(AccessTokenGuard)
   @Get()
-  getHello(@Req() req: Request) {
-    console.log(
-      `constainer service: controller: user: ${req.user as JwtPayload}`,
+  async getOne(
+    @Request() req,
+    @Param('id') containerId: string,
+  ): Promise<ContainerModel> {
+    return await this.queryBus.execute<GetByIdQuery, ContainerModel>(
+      new GetByIdQuery(req.user.id, containerId),
     );
   }
 }

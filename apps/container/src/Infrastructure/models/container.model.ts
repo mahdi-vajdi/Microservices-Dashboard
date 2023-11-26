@@ -43,4 +43,4 @@ export class ContainerModel {
   settings: ContainerSettingsModel;
 }
 
-export const ContainersSchema = SchemaFactory.createForClass(ContainerModel);
+export const ContainerSchema = SchemaFactory.createForClass(ContainerModel);
