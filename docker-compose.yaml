@@ -25,6 +25,19 @@ services:
     volumes:
       - .:/usr/src/app
 
+  agent:
+    build:
+      context: .
+      dockerfile: ./apps/agent/Dockerfile
+      target: development
+    command: npm run start:dev agent
+    env_file:
+      - ./apps/agent/.env
+    ports:
+      - '3002:3002'
+    volumes:
+      - .:/usr/src/app
+
   container:
     build:
       context: .
