@@ -10,17 +10,20 @@ import { ClientProxy } from '@nestjs/microservices';
 import { JwtPayload } from '../dto/jwt-payload';
 
 @Injectable()
-export class AccessTokenGuard implements CanActivate {
-  constructor(@Inject(AUTH_SERVICE) private readonly authClient: ClientProxy) {}
+export class CommonAccessTokenGuard implements CanActivate {
+  constructor(
+    @Inject(AUTH_SERVICE) private readonly authService: ClientProxy,
+  ) {}
 
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    const jwt = context.switchToHttp().getRequest().cookies?.Authentication;
+    const jwt =
+      context.switchToHttp().getRequest().cookies?.access_token || null;
     if (!jwt) return false;
 
-    return this.authClient
-      .send<JwtPayload>('authenticate', { Authentication: jwt })
+    return this.authService
+      .send<JwtPayload>('authenticate', { access_token: jwt })
       .pipe(
         tap((res) => {
           context.switchToHttp().getRequest().user = res;

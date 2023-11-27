@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { ChannelModel } from '../models/channel.model';
+import { CHANNEL_DB_COLLECTION, ChannelModel } from '../models/channel.model';
 import { Model } from 'mongoose';
 
 @Injectable()
-export class ChannelReadRepository {
+export class ChannelQueryRepository {
   constructor(
-    @InjectModel(ChannelModel.name)
+    @InjectModel(CHANNEL_DB_COLLECTION)
     private readonly channelModel: Model<ChannelModel>,
   ) {}
 
@@ -16,7 +16,7 @@ export class ChannelReadRepository {
 
   async findByUser(userId: string): Promise<ChannelModel[]> {
     return await this.channelModel
-      .find({ owner: userId }, { lean: true })
+      .find({ owner: userId }, {}, { lean: true })
       .exec();
   }
 }

@@ -1,15 +1,33 @@
-import { Types } from 'mongoose';
+import { Model, Types } from 'mongoose';
 import { Channel } from '../../Domain/models/channel';
 import { ChannelRepository } from '../../Domain/base-channel.repo';
-import { ChannelModel } from '../models/channel.model';
+import { CHANNEL_DB_COLLECTION, ChannelModel } from '../models/channel.model';
+import { InjectModel } from '@nestjs/mongoose';
 
-export class ChannelWriteRepository extends ChannelRepository {
-  add(entity: Channel): Promise<void> {
-    throw new Error('Method not implemented.');
+export class ChannelEntityRepository implements ChannelRepository {
+  constructor(
+    @InjectModel(CHANNEL_DB_COLLECTION)
+    private readonly channelModel: Model<ChannelModel>,
+  ) {}
+
+  async add(entity: Channel): Promise<void> {
+    await this.channelModel.create(this.fromEntity(entity));
   }
 
-  findById(id: string): Promise<Channel> {
-    throw new Error('Method not implemented.');
+  async save(entity: Channel): Promise<void> {
+    await this.channelModel.findByIdAndUpdate(
+      entity.id,
+      this.fromEntity(entity),
+      { lean: true },
+    );
+  }
+
+  async findById(id: string): Promise<Channel | null> {
+    const channel = await this.channelModel
+      .findById(id, {}, { lean: true })
+      .exec();
+    if (channel) return this.toEntity(channel);
+    else return null;
   }
 
   private fromEntity(channel: Channel): ChannelModel {

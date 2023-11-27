@@ -11,6 +11,8 @@ services:
       - '3000:3000'
     volumes:
       - .:/usr/src/app
+    depends_on:
+      - nats
 
   auth:
     build:
@@ -24,6 +26,8 @@ services:
       - '3001:3001'
     volumes:
       - .:/usr/src/app
+    depends_on:
+      - nats
 
   agent:
     build:
@@ -37,6 +41,8 @@ services:
       - '3002:3002'
     volumes:
       - .:/usr/src/app
+    depends_on:
+      - nats
 
   channel:
     build:
@@ -50,6 +56,8 @@ services:
       - '3003:3003'
     volumes:
       - .:/usr/src/app
+    depends_on:
+      - nats
 
   mongo:
     image: mongo

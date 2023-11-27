@@ -1,20 +1,20 @@
 import { Module } from '@nestjs/common';
-import { ChannelController } from './Presentation/channel.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AGENT_SERVICE, AUTH_SERVICE } from '@app/common/constants';
 import { ChannelRepository } from './Domain/base-channel.repo';
-import { ChannelWriteRepository } from './Infrastructure/repositories/channel-write.repo';
+import { ChannelEntityRepository } from './Infrastructure/repositories/channel.entity-repo';
 import { ChannelChannelHandlers } from './Application/commands/handlers';
 import { ChannelQueryHandlers } from './Application/queries/handlers';
-import { ChannelReadRepository } from './Infrastructure/repositories/channel-read.repo';
 import { MongooseModule } from '@nestjs/mongoose';
 import {
-  ChannelModel,
+  CHANNEL_DB_COLLECTION,
   ChannelSchema,
 } from './Infrastructure/models/channel.model';
 import { CqrsModule } from '@nestjs/cqrs';
+import { ChannelController } from './Presentation/channel.controller';
+import { ChannelQueryRepository } from './Infrastructure/repositories/channel.query-repo';
 
 @Module({
   imports: [
@@ -34,7 +34,7 @@ import { CqrsModule } from '@nestjs/cqrs';
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([
-      { name: ChannelModel.name, schema: ChannelSchema },
+      { name: CHANNEL_DB_COLLECTION, schema: ChannelSchema },
     ]),
     ClientsModule.registerAsync([
       {
@@ -61,8 +61,8 @@ import { CqrsModule } from '@nestjs/cqrs';
   ],
   controllers: [ChannelController],
   providers: [
-    { provide: ChannelRepository, useClass: ChannelWriteRepository },
-    ChannelReadRepository,
+    { provide: ChannelRepository, useClass: ChannelEntityRepository },
+    ChannelQueryRepository,
     ...ChannelChannelHandlers,
     ...ChannelQueryHandlers,
   ],

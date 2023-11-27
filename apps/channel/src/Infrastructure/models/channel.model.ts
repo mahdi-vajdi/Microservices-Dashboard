@@ -5,9 +5,11 @@ import {
   ChannelSettingsSchema,
 } from './channel-settings.model';
 
+export const CHANNEL_DB_COLLECTION = 'channels';
+
 export type ChannelDocument = HydratedDocument<ChannelModel>;
 
-@Schema({ versionKey: false })
+@Schema({ collection: CHANNEL_DB_COLLECTION, versionKey: false })
 export class ChannelModel {
   @Prop({ type: SchemaTypes.ObjectId })
   _id: Types.ObjectId;
@@ -34,7 +36,7 @@ export class ChannelModel {
   isEnabled: boolean;
 
   @Prop({
-    type: [{ type: SchemaTypes.ObjectId, ref: 'AgentDO' }],
+    type: [{ type: SchemaTypes.ObjectId }],
     required: true,
   })
   agents: Types.ObjectId[];

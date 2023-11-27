@@ -1,11 +1,12 @@
-import { AccessTokenGuard } from '@app/common';
+import { CommonAccessTokenGuard, JwtPayload } from '@app/common';
 import {
   Body,
   Controller,
   Get,
+  NotFoundException,
   Param,
   Post,
-  Request,
+  Req,
   UseGuards,
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
@@ -22,29 +23,45 @@ export class ChannelController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(CommonAccessTokenGuard)
   @Post()
-  async create(@Request() req, @Body() dto: CreateChannelDto): Promise<void> {
+  async create(
+    @Req() req: Request,
+    @Body() dto: CreateChannelDto,
+  ): Promise<void> {
+    const user = req['user'] as JwtPayload;
     await this.commandBus.execute<CreateChannelCommand, void>(
-      new CreateChannelCommand(req.user.sub, dto),
+      new CreateChannelCommand(user.sub, dto),
     );
   }
 
-  @UseGuards(AccessTokenGuard)
+  @UseGuards(CommonAccessTokenGuard)
+  @Get()
+  async getUserChannels(@Req() req: Request) {
+    const user = req['user'] as JwtPayload;
+
+    return await this.queryBus.execute<
+      GetUserChannelsQuery,
+      ChannelModel[] | null
+    >(new GetUserChannelsQuery(user.sub));
+  }
+
+  @UseGuards(CommonAccessTokenGuard)
   @Get(':id')
-  async getOne(
-    @Request() req,
+  async getById(
+    @Req() req: Request,
     @Param('id') channelId: string,
   ): Promise<ChannelModel> {
-    return await this.queryBus.execute<GetByIdQuery, ChannelModel>(
-      new GetByIdQuery(req.user.id, channelId),
+    const user = req['user'] as JwtPayload;
+    const channel = await this.queryBus.execute<GetByIdQuery, ChannelModel>(
+      new GetByIdQuery(user.sub, channelId),
     );
-  }
 
-  @UseGuards(AccessTokenGuard)
-  async getUserChannels(@Request() req) {
-    return await this.queryBus.execute<GetUserChannelsQuery, ChannelModel[]>(
-      new GetUserChannelsQuery(req.user.id as string),
-    );
+    if (!channel)
+      throw new NotFoundException(
+        `Could not find a channel for user with id ${channelId}`,
+      );
+
+    return channel;
   }
 }

@@ -1,15 +1,15 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { GetUserChannelsQuery } from '../impl/get-user-cahnnels.query';
-import { ChannelReadRepository } from 'apps/channel/src/Infrastructure/repositories/channel-read.repo';
 import { ChannelModel } from 'apps/channel/src/Infrastructure/models/channel.model';
+import { ChannelQueryRepository } from 'apps/channel/src/Infrastructure/repositories/channel.query-repo';
 
 @QueryHandler(GetUserChannelsQuery)
-export class GetUserChannelHandler
+export class GetUserChannelsHandler
   implements IQueryHandler<GetUserChannelsQuery>
 {
-  constructor(private readonly channelRepo: ChannelReadRepository) {}
+  constructor(private readonly channelRepo: ChannelQueryRepository) {}
 
-  async execute(query: GetUserChannelsQuery): Promise<ChannelModel[] | null> {
+  async execute(query: GetUserChannelsQuery): Promise<ChannelModel[]> {
     return await this.channelRepo.findByUser(query.userId);
   }
 }
