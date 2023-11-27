@@ -38,14 +38,14 @@ services:
     volumes:
       - .:/usr/src/app
 
-  container:
+  channel:
     build:
       context: .
-      dockerfile: ./apps/container/Dockerfile
+      dockerfile: ./apps/channel/Dockerfile
       target: development
-    command: npm run start:dev container
+    command: npm run start:dev channel
     env_file:
-      - ./apps/container/.env
+      - ./apps/channel/.env
     ports:
       - '3003:3003'
     volumes:
