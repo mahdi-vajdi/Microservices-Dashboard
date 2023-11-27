@@ -1,15 +1,15 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
 import { UserDto } from '@app/common';
-import { UserReadRepository } from 'apps/user/src/Infrastructure/user.read-repo';
 import { GetByEmailQuery } from '../impl/get-by-email.query';
+import { MongoUserQueryRepository } from 'apps/user/src/Infrastructure/repositories/user.query-repo';
 
 @QueryHandler(GetByEmailQuery)
 export class GetByEmailHandler
-  implements IQueryHandler<GetByEmailQuery, UserDto>
+  implements IQueryHandler<GetByEmailQuery, UserDto | null>
 {
-  constructor(private readonly userRepo: UserReadRepository) {}
+  constructor(private readonly userRepo: MongoUserQueryRepository) {}
 
-  async execute({ email }: GetByEmailQuery): Promise<UserDto> {
+  async execute({ email }: GetByEmailQuery): Promise<UserDto | null> {
     return this.userRepo.findOneByEmail(email);
   }
 }

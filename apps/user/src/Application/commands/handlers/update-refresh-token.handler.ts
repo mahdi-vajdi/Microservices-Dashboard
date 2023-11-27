@@ -1,19 +1,21 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { UpdateRefreshTokenCommand } from '../impl/update-refresh-token.command';
-import { UserRepository } from 'apps/user/src/Domain/user.repo';
+import { UserEntityRepository } from 'apps/user/src/Domain/base-user.entity-repo';
 
 @CommandHandler(UpdateRefreshTokenCommand)
 export class UpdateRefreshTokenHandler
   implements ICommandHandler<UpdateRefreshTokenCommand, void>
 {
-  constructor(private readonly userRepo: UserRepository) {}
+  constructor(private readonly userRepo: UserEntityRepository) {}
 
   async execute(command: UpdateRefreshTokenCommand): Promise<void> {
-    const { id, token } = command.requestDto;
+    const user = await this.userRepo.findOneById(command.userId);
+    if (!user) return;
 
-    const user = await this.userRepo.findOneById(id);
-    if (user) user.changeRefreshToken(token);
+    // const hashedToken =
+    //   command.token !== null ? await bcrypt.hash(command.token, 10) : null;
 
+    user.changeRefreshToken(command.token);
     await this.userRepo.save(user);
     user.commit();
   }

@@ -1,12 +1,12 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { User } from '../../Domain/entities/user.entity';
-import { UserRepository } from '../../Domain/user.repo';
+import { UserEntityRepository } from '../../Domain/base-user.entity-repo';
 import { USER_DB_COLLECTION, UserModel } from '../models/user.model';
 import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class UserWriteRepository implements UserRepository {
+export class MongoUserEntityRepository implements UserEntityRepository {
   constructor(
     @InjectModel(USER_DB_COLLECTION)
     private readonly userModel: Model<UserModel>,
@@ -18,11 +18,9 @@ export class UserWriteRepository implements UserRepository {
   }
 
   async save(user: User): Promise<void> {
-    const updatedUser = await this.userModel
+    await this.userModel
       .findByIdAndUpdate(user.id, this.fromEntity(user), { lean: true })
       .exec();
-
-    if (updatedUser) throw new Error('user not found');
   }
 
   async findOneById(id: string): Promise<User> {

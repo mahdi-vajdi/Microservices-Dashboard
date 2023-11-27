@@ -8,11 +8,12 @@ import {
   UserSchema,
 } from './Infrastructure/models/user.model';
 import { CqrsModule } from '@nestjs/cqrs';
-import { UserWriteRepository } from './Infrastructure/repositories/user.write-repo';
 import { UserCommandHandlers } from './Application/commands/handlers';
 import { UserQueryHandlers } from './Application/queries/handlers';
 import { UserEventHandlers } from './Application/events/handlers';
-import { UserReadRepository } from './Infrastructure/repositories/user.read-repo';
+import { MongoUserQueryRepository } from './Infrastructure/repositories/user.query-repo';
+import { MongoUserEntityRepository } from './Infrastructure/repositories/user.entity-repo';
+import { UserEntityRepository } from './Domain/base-user.entity-repo';
 
 @Module({
   imports: [
@@ -37,8 +38,8 @@ import { UserReadRepository } from './Infrastructure/repositories/user.read-repo
   ],
   controllers: [UserController],
   providers: [
-    UserReadRepository,
-    { provide: 'UserRepository', useClass: UserWriteRepository },
+    MongoUserQueryRepository,
+    { provide: UserEntityRepository, useClass: MongoUserEntityRepository },
     ...UserCommandHandlers,
     ...UserEventHandlers,
     ...UserQueryHandlers,

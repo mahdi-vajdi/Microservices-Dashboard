@@ -2,7 +2,7 @@ import { CommandHandler, EventPublisher, ICommandHandler } from '@nestjs/cqrs';
 import { CreateUserCommand } from '../impl/create-user.command';
 import { Types } from 'mongoose';
 import * as bcrypt from 'bcryptjs';
-import { UserRepository } from 'apps/user/src/Domain/user.repo';
+import { UserEntityRepository } from 'apps/user/src/Domain/base-user.entity-repo';
 import { UserDto } from '@app/common';
 import { User } from 'apps/user/src/Domain/entities/user.entity';
 
@@ -11,7 +11,7 @@ export class CreateUserHandler
   implements ICommandHandler<CreateUserCommand, UserDto>
 {
   constructor(
-    private readonly userRepository: UserRepository,
+    private readonly userRepository: UserEntityRepository,
     private readonly eventPublisher: EventPublisher,
   ) {}
 
@@ -26,7 +26,7 @@ export class CreateUserHandler
         email,
         phone,
         await bcrypt.hash(password, 10),
-        refreshToken,
+        await bcrypt.hash(refreshToken, 10),
       ),
     );
     await this.userRepository.add(user);

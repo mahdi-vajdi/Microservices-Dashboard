@@ -12,15 +12,15 @@ export class AccessTokenStrategy extends PassportStrategy(
   constructor(configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) =>
-          request?.cookies?.Authentication || request?.Authentication,
+        (request: any) => request?.cookies?.access_token || null,
+        ExtractJwt.fromAuthHeaderAsBearerToken,
       ]),
       ignoreExpiration: false,
       secretOrKey: configService.getOrThrow('JWT_ACCESS_SECRET'),
     });
   }
 
-  validate(payload: JwtPayload): JwtPayload {
-    return payload;
+  validate(payload: any): JwtPayload {
+    return payload as JwtPayload;
   }
 }

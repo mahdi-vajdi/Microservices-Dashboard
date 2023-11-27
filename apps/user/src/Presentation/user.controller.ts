@@ -7,9 +7,11 @@ import { UserDto } from '@app/common';
 import { UpdateRefreshTokenDto } from '../Application/dto/request/update-refresh-token.dto';
 import { UpdateRefreshTokenCommand } from '../Application/commands/impl/update-refresh-token.command';
 import { GetByIdDto } from '../Application/dto/request/get-by-id.dto';
-import { GetByIdQuery } from '../Application/queries/impl/find-by-id.query';
+import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query';
 import { GetByEmailDto } from '../Application/dto/request/get-by-email.dto';
+import { UserExistsDto } from '../Application/dto/user-exists.dto';
+import { UserExistsQuery } from '../Application/queries/impl/user-exists-query';
 
 @Controller()
 export class UserController {
@@ -27,10 +29,19 @@ export class UserController {
 
   @MessagePattern('updateRefreshToken')
   async updateRefreshToken(
-    @Payload() dto: UpdateRefreshTokenDto,
+    @Payload() { id, token }: UpdateRefreshTokenDto,
   ): Promise<void> {
     await this.commandBus.execute<UpdateRefreshTokenCommand, void>(
-      new UpdateRefreshTokenCommand(dto),
+      new UpdateRefreshTokenCommand(id, token),
+    );
+  }
+
+  @MessagePattern('userExists')
+  async userExists(
+    @Payload() { email, phone }: UserExistsDto,
+  ): Promise<boolean> {
+    return await this.queryBus.execute<UserExistsQuery, boolean>(
+      new UserExistsQuery(email, phone),
     );
   }
 
@@ -40,8 +51,10 @@ export class UserController {
   }
 
   @MessagePattern('getByEmail')
-  async getByEmail(@Payload() { email }: GetByEmailDto): Promise<UserDto> {
-    return this.queryBus.execute<GetByEmailQuery, UserDto>(
+  async getByEmail(
+    @Payload() { email }: GetByEmailDto,
+  ): Promise<UserDto | null> {
+    return this.queryBus.execute<GetByEmailQuery, UserDto | null>(
       new GetByEmailQuery(email),
     );
   }

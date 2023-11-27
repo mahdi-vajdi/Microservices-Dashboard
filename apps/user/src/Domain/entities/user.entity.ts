@@ -86,6 +86,7 @@ export class User extends AggregateRoot {
   changeRefreshToken(token: string | null) {
     // turn undefined arguments to null
     token === undefined ? null : token;
+
     this._refreshToken = token;
     this._updatedAt = new Date();
   }
@@ -96,7 +97,7 @@ export class User extends AggregateRoot {
     const name = _name.trim();
     if (name.length === 0) throw new Error('First name cannot be empty');
     else if (name.length < 3)
-      throw new Error('First name connot be less than three characters');
+      throw new Error('First name connot  be less than three characters');
     else if (name.length > 15)
       throw new Error('First name cannot be longer than 15 characters');
     else return;

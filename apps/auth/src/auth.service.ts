@@ -1,10 +1,16 @@
-import { ForbiddenException, Inject, Injectable } from '@nestjs/common';
+import {
+  ConflictException,
+  ForbiddenException,
+  Inject,
+  Injectable,
+} from '@nestjs/common';
 import { JwtPayload, USER_SERVICE, UserDto } from '@app/common';
 import { SignupDto } from './dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtUtils } from './jwt.util';
 import { Observable, lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
+import { Response } from 'express';
 
 export type AuthResponse = {
   email: string;
@@ -20,18 +26,28 @@ export class AuthService {
     private readonly jwtUtils: JwtUtils,
   ) {}
 
-  signup(signupDto: SignupDto): Observable<Promise<AuthResponse>> {
+  async signup(
+    signupDto: SignupDto,
+  ): Promise<Observable<Promise<AuthResponse>>> {
+    // check if email or phone exists
+    const userExists = await lastValueFrom(
+      this.userService.send<boolean>('userExists', {
+        email: signupDto.email,
+        phone: signupDto.phone,
+      }),
+    );
+    if (userExists) throw new ConflictException('User already exists');
+
     return this.userService.send<UserDto>('create', signupDto).pipe(
       map(async (user) => {
         // generate tokens for the user
         const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
 
-        // insert the new refresh token in user
+        // insert the new refresh token in user database
         this.userService.emit<void>('updateRefreshToken', {
           id: user.id,
           token: tokens.refresh_token,
         });
-        console.log(`user data ${user.email} ${user.id}`);
 
         return {
           email: user.email,
@@ -65,28 +81,28 @@ export class AuthService {
   }
 
   async refreshTokens(userPayload: JwtPayload, refreshToken: string) {
-    return this.userService
-      .send<UserDto>('getById', {
+    const user = await lastValueFrom(
+      this.userService.send<UserDto | null>('getById', {
         id: userPayload.sub,
-      })
-      .subscribe(async (user) => {
-        if (user.refreshToken !== null) {
-          const doesTokenMatch = await bcrypt.compare(
-            refreshToken,
-            user.refreshToken,
-          );
-          if (!doesTokenMatch) throw new ForbiddenException('Access Denied');
-        } else throw new ForbiddenException('Access Denied');
+      }),
+    );
 
-        const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
+    if (!user || !user.refreshToken)
+      throw new ForbiddenException('Access Denied');
 
-        this.userService.emit<void>('updateRefreshToken', {
-          id: user.id,
-          token: tokens.refresh_token,
-        });
+    // const tokenMatches =  await bcrypt.compare(refreshToken, user.refreshToken);
+    const tokenMatches = refreshToken === user.refreshToken;
 
-        return tokens;
-      });
+    if (!tokenMatches) throw new ForbiddenException('Acess Denied');
+
+    const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
+
+    this.userService.emit<void>('updateRefreshToken', {
+      id: user.id,
+      token: tokens.refresh_token,
+    });
+
+    return tokens;
   }
 
   async validateUser(email: string, password: string): Promise<UserDto | null> {
@@ -99,5 +115,19 @@ export class AuthService {
     );
 
     return await lastValueFrom(user);
+  }
+
+  setCookies(
+    res: Response,
+    tokens: { access_token: string; refresh_token: string },
+  ) {
+    res.cookie('access_token', tokens.access_token, {
+      maxAge: 1000 * 60 * 60,
+      httpOnly: true,
+    });
+    res.cookie('refresh_token', tokens.refresh_token, {
+      maxAge: 1000 * 60 * 60 * 24 * 7,
+      httpOnly: true,
+    });
   }
 }
