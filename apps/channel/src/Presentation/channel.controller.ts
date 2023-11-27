@@ -15,6 +15,7 @@ import { CreateChannelDto } from '../Application/dto/create-channel.dto';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { ChannelModel } from '../Infrastructure/models/channel.model';
 import { GetUserChannelsQuery } from '../Application/queries/impl/get-user-cahnnels.query';
+import { ParseMongoIdPipe } from '@app/common/pipes/parse-objectId.pipe';
 
 @Controller('channel')
 export class ChannelController {
@@ -50,7 +51,7 @@ export class ChannelController {
   @Get(':id')
   async getById(
     @Req() req: Request,
-    @Param('id') channelId: string,
+    @Param('id', ParseMongoIdPipe) channelId: string,
   ): Promise<ChannelModel> {
     const user = req['user'] as JwtPayload;
     const channel = await this.queryBus.execute<GetByIdQuery, ChannelModel>(

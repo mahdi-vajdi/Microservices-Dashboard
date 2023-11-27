@@ -12,6 +12,7 @@ import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query'
 import { GetByEmailDto } from '../Application/dto/request/get-by-email.dto';
 import { UserExistsDto } from '../Application/dto/user-exists.dto';
 import { UserExistsQuery } from '../Application/queries/impl/user-exists-query';
+import { ParseMongoIdPipe } from '@app/common/pipes/parse-objectId.pipe';
 
 @Controller()
 export class UserController {
@@ -46,7 +47,9 @@ export class UserController {
   }
 
   @MessagePattern('getById')
-  async getById(@Payload() { id }: GetByIdDto): Promise<UserDto> {
+  async getById(
+    @Payload(ParseMongoIdPipe) { id }: GetByIdDto,
+  ): Promise<UserDto> {
     return this.queryBus.execute<GetByIdQuery, UserDto>(new GetByIdQuery(id));
   }
 
