@@ -5,8 +5,8 @@ import { AGENT_SERVICE } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
 import { Types } from 'mongoose';
-import { ChannelRepository } from 'apps/channel/src/Domain/base-channel.repo';
-import { Channel } from 'apps/channel/src/Domain/models/channel';
+import { ChannelEntityRepository } from 'apps/channel/src/Domain/base-channel.repo';
+import { Channel } from 'apps/channel/src/Domain/entities/channel.entity';
 
 @CommandHandler(CreateChannelCommand)
 export class CreateChannelHandler
@@ -14,7 +14,7 @@ export class CreateChannelHandler
 {
   constructor(
     @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
-    private readonly channelRepo: ChannelRepository,
+    private readonly channelRepo: ChannelEntityRepository,
   ) {}
 
   async execute({ id, dto }: CreateChannelCommand): Promise<void> {

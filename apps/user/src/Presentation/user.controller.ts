@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateUserDto } from '../Application/dto/request/create-user.dto';
 import { CreateUserCommand } from '../Application/commands/impl/create-user.command';
-import { MessagePattern, Payload } from '@nestjs/microservices';
+import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { UserDto } from '@app/common';
 import { UpdateRefreshTokenDto } from '../Application/dto/request/update-refresh-token.dto';
 import { UpdateRefreshTokenCommand } from '../Application/commands/impl/update-refresh-token.command';
@@ -28,7 +28,7 @@ export class UserController {
     );
   }
 
-  @MessagePattern('updateRefreshToken')
+  @EventPattern('updateRefreshToken')
   async updateRefreshToken(
     @Payload() { id, token }: UpdateRefreshTokenDto,
   ): Promise<void> {

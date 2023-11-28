@@ -3,8 +3,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AGENT_SERVICE, AUTH_SERVICE } from '@app/common/constants';
-import { ChannelRepository } from './Domain/base-channel.repo';
-import { ChannelEntityRepository } from './Infrastructure/repositories/channel.entity-repo';
+import { ChannelEntityRepository } from './Domain/base-channel.repo';
+import { ChannelEntityRepositoryImpl } from './Infrastructure/repositories/impl-channel.entity-repo';
 import { ChannelChannelHandlers } from './Application/commands/handlers';
 import { ChannelQueryHandlers } from './Application/queries/handlers';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -61,7 +61,7 @@ import { ChannelQueryRepository } from './Infrastructure/repositories/channel.qu
   ],
   controllers: [ChannelController],
   providers: [
-    { provide: ChannelRepository, useClass: ChannelEntityRepository },
+    { provide: ChannelEntityRepository, useClass: ChannelEntityRepositoryImpl },
     ChannelQueryRepository,
     ...ChannelChannelHandlers,
     ...ChannelQueryHandlers,

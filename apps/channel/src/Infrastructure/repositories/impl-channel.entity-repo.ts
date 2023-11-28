@@ -1,10 +1,10 @@
 import { Model, Types } from 'mongoose';
-import { Channel } from '../../Domain/models/channel';
-import { ChannelRepository } from '../../Domain/base-channel.repo';
+import { Channel } from '../../Domain/entities/channel.entity';
+import { ChannelEntityRepository } from '../../Domain/base-channel.repo';
 import { CHANNEL_DB_COLLECTION, ChannelModel } from '../models/channel.model';
 import { InjectModel } from '@nestjs/mongoose';
 
-export class ChannelEntityRepository implements ChannelRepository {
+export class ChannelEntityRepositoryImpl implements ChannelEntityRepository {
   constructor(
     @InjectModel(CHANNEL_DB_COLLECTION)
     private readonly channelModel: Model<ChannelModel>,

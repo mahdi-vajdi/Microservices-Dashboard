@@ -5,6 +5,7 @@ import {
   Get,
   NotFoundException,
   Param,
+  Patch,
   Post,
   Req,
   UseGuards,
@@ -16,6 +17,8 @@ import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { ChannelModel } from '../Infrastructure/models/channel.model';
 import { GetUserChannelsQuery } from '../Application/queries/impl/get-user-cahnnels.query';
 import { ParseMongoIdPipe } from '@app/common/pipes/parse-objectId.pipe';
+import { UpdateChannelAgentsCommand } from '../Application/commands/impl/update-channel-agents';
+import { UpdateChannelAgentsDto } from '../Application/dto/request/update-channel-agents.dto';
 
 @Controller('channel')
 export class ChannelController {
@@ -64,5 +67,18 @@ export class ChannelController {
       );
 
     return channel;
+  }
+
+  @UseGuards(CommonAccessTokenGuard)
+  @Patch(':id/agents')
+  async updateChannelAgents(
+    @Req() req: Request,
+    @Param('id', ParseMongoIdPipe) channelId: string,
+    @Body() { agents }: UpdateChannelAgentsDto,
+  ) {
+    const user = req['user'] as JwtPayload;
+    await this.commandBus.execute<UpdateChannelAgentsCommand, void>(
+      new UpdateChannelAgentsCommand(user.sub, channelId, agents),
+    );
   }
 }

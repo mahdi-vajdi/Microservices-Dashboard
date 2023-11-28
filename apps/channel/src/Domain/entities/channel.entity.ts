@@ -13,7 +13,7 @@ export class Channel extends AggregateRoot {
     private _url: string,
     private readonly _token: string,
     private _isEnabled: boolean,
-    private readonly _agents: string[],
+    private _agents: string[],
     private readonly _settings: ChannelSettings,
   ) {
     super();
@@ -57,6 +57,12 @@ export class Channel extends AggregateRoot {
 
   get settings() {
     return this._settings;
+  }
+
+  updateAgents(agentIds: string[]): void {
+    this._agents = agentIds;
+    this._updatedAt = new Date();
+    return;
   }
 
   // Factory method
