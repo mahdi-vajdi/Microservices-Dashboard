@@ -1,12 +1,12 @@
 import { Injectable } from '@nestjs/common';
-import { AgentRepository } from '../../Domain/agent.repo';
-import { Agent } from '../../Domain/entities/agent';
+import { AgentEntityRepository } from '../../Domain/base-agent.entity-repo';
+import { Agent } from '../../Domain/entities/agent.entity';
 import { InjectModel } from '@nestjs/mongoose';
 import { AgentModel } from '../models/agent.model';
 import { Model, Types } from 'mongoose';
 
 @Injectable()
-export class AgentWriteRepository implements AgentRepository {
+export class AgentEntityRepositoryImpl implements AgentEntityRepository {
   constructor(
     @InjectModel(AgentModel.name)
     private readonly agentModel: Model<AgentModel>,

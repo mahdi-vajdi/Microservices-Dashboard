@@ -1,15 +1,15 @@
 import { IQueryHandler, QueryHandler } from '@nestjs/cqrs';
-import { GetByAdminQuery } from '../impl/get-by-admin.query';
+import { GetUserAgents } from '../impl/get-user-agents.query';
 import { AgentModel } from 'apps/agent/src/Infrastructure/models/agent.model';
-import { AgentReadRepository } from 'apps/agent/src/Infrastructure/repositories/agent-read.repo';
+import { AgentQueryepository } from 'apps/agent/src/Infrastructure/repositories/agent.query-repo';
 
-@QueryHandler(GetByAdminQuery)
-export class GetByAdminHandler
-  implements IQueryHandler<GetByAdminQuery, AgentModel[]>
+@QueryHandler(GetUserAgents)
+export class GetUserAgentsHandler
+  implements IQueryHandler<GetUserAgents, AgentModel[]>
 {
-  constructor(private readonly agentRepo: AgentReadRepository) {}
+  constructor(private readonly agentRepo: AgentQueryepository) {}
 
-  async execute(query: GetByAdminQuery): Promise<AgentModel[]> {
+  async execute(query: GetUserAgents): Promise<AgentModel[]> {
     return this.agentRepo.findByAdmin(query.adminId);
   }
 }

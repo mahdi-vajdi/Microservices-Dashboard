@@ -5,8 +5,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AgentModel, AgentSchema } from './Infrastructure/models/agent.model';
-import { AgentWriteRepository } from './Infrastructure/repositories/agent-write.repo';
-import { AgentReadRepository } from './Infrastructure/repositories/agent-read.repo';
+import { AgentEntityRepositoryImpl } from './Infrastructure/repositories/impl-agent.entity-repo';
+import { AgentQueryepository } from './Infrastructure/repositories/agent.query-repo';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AUTH_SERVICE } from '@app/common';
+import { AgentCommandHandlers } from './Application/commands/handlers';
+import { AgentQueryHandlers } from './Application/queries/handlers';
+import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
 
 @Module({
   imports: [
@@ -26,11 +31,25 @@ import { AgentReadRepository } from './Infrastructure/repositories/agent-read.re
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: AgentModel.name, schema: AgentSchema }]),
+    ClientsModule.registerAsync([
+      {
+        name: AUTH_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [configService.getOrThrow('NATS_URI')],
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
   ],
   controllers: [AgentController],
   providers: [
-    { provide: 'AgentRepository', useClass: AgentWriteRepository },
-    AgentReadRepository,
+    { provide: AgentEntityRepository, useClass: AgentEntityRepositoryImpl },
+    AgentQueryepository,
+    ...AgentCommandHandlers,
+    ...AgentQueryHandlers,
   ],
 })
 export class AgentModule {}

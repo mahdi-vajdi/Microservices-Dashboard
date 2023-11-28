@@ -1,14 +1,14 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateAgentCommand } from '../impl/create-agent.command';
-import { AgentRepository } from 'apps/agent/src/Domain/agent.repo';
-import { Agent } from 'apps/agent/src/Domain/entities/agent';
+import { AgentEntityRepository } from 'apps/agent/src/Domain/base-agent.entity-repo';
+import { Agent } from 'apps/agent/src/Domain/entities/agent.entity';
 import { Types } from 'mongoose';
 
 @CommandHandler(CreateAgentCommand)
 export class CreateAgentHandler
   implements ICommandHandler<CreateAgentCommand, void>
 {
-  constructor(private readonly agentRepo: AgentRepository) {}
+  constructor(private readonly agentRepo: AgentEntityRepository) {}
 
   async execute({ userId, dto }: CreateAgentCommand): Promise<void> {
     const agent = Agent.create(
