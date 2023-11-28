@@ -8,7 +8,7 @@ import { CommonAccessTokenGuard, JwtPayload } from '@app/common';
 import { Request } from 'express';
 
 @Controller('agent')
-export class AgentController {
+export class AgentHttpController {
   constructor(
     private readonly commandBus: CommandBus,
     private readonly queryBus: QueryBus,

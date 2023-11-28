@@ -19,10 +19,10 @@ export class CreateChannelHandler
 
   async execute({ id, dto }: CreateChannelCommand): Promise<void> {
     let agents: string[] = [];
-
-    if (dto.addAllAgents === true) {
+    // get agents ids if user wants
+    if (dto.addAllAgents) {
       agents = await lastValueFrom(
-        this.agentService.send<string[]>('getAgentIds', { id }),
+        this.agentService.send<string[]>('getAgentsIds', { id }),
       );
     }
 

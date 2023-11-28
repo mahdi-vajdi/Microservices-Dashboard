@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AgentController } from './Presentation/agent.controller';
+import { AgentHttpController } from './Presentation/agent.http-controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -12,6 +12,7 @@ import { AUTH_SERVICE } from '@app/common';
 import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
+import { AgentNatsController } from './Presentation/agnet.nats-cotroller';
 
 @Module({
   imports: [
@@ -44,7 +45,7 @@ import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
       },
     ]),
   ],
-  controllers: [AgentController],
+  controllers: [AgentHttpController, AgentNatsController],
   providers: [
     { provide: AgentEntityRepository, useClass: AgentEntityRepositoryImpl },
     AgentQueryepository,

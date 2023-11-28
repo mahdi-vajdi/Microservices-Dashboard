@@ -11,4 +11,14 @@ export class AgentQueryepository {
   async findByAdmin(adminId: string): Promise<AgentModel[]> {
     return this.agentModel.find({ admin: adminId }, {}, { lean: true }).exec();
   }
+
+  async findIdsByAdmin(adminId: string): Promise<string[]> {
+    const ids = await this.agentModel.find(
+      { admin: adminId },
+      { _id: 1 },
+      { lean: true },
+    );
+
+    return ids.map((id) => id._id.toHexString());
+  }
 }

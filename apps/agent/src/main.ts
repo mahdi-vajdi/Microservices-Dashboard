@@ -3,6 +3,7 @@ import { AgentModule } from './agent.module';
 import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
+import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 
 async function bootstrap() {
   const app = await NestFactory.create(AgentModule);
@@ -11,7 +12,14 @@ async function bootstrap() {
   app.use(cookieParser());
   app.setGlobalPrefix('dashboard');
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.NATS,
+    options: {
+      servers: [configService.getOrThrow('NATS_URI')],
+    },
+  });
 
+  await app.startAllMicroservices();
   await app.listen(configService.getOrThrow('HTTP_PORT'));
 }
 bootstrap();
