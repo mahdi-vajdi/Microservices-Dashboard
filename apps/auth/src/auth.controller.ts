@@ -36,6 +36,7 @@ export class AuthController {
   ): Promise<void> {
     const tokens = await this.authService.signin(req.user as UserDto);
     this.authService.setCookies(res, tokens);
+    res.sendStatus(200);
   }
 
   @UseGuards(AccessTokenGuard)
