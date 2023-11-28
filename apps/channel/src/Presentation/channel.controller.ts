@@ -11,7 +11,7 @@ import {
 } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateChannelCommand } from '../Application/commands/impl/create-channel.command';
-import { CreateChannelDto } from '../Application/dto/create-channel.dto';
+import { CreateChannelDto } from '../Application/dto/request/create-channel.dto';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { ChannelModel } from '../Infrastructure/models/channel.model';
 import { GetUserChannelsQuery } from '../Application/queries/impl/get-user-cahnnels.query';
