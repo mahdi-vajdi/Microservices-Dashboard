@@ -111,6 +111,7 @@ export class User extends AggregateRoot {
     email: string,
     phone: string,
     password: string,
+    passwordHash: string,
     refreshToken: string,
   ): User {
     const user = new User(
@@ -121,11 +122,20 @@ export class User extends AggregateRoot {
       lastName,
       email,
       phone,
-      password,
+      passwordHash,
       refreshToken,
     );
 
-    user.apply(new UserCreatedEvent(user.id));
+    user.apply(
+      new UserCreatedEvent(
+        id,
+        email,
+        phone,
+        `${firstName} ${lastName}`,
+        password,
+      ),
+    );
+
     return user;
   }
 }

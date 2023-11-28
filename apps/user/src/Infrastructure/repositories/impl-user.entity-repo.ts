@@ -6,7 +6,7 @@ import { Model, Types } from 'mongoose';
 import { Injectable } from '@nestjs/common';
 
 @Injectable()
-export class MongoUserEntityRepository implements UserEntityRepository {
+export class UserEntityRepositoryImpl implements UserEntityRepository {
   constructor(
     @InjectModel(USER_DB_COLLECTION)
     private readonly userModel: Model<UserModel>,

@@ -26,6 +26,7 @@ export class CreateUserHandler
         lastName,
         email,
         phone,
+        password,
         await bcrypt.hash(password, 10),
         refreshToken,
         // await bcrypt.hash(refreshToken, 10),

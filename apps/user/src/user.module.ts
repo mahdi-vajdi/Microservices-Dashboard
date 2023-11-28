@@ -12,8 +12,10 @@ import { UserCommandHandlers } from './Application/commands/handlers';
 import { UserQueryHandlers } from './Application/queries/handlers';
 import { UserEventHandlers } from './Application/events/handlers';
 import { MongoUserQueryRepository } from './Infrastructure/repositories/user.query-repo';
-import { MongoUserEntityRepository } from './Infrastructure/repositories/user.entity-repo';
+import { UserEntityRepositoryImpl } from './Infrastructure/repositories/impl-user.entity-repo';
 import { UserEntityRepository } from './Domain/base-user.entity-repo';
+import { ClientsModule, Transport } from '@nestjs/microservices';
+import { AGENT_SERVICE } from '@app/common';
 
 @Module({
   imports: [
@@ -35,11 +37,23 @@ import { UserEntityRepository } from './Domain/base-user.entity-repo';
     MongooseModule.forFeature([
       { name: USER_DB_COLLECTION, schema: UserSchema },
     ]),
+    ClientsModule.registerAsync([
+      {
+        name: AGENT_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [configService.getOrThrow('NATS_URI')],
+          },
+        }),
+        inject: [ConfigService],
+      },
+    ]),
   ],
   controllers: [UserController],
   providers: [
     MongoUserQueryRepository,
-    { provide: UserEntityRepository, useClass: MongoUserEntityRepository },
+    { provide: UserEntityRepository, useClass: UserEntityRepositoryImpl },
     ...UserCommandHandlers,
     ...UserEventHandlers,
     ...UserQueryHandlers,
