@@ -1,6 +1,6 @@
 import { Controller } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { CreateUserRequestDto } from '../Application/dto/request/create-user-request.dto';
+import { CreateUserDto } from '../Application/dto/request/create-user.dto';
 import { CreateUserCommand } from '../Application/commands/impl/create-user.command';
 import { MessagePattern, Payload } from '@nestjs/microservices';
 import { UserDto } from '@app/common';
@@ -10,7 +10,7 @@ import { GetByIdDto } from '../Application/dto/request/get-by-id.dto';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query';
 import { GetByEmailDto } from '../Application/dto/request/get-by-email.dto';
-import { UserExistsDto } from '../Application/dto/user-exists.dto';
+import { UserExistsDto } from '../Application/dto/request/user-exists.dto';
 import { UserExistsQuery } from '../Application/queries/impl/user-exists-query';
 import { ParseMongoIdPipe } from '@app/common/pipes/parse-objectId.pipe';
 
@@ -22,7 +22,7 @@ export class UserController {
   ) {}
 
   @MessagePattern('create')
-  async createUser(@Payload() dto: CreateUserRequestDto): Promise<UserDto> {
+  async createUser(@Payload() dto: CreateUserDto): Promise<UserDto> {
     return await this.commandBus.execute<CreateUserCommand, UserDto>(
       new CreateUserCommand(dto),
     );

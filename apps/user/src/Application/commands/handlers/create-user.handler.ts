@@ -18,6 +18,7 @@ export class CreateUserHandler
   async execute({ createUserRequest }: CreateUserCommand): Promise<UserDto> {
     const { firstName, lastName, email, phone, password, refreshToken } =
       createUserRequest;
+
     const user = this.eventPublisher.mergeObjectContext(
       User.create(
         new Types.ObjectId().toHexString(),
@@ -26,7 +27,8 @@ export class CreateUserHandler
         email,
         phone,
         await bcrypt.hash(password, 10),
-        await bcrypt.hash(refreshToken, 10),
+        refreshToken,
+        // await bcrypt.hash(refreshToken, 10),
       ),
     );
     await this.userRepository.add(user);

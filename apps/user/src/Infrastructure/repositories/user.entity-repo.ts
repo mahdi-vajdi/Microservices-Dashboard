@@ -14,6 +14,7 @@ export class MongoUserEntityRepository implements UserEntityRepository {
 
   async add(userEntity: User): Promise<User> {
     const newUser = await this.userModel.create(this.fromEntity(userEntity));
+
     return this.toEntity(newUser);
   }
 
