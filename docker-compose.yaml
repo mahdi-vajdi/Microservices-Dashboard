@@ -1,12 +1,12 @@
 services:
-  user:
+  account:
     build:
       context: .
-      dockerfile: ./apps/user/Dockerfile
+      dockerfile: ./apps/account/Dockerfile
       target: development
-    command: npm run start:dev user
+    command: npm run start:dev account
     env_file:
-      - ./apps/user/.env
+      - ./apps/account/.env
     ports:
       - '3000:3000'
     volumes:
