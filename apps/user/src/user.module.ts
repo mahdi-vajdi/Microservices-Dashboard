@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { UserController } from './Presentation/user.controller';
+import { UserController } from './Presentation/nats-user.controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';

@@ -54,53 +54,22 @@ export class User extends AggregateRoot {
     return this._updatedAt;
   }
 
-  // Domain model operations
+  // entity state operation
 
-  changeFirstName(firstName: string): void {
-    this.validateName(firstName);
-    this._firstName = firstName.trim();
+  changeUserInfo(firstName?: string, lastName?: string, phone?: string): void {
+    if (firstName !== undefined) this._firstName = firstName.trim();
+    if (lastName !== undefined) this._lastName = lastName.trim();
+    if (phone !== undefined) this._phone = phone.trim();
+
     this._updatedAt = new Date();
   }
 
-  changeLastName(lastName: string): void {
-    this.validateName(lastName);
-    this._lastName = lastName.trim();
-    this._updatedAt = new Date();
-  }
-
-  changeEmail(email: string) {
-    this._email = email;
-    this._updatedAt = new Date();
-  }
-
-  changePhone(phone: string) {
-    this._phone = phone;
-    this._updatedAt = new Date();
-  }
-
-  chnagePassword(password: string) {
-    this._password = password;
-    this._updatedAt = new Date();
-  }
-
-  changeRefreshToken(token: string | null) {
+  changeRefreshToken(token: string | null): void {
     // turn undefined arguments to null
     token === undefined ? null : token;
 
     this._refreshToken = token;
     this._updatedAt = new Date();
-  }
-
-  // Helper methods
-
-  private validateName(_name: string): void | Error {
-    const name = _name.trim();
-    if (name.length === 0) throw new Error('First name cannot be empty');
-    else if (name.length < 3)
-      throw new Error('First name connot  be less than three characters');
-    else if (name.length > 15)
-      throw new Error('First name cannot be longer than 15 characters');
-    else return;
   }
 
   // Static factory method
