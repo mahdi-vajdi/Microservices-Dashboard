@@ -43,6 +43,7 @@ import { ChannelQueryRepository } from './Infrastructure/repositories/channel.qu
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
+            queue: AUTH_SERVICE,
           },
         }),
         inject: [ConfigService],
@@ -53,6 +54,7 @@ import { ChannelQueryRepository } from './Infrastructure/repositories/channel.qu
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
+            queue: AGENT_SERVICE,
           },
         }),
         inject: [ConfigService],

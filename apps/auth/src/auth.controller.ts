@@ -13,7 +13,7 @@ import { LocalAuthGuard } from './guards/local.guard';
 import { AccessTokenGuard } from './guards/access-token.guard';
 import { RefreshTokenGuard } from './guards/refresh-token.guard';
 import { SignupDto } from './dto/signup.dto';
-import { JwtPayload, UserDto } from '@app/common';
+import { JwtPayload, AgentDto } from '@app/common';
 import { Observable } from 'rxjs';
 import { Request, Response } from 'express';
 
@@ -34,8 +34,8 @@ export class AuthController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): Promise<void> {
-    const tokens = await this.authService.signin(req.user as UserDto);
-    this.authService.setCookies(res, tokens);
+    const tokens = await this.authService.signin(req.user as AgentDto);
+    this.authService.setTokensToCookies(res, tokens);
     res.sendStatus(200);
   }
 
@@ -61,7 +61,7 @@ export class AuthController {
       req.user as JwtPayload,
       refreshToken,
     );
-    this.authService.setCookies(res, newTokens);
+    this.authService.setTokensToCookies(res, newTokens);
   }
 
   @UseGuards(AccessTokenGuard)

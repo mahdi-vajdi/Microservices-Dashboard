@@ -1,4 +1,5 @@
 export enum AgentRole {
-  OPERATOR = 'operator',
+  OWNER = 'owner',
   ADMIN = 'admin',
+  OPERATOR = 'operator',
 }

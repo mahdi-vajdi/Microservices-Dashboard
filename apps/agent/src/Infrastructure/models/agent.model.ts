@@ -15,6 +15,9 @@ export class AgentModel {
   @Prop({ type: Date, required: true })
   updatedAt: Date;
 
+  @Prop({ type: SchemaTypes.ObjectId, required: true })
+  account: Types.ObjectId;
+
   @Prop({ required: true })
   email: string;
 
@@ -22,22 +25,19 @@ export class AgentModel {
   phone: string;
 
   @Prop({ required: true })
-  title: string;
+  firstName: string;
 
   @Prop({ required: true })
-  name: string;
+  lastName: string;
+
+  @Prop({ required: true })
+  title: string;
 
   @Prop({ required: true })
   password: string;
 
-  @Prop({ required: true })
-  avatar: string;
-
-  @Prop({ required: true })
-  online: boolean;
-
-  @Prop({ type: SchemaTypes.ObjectId, required: true })
-  admin: Types.ObjectId;
+  @Prop({ type: SchemaTypes.String, default: null })
+  refreshToken: string | null;
 
   @Prop({
     type: String,
@@ -45,6 +45,12 @@ export class AgentModel {
     required: true,
   })
   role: AgentRole;
+
+  @Prop({ required: true })
+  avatar: string;
+
+  @Prop({ required: true })
+  online: boolean;
 }
 
 export const AgentSchema = SchemaFactory.createForClass(AgentModel);

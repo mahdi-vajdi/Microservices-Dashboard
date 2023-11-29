@@ -22,20 +22,25 @@ export class CreateAgentDto {
   @IsString()
   @IsNotEmpty()
   @Length(3, 30)
-  title: string;
+  firstName: string;
 
   @IsString()
   @IsNotEmpty()
   @Length(3, 30)
-  name: string;
+  lastName: string;
 
-  @IsStrongPassword()
-  @Length(8, 20)
-  password: string;
+  @IsString()
+  @IsNotEmpty()
+  @Length(3, 30)
+  title: string;
 
   @IsArray()
   @IsMongoId({ each: true })
   channelIds: string[];
+
+  @IsStrongPassword()
+  @Length(8, 20)
+  password: string;
 
   @IsEnum(AgentRole)
   role: AgentRole;

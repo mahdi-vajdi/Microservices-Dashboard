@@ -4,6 +4,7 @@ import * as cookieParser from 'cookie-parser';
 import { AccountModule } from './account.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
+import { ACCOUNT_SERVICE } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AccountModule);
@@ -17,6 +18,7 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: [configService.getOrThrow('NATS_URI')],
+      queue: ACCOUNT_SERVICE,
     },
   });
   await app.startAllMicroservices();

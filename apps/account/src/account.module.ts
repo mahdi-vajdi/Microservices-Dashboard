@@ -44,6 +44,7 @@ import { AGENT_SERVICE } from '@app/common';
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
+            queue: AGENT_SERVICE,
           },
         }),
         inject: [ConfigService],

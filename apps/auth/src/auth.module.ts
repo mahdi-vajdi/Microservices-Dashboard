@@ -9,7 +9,7 @@ import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { USER_SERVICE } from '@app/common';
+import { AGENT_SERVICE } from '@app/common';
 import { JwtUtils } from './jwt.util';
 
 @Module({
@@ -25,11 +25,12 @@ import { JwtUtils } from './jwt.util';
     }),
     ClientsModule.registerAsync([
       {
-        name: USER_SERVICE,
+        name: AGENT_SERVICE,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
+            queue: AGENT_SERVICE,
           },
         }),
         inject: [ConfigService],

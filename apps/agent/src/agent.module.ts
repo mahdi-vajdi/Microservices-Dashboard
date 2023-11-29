@@ -12,7 +12,7 @@ import { AUTH_SERVICE } from '@app/common';
 import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
-import { AgentNatsController } from './Presentation/agnet.nats-cotroller';
+import { AgentNatsController } from './Presentation/agent.nats-cotroller';
 
 @Module({
   imports: [
@@ -39,6 +39,7 @@ import { AgentNatsController } from './Presentation/agnet.nats-cotroller';
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
+            queue: AUTH_SERVICE,
           },
         }),
         inject: [ConfigService],

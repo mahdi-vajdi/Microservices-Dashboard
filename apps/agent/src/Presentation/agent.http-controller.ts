@@ -3,7 +3,7 @@ import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateAgentCommand } from '../Application/commands/impl/create-agent.command';
 import { CreateAgentDto } from '../Application/dto/create-agent.dto';
 import { AgentModel } from '../Infrastructure/models/agent.model';
-import { GetUserAgents } from '../Application/queries/impl/get-user-agents.query';
+import { GetAccountAgentsQuery } from '../Application/queries/impl/get-account-agents.query';
 import { CommonAccessTokenGuard, JwtPayload } from '@app/common';
 import { Request } from 'express';
 
@@ -30,8 +30,8 @@ export class AgentHttpController {
   @Get()
   async getUserAgents(@Req() req: Request): Promise<AgentModel[]> {
     const user = req['user'] as JwtPayload;
-    return await this.queryBus.execute<GetUserAgents, AgentModel[]>(
-      new GetUserAgents(user.sub),
+    return await this.queryBus.execute<GetAccountAgentsQuery, AgentModel[]>(
+      new GetAccountAgentsQuery(user.sub),
     );
   }
 }

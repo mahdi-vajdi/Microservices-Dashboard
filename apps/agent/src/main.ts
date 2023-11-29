@@ -4,6 +4,7 @@ import { ConfigService } from '@nestjs/config';
 import * as cookieParser from 'cookie-parser';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
+import { AGENT_SERVICE } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AgentModule);
@@ -16,6 +17,7 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: [configService.getOrThrow('NATS_URI')],
+      queue: AGENT_SERVICE,
     },
   });
 

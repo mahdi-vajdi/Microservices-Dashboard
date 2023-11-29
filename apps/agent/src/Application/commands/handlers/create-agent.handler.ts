@@ -10,16 +10,19 @@ export class CreateAgentHandler
 {
   constructor(private readonly agentRepo: AgentEntityRepository) {}
 
-  async execute({ userId, dto }: CreateAgentCommand): Promise<void> {
+  async execute({ accountId, dto }: CreateAgentCommand): Promise<void> {
     const agent = Agent.create(
       new Types.ObjectId().toHexString(),
+      accountId,
       dto.email,
       dto.phone,
+      dto.firstName,
+      dto.lastName,
       dto.title,
-      dto.name,
       dto.password,
-      userId,
+      null,
       dto.role,
+      'default',
     );
 
     await this.agentRepo.add(agent);

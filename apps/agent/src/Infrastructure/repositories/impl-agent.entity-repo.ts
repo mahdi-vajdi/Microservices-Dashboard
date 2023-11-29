@@ -21,7 +21,7 @@ export class AgentEntityRepositoryImpl implements AgentEntityRepository {
       .findByIdAndUpdate(entity.id, this.fromEntity(entity))
       .exec();
 
-    if (updatedAgent) throw new Error('user not found');
+    if (!updatedAgent) throw new Error('Agent not found');
   }
 
   async findById(id: string): Promise<Agent> {
@@ -38,12 +38,14 @@ export class AgentEntityRepositoryImpl implements AgentEntityRepository {
       email: entity.email,
       phone: entity.phone,
       title: entity.title,
-      name: entity.name,
+      firstName: entity.firstName,
+      lastName: entity.lastName,
       password: entity.password,
       avatar: entity.avatar,
       online: entity.online,
-      admin: new Types.ObjectId(entity.admin),
+      account: new Types.ObjectId(entity.admin),
       role: entity.role,
+      refreshToken: entity.refreshToken,
     };
   }
 
@@ -52,14 +54,16 @@ export class AgentEntityRepositoryImpl implements AgentEntityRepository {
       model._id.toHexString(),
       model.createdAt,
       model.updatedAt,
+      model.account.toHexString(),
       model.email,
       model.phone,
+      model.firstName,
+      model.lastName,
       model.title,
-      model.name,
       model.password,
-      model.avatar,
-      model.admin.toHexString(),
+      model.refreshToken,
       model.role,
+      model.avatar,
       model.online,
     );
   }
