@@ -13,7 +13,7 @@ import {
 } from '@app/common';
 import { SignupDto } from './dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtUtils } from './jwt.util';
+import { JwtHelperService } from './jwt-helper.service';
 import { Observable, lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
@@ -31,7 +31,7 @@ export class AuthService {
   constructor(
     @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
     @Inject(ACCOUNT_SERVICE) private readonly accountService: ClientProxy,
-    private readonly jwtUtils: JwtUtils,
+    private readonly jwtUtils: JwtHelperService,
   ) {}
 
   async signup(
@@ -73,6 +73,7 @@ export class AuthService {
             agent.id,
             agent.email,
             account.id,
+            agent.role,
           );
 
           // insert the new refresh token in agent database
@@ -96,6 +97,7 @@ export class AuthService {
       agent.id,
       agent.email,
       agent.account,
+      agent.role,
     );
 
     this.agentService.emit<void>('updateRefreshToken', {
@@ -137,6 +139,7 @@ export class AuthService {
       agent.id,
       agent.email,
       agent.account,
+      agent.role,
     );
 
     this.agentService.emit<void>('updateRefreshToken', {

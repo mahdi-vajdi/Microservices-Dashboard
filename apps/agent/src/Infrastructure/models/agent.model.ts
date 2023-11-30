@@ -1,6 +1,6 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Types, SchemaTypes, HydratedDocument } from 'mongoose';
-import { AgentRole } from '../../Domain/value-objects/agent-roles.enum';
+import { DomainAgentRole } from '../../Domain/value-objects/agent-roles.enum';
 
 export type AgentDocument = HydratedDocument<AgentModel>;
 
@@ -41,10 +41,10 @@ export class AgentModel {
 
   @Prop({
     type: String,
-    enum: Object.values(AgentRole),
+    enum: Object.values(DomainAgentRole),
     required: true,
   })
-  role: AgentRole;
+  role: DomainAgentRole;
 
   @Prop({ required: true })
   avatar: string;

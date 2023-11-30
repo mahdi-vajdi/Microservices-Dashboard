@@ -1,4 +1,4 @@
-export enum AgentRole {
+export enum DomainAgentRole {
   OWNER = 'owner',
   ADMIN = 'admin',
   OPERATOR = 'operator',

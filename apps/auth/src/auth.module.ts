@@ -10,7 +10,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ACCOUNT_SERVICE, AGENT_SERVICE } from '@app/common';
-import { JwtUtils } from './jwt.util';
+import { JwtHelperService } from './jwt-helper.service';
 
 @Module({
   imports: [
@@ -56,7 +56,7 @@ import { JwtUtils } from './jwt.util';
     LocalStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
-    JwtUtils,
+    JwtHelperService,
   ],
   exports: [AuthService, JwtModule],
 })

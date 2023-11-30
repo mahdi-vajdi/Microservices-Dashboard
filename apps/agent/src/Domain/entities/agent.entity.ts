@@ -1,5 +1,5 @@
 import { AggregateRoot } from '@nestjs/cqrs';
-import { AgentRole } from '../value-objects/agent-roles.enum';
+import { DomainAgentRole } from '../value-objects/agent-roles.enum';
 
 export class Agent extends AggregateRoot {
   constructor(
@@ -14,7 +14,7 @@ export class Agent extends AggregateRoot {
     private readonly _title: string,
     private readonly _password: string,
     private _refreshToken: string | null,
-    private readonly _role: AgentRole,
+    private readonly _role: DomainAgentRole,
     private readonly _avatar: string,
     private readonly _online: boolean,
   ) {
@@ -96,7 +96,7 @@ export class Agent extends AggregateRoot {
     title: string,
     password: string,
     refreshToken: string | null,
-    role: AgentRole,
+    role: DomainAgentRole,
     avatar: string,
   ): Agent {
     return new Agent(

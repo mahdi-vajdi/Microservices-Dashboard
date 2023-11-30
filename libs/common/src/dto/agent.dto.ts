@@ -1,3 +1,5 @@
+import { AgentRole } from './agent-roles.enum';
+
 export type AgentDto = {
   id: string;
   createdAt: Date;
@@ -8,6 +10,7 @@ export type AgentDto = {
   firstName: string;
   lastName: string;
   title: string;
+  role: AgentRole;
   password: string;
   refreshToken: string | null;
 };
