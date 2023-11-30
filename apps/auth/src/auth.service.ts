@@ -3,14 +3,21 @@ import {
   ForbiddenException,
   Inject,
   Injectable,
+  InternalServerErrorException,
 } from '@nestjs/common';
-import { AGENT_SERVICE, JwtPayload, AgentDto } from '@app/common';
+import {
+  AGENT_SERVICE,
+  JwtPayload,
+  AgentDto,
+  ACCOUNT_SERVICE,
+} from '@app/common';
 import { SignupDto } from './dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { JwtUtils } from './jwt.util';
 import { Observable, lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
+import { AccountDto } from '@app/common/dto/account.dto';
 
 export type AuthResponse = {
   email: string;
@@ -23,6 +30,7 @@ export type AuthResponse = {
 export class AuthService {
   constructor(
     @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
+    @Inject(ACCOUNT_SERVICE) private readonly accountService: ClientProxy,
     private readonly jwtUtils: JwtUtils,
   ) {}
 
@@ -38,24 +46,48 @@ export class AuthService {
     );
     if (userExists) throw new ConflictException('User already exists');
 
-    return this.agentService.send<AgentDto>('createOwnerAgent', signupDto).pipe(
-      map(async (user) => {
-        // generate tokens for the user
-        const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
-
-        // insert the new refresh token in user database
-        this.agentService.emit<void>('updateRefreshToken', {
-          agentId: user.id,
-          newToken: tokens.refresh_token,
-        });
-
-        return {
-          email: user.email,
-          userId: user.id,
-          ...tokens,
-        };
+    // create an account for the new signup
+    const account = await lastValueFrom(
+      this.accountService.send<AccountDto>('createAccount', {
+        email: signupDto.email,
       }),
     );
+    if (!account)
+      throw new InternalServerErrorException(
+        'something went wrong while creating account',
+      );
+
+    return this.agentService
+      .send<AgentDto>('createOwnerAgent', {
+        accountId: account.id,
+        firstName: signupDto.firstName,
+        lastName: signupDto.lastName,
+        email: signupDto.email,
+        phone: signupDto.phone,
+        password: await bcrypt.hash(signupDto.password, 10),
+      })
+      .pipe(
+        map(async (agent) => {
+          // generate tokens for the user
+          const tokens = await this.jwtUtils.generateTokens(
+            agent.id,
+            agent.email,
+          );
+
+          // insert the new refresh token in user database
+          this.agentService.emit<void>('updateRefreshToken', {
+            agentId: agent.id,
+            newToken: tokens.refresh_token,
+          });
+
+          console.debug(`agent ${JSON.stringify(agent)}`);
+          return {
+            email: agent.email,
+            userId: agent.id,
+            ...tokens,
+          };
+        }),
+      );
   }
 
   async signin(user: AgentDto): Promise<AuthResponse> {
@@ -110,13 +142,17 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<AgentDto | null> {
-    const user = this.agentService.send<AgentDto>('getByEmail', { email }).pipe(
-      map(async (user) => {
-        if (user && (await bcrypt.compare(password, user.password)))
-          return user;
-        else return null;
-      }),
-    );
+    const user = this.agentService
+      .send<AgentDto>('getAgentByEmail', { email })
+      .pipe(
+        map(async (agent) => {
+          console.debug('validate agent', JSON.stringify(agent));
+          const match = await bcrypt.compare(password, agent.password);
+          console.debug('match', match);
+          if (agent && match) return agent;
+          else return null;
+        }),
+      );
 
     return await lastValueFrom(user);
   }

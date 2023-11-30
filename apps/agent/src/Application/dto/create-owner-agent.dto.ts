@@ -28,6 +28,8 @@ export class CreateOwnerAgentDto {
   @IsMobilePhone()
   phone: string;
 
+  @IsString()
+  @IsNotEmpty()
   @Length(8, 20)
   password: string;
 }

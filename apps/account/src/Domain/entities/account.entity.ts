@@ -5,7 +5,7 @@ export class Account extends AggregateRoot {
     private readonly _id: string,
     private readonly _createdAt: Date,
     private _updatedAt: Date,
-    private readonly _owner: string,
+    private readonly _email: string,
   ) {
     super();
   }
@@ -24,8 +24,8 @@ export class Account extends AggregateRoot {
     return this._updatedAt;
   }
 
-  get owner() {
-    return this._owner;
+  get email() {
+    return this._email;
   }
 
   // entity state operations

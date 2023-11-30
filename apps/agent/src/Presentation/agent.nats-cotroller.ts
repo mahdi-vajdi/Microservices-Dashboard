@@ -45,7 +45,7 @@ export class AgentNatsController {
     );
   }
 
-  @MessagePattern('getByEmail')
+  @MessagePattern('getAgentByEmail')
   async getByEmail(
     @Payload() { email }: GetByEmailDto,
   ): Promise<AgentDto | null> {

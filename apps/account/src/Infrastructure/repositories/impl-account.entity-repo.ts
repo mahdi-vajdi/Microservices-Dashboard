@@ -39,7 +39,7 @@ export class AccountEntityRepositoryImpl implements AccountEntityRepository {
       _id: new Types.ObjectId(account.id),
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
-      owner: new Types.ObjectId(account.owner),
+      email: new Types.ObjectId(account.email),
     };
   }
 
@@ -48,7 +48,7 @@ export class AccountEntityRepositoryImpl implements AccountEntityRepository {
       model._id.toHexString(),
       model.createdAt,
       model.updatedAt,
-      model.owner.toHexString(),
+      model.email.toHexString(),
     );
   }
 }

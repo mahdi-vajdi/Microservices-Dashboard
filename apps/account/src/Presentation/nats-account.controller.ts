@@ -6,6 +6,7 @@ import { MessagePattern, Payload } from '@nestjs/microservices';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { GetByIdDto } from '../Application/dto/get-by-id.dto';
 import { AccountModel } from '../Infrastructure/models/account.model';
+import { AccountDto } from '@app/common/dto/account.dto';
 
 @Controller()
 export class NatsAccountController {
@@ -14,10 +15,12 @@ export class NatsAccountController {
     private readonly queryBus: QueryBus,
   ) {}
 
-  @MessagePattern('create')
-  async createAccount(@Payload() dto: CreateAccountDto): Promise<void> {
-    return await this.commandBus.execute<CreateAccountCommand, void>(
-      new CreateAccountCommand(dto),
+  @MessagePattern('createAccount')
+  async createAccount(
+    @Payload() { owner }: CreateAccountDto,
+  ): Promise<AccountDto> {
+    return await this.commandBus.execute<CreateAccountCommand, AccountDto>(
+      new CreateAccountCommand(owner),
     );
   }
 

@@ -5,7 +5,6 @@ import { AgentEntityRepository } from 'apps/agent/src/Domain/base-agent.entity-r
 import { Agent } from 'apps/agent/src/Domain/entities/agent.entity';
 import { AgentRole } from 'apps/agent/src/Domain/value-objects/agent-roles.enum';
 import { Types } from 'mongoose';
-import * as bcrypt from 'bcryptjs';
 
 @CommandHandler(CreateOwnerAgentCommand)
 export class CreateOwnerAgentHandler
@@ -22,7 +21,7 @@ export class CreateOwnerAgentHandler
       dto.firstName,
       dto.lastName,
       dto.firstName,
-      await bcrypt.hash(dto.password, 10),
+      dto.password,
       null,
       AgentRole.OWNER,
       'default',

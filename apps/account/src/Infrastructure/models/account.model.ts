@@ -17,7 +17,7 @@ export class AccountModel {
   updatedAt: Date;
 
   @Prop({ type: SchemaTypes.ObjectId, required: true })
-  owner: Types.ObjectId;
+  email: Types.ObjectId;
 }
 
 export const AccountSchema = SchemaFactory.createForClass(AccountModel);
