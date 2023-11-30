@@ -8,7 +8,7 @@ export class Channel extends AggregateRoot {
     private _id: string,
     private _createdAt: Date,
     private _updatedAt: Date,
-    private readonly _owner: string,
+    private readonly _account: string,
     private _title: string,
     private _url: string,
     private readonly _token: string,
@@ -31,8 +31,8 @@ export class Channel extends AggregateRoot {
     return this._updatedAt;
   }
 
-  get owner() {
-    return this._owner;
+  get account() {
+    return this._account;
   }
 
   get title() {

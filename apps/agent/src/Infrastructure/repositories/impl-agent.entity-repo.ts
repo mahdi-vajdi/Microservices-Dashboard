@@ -13,7 +13,8 @@ export class AgentEntityRepositoryImpl implements AgentEntityRepository {
   ) {}
 
   async add(entity: Agent): Promise<void> {
-    await this.agentModel.create(this.fromEntity(entity));
+    const agent = await this.agentModel.create(this.fromEntity(entity));
+    console.debug('created agent', JSON.stringify(agent));
   }
 
   async save(entity: Agent): Promise<void> {

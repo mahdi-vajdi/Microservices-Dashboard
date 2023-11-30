@@ -7,7 +7,7 @@ import {
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { AUTH_SERVICE } from '../constants/services';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtPayload } from '../dto/jwt-payload';
+import { JwtPayload } from '../dto';
 
 @Injectable()
 export class CommonAccessTokenGuard implements CanActivate {

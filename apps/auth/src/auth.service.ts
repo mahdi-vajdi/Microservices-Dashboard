@@ -72,6 +72,7 @@ export class AuthService {
           const tokens = await this.jwtUtils.generateTokens(
             agent.id,
             agent.email,
+            account.id,
           );
 
           // insert the new refresh token in user database
@@ -90,17 +91,21 @@ export class AuthService {
       );
   }
 
-  async signin(user: AgentDto): Promise<AuthResponse> {
-    const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
+  async signin(agent: AgentDto): Promise<AuthResponse> {
+    const tokens = await this.jwtUtils.generateTokens(
+      agent.id,
+      agent.email,
+      agent.account,
+    );
 
     this.agentService.emit<void>('updateRefreshToken', {
-      agentId: user.id,
+      agentId: agent.id,
       newToken: tokens.refresh_token,
     });
 
     return {
-      email: user.email,
-      userId: user.id,
+      email: agent.email,
+      userId: agent.id,
       ...tokens,
     };
   }
@@ -113,25 +118,29 @@ export class AuthService {
   }
 
   async refreshTokens(userPayload: JwtPayload, refreshToken: string) {
-    const user = await lastValueFrom(
+    const agent = await lastValueFrom(
       this.agentService.send<AgentDto | null>('getAgentById', {
         agentId: userPayload.sub,
       }),
     );
 
-    if (!user || !user.refreshToken) {
+    if (!agent || !agent.refreshToken) {
       throw new ForbiddenException('Access Denied');
     }
 
     // const tokenMatches =  await bcrypt.compare(refreshToken, user.refreshToken);
-    const tokenMatches = refreshToken === user.refreshToken;
+    const tokenMatches = refreshToken === agent.refreshToken;
 
     if (!tokenMatches) throw new ForbiddenException('Acess Denied');
 
-    const tokens = await this.jwtUtils.generateTokens(user.id, user.email);
+    const tokens = await this.jwtUtils.generateTokens(
+      agent.id,
+      agent.email,
+      agent.account,
+    );
 
     this.agentService.emit<void>('updateRefreshToken', {
-      agentId: user.id,
+      agentId: agent.id,
       newToken: tokens.refresh_token,
     });
 
@@ -147,9 +156,8 @@ export class AuthService {
       .pipe(
         map(async (agent) => {
           console.debug('validate agent', JSON.stringify(agent));
-          const match = await bcrypt.compare(password, agent.password);
-          console.debug('match', match);
-          if (agent && match) return agent;
+          if (agent && (await bcrypt.compare(password, agent.password)))
+            return agent;
           else return null;
         }),
       );

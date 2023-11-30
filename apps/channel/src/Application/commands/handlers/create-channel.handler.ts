@@ -17,24 +17,27 @@ export class CreateChannelHandler
     private readonly channelRepo: ChannelEntityRepository,
   ) {}
 
-  async execute({ id, dto }: CreateChannelCommand): Promise<void> {
+  async execute({ accountId, dto }: CreateChannelCommand): Promise<void> {
     let agents: string[] = [];
     // get agents ids if user wants
+    console.debug('accont id: ', accountId);
     if (dto.addAllAgents) {
       agents = await lastValueFrom(
-        this.agentService.send<string[]>('getAgentsIds', { id }),
+        this.agentService.send<string[]>('getAgentsIds', { accountId }),
       );
+      console.debug('agents', agents);
     }
 
     const channel = Channel.create(
       new Types.ObjectId().toHexString(),
-      id,
+      accountId,
       dto.title,
       dto.url,
       crypto.randomUUID(),
       agents,
     );
 
+    console.debug('channel agents: ', channel.agents);
     await this.channelRepo.add(channel);
     channel.commit();
   }

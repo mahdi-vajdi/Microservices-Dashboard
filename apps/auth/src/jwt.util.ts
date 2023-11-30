@@ -10,10 +10,11 @@ export class JwtUtils {
     private readonly configService: ConfigService,
   ) {}
 
-  async generateTokens(id: string, email: string) {
+  async generateTokens(id: string, email: string, account: string) {
     const payload: JwtPayload = {
       sub: id,
-      email: email,
+      email,
+      account,
     };
 
     const [access_token, refresh_token] = await Promise.all([

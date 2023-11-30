@@ -9,6 +9,6 @@ export class GetUserAgentsIdsHandler
   constructor(private readonly agentRepo: AgentQueryepository) {}
 
   async execute(query: GetUserAgentsIdsQuery): Promise<string[]> {
-    return await this.agentRepo.findIdsByAdmin(query.userId);
+    return await this.agentRepo.findIdsByAccount(query.accountId);
   }
 }

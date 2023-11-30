@@ -15,7 +15,7 @@ import { CreateChannelCommand } from '../Application/commands/impl/create-channe
 import { CreateChannelDto } from '../Application/dto/request/create-channel.dto';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { ChannelModel } from '../Infrastructure/models/channel.model';
-import { GetUserChannelsQuery } from '../Application/queries/impl/get-user-cahnnels.query';
+import { GetAccountChannelsQuery } from '../Application/queries/impl/get-account-cahnnels.query';
 import { ParseMongoIdPipe } from '@app/common/pipes/parse-objectId.pipe';
 import { UpdateChannelAgentsCommand } from '../Application/commands/impl/update-channel-agents';
 import { UpdateChannelAgentsDto } from '../Application/dto/request/update-channel-agents.dto';
@@ -35,19 +35,19 @@ export class ChannelController {
   ): Promise<void> {
     const user = req['user'] as JwtPayload;
     await this.commandBus.execute<CreateChannelCommand, void>(
-      new CreateChannelCommand(user.sub, dto),
+      new CreateChannelCommand(user.account, dto),
     );
   }
 
   @UseGuards(CommonAccessTokenGuard)
   @Get()
-  async getUserChannels(@Req() req: Request) {
+  async getAccountChannels(@Req() req: Request) {
     const user = req['user'] as JwtPayload;
 
     return await this.queryBus.execute<
-      GetUserChannelsQuery,
+      GetAccountChannelsQuery,
       ChannelModel[] | null
-    >(new GetUserChannelsQuery(user.sub));
+    >(new GetAccountChannelsQuery(user.account));
   }
 
   @UseGuards(CommonAccessTokenGuard)

@@ -14,9 +14,9 @@ export class ChannelQueryRepository {
     return this.channelModel.findById(id, {}, { lean: true }).exec();
   }
 
-  async findByUser(userId: string): Promise<ChannelModel[]> {
+  async findByAccount(accountId: string): Promise<ChannelModel[]> {
     return await this.channelModel
-      .find({ owner: userId }, {}, { lean: true })
+      .find({ account: accountId }, {}, { lean: true })
       .exec();
   }
 }

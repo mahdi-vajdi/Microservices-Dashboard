@@ -11,9 +11,9 @@ export class UpdateChannelAgentsHandler
   async execute(command: UpdateChannelAgentsCommand): Promise<void> {
     const channel = await this.channelRepo.findById(command.channelId);
 
-    if (!channel || channel.owner !== command.userId) return;
+    if (!channel || channel.account !== command.userId) return;
 
-    if (channel && channel.owner === command.userId) {
+    if (channel && channel.account === command.userId) {
       channel.updateAgents(command.agentIds);
     }
 

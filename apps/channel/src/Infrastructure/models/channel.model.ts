@@ -21,7 +21,7 @@ export class ChannelModel {
   updatedAt: Date;
 
   @Prop({ type: SchemaTypes.ObjectId, required: true })
-  owner: Types.ObjectId;
+  account: Types.ObjectId;
 
   @Prop({ required: true })
   title: string;

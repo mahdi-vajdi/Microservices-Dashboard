@@ -27,14 +27,15 @@ export class AgentQueryepository {
     return this.agentModel.find({ admin: adminId }, {}, { lean: true }).exec();
   }
 
-  async findIdsByAdmin(adminId: string): Promise<string[]> {
-    const ids = await this.agentModel.find(
-      { admin: adminId },
+  async findIdsByAccount(accountId: string): Promise<string[]> {
+    const models = await this.agentModel.find(
+      { account: accountId },
       { _id: 1 },
       { lean: true },
     );
 
-    return ids.map((id) => id._id.toHexString());
+    console.debug('agent ids models', models);
+    return models.map((model) => model._id.toHexString());
   }
 
   async agentExists(email: string, phone: string) {

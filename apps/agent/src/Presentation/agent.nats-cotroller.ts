@@ -32,9 +32,11 @@ export class AgentNatsController {
   }
 
   @MessagePattern('getAgentsIds')
-  async getAgnetsIds(@Payload() { id }: GetAgentIdsDto): Promise<string[]> {
+  async getAgnetsIds(
+    @Payload() { accountId }: GetAgentIdsDto,
+  ): Promise<string[]> {
     return await this.queryBus.execute<GetUserAgentsIdsQuery, string[]>(
-      new GetUserAgentsIdsQuery(id),
+      new GetUserAgentsIdsQuery(accountId),
     );
   }
 

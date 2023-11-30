@@ -1,4 +1,4 @@
 import { GetByIdHandler } from './get-by-id.handler';
-import { GetUserChannelsHandler } from './get-by-user.handle';
+import { GetAccountChannelsHandler } from './get-account-channels.handle';
 
-export const ChannelQueryHandlers = [GetUserChannelsHandler, GetByIdHandler];
+export const ChannelQueryHandlers = [GetAccountChannelsHandler, GetByIdHandler];
