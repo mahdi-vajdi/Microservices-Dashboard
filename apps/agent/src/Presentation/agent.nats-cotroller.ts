@@ -2,7 +2,7 @@ import { Controller } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import { GetAgentIdsDto } from '../Application/dto/get-agents-ids.dto';
-import { GetUserAgentsIdsQuery } from '../Application/queries/impl/get-user-agents-ids.query';
+import { GetAccountAgentsIdsQuery } from '../Application/queries/impl/get-account-agents-ids.query';
 import { UpdateRefreshTokenDto } from '../Application/dto/update-refresh-token.dto';
 import { UpdateRefreshTokenCommand } from '../Application/commands/impl/update-refresh-token.command';
 import { AgentExistsDto } from '../Application/dto/agent-exists.dto';
@@ -35,8 +35,8 @@ export class AgentNatsController {
   async getAgnetsIds(
     @Payload() { accountId }: GetAgentIdsDto,
   ): Promise<string[]> {
-    return await this.queryBus.execute<GetUserAgentsIdsQuery, string[]>(
-      new GetUserAgentsIdsQuery(accountId),
+    return await this.queryBus.execute<GetAccountAgentsIdsQuery, string[]>(
+      new GetAccountAgentsIdsQuery(accountId),
     );
   }
 

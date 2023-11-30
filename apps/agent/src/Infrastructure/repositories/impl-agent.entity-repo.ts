@@ -28,7 +28,7 @@ export class AgentEntityRepositoryImpl implements AgentEntityRepository {
   async findById(id: string): Promise<Agent> {
     const agent = await this.agentModel.findById(id, {}, { lean: true }).exec();
     if (agent) return this.toEntity(agent);
-    else throw new Error(`User with id: ${id} does'nt exist`);
+    else throw new Error(`Agent with id: ${id} does'nt exist`);
   }
 
   private fromEntity(entity: Agent): AgentModel {

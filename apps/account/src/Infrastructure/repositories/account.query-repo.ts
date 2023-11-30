@@ -7,17 +7,15 @@ import { Model } from 'mongoose';
 export class AccountQueryRepository {
   constructor(
     @InjectModel(ACCOUNT_DB_COLLECTION)
-    private readonly userModel: Model<AccountModel>,
+    private readonly account: Model<AccountModel>,
   ) {}
   async findOneById(id: string): Promise<AccountModel | null> {
-    const account = await this.userModel
-      .findById(id, {}, { lean: true })
-      .exec();
+    const account = await this.account.findById(id, {}, { lean: true }).exec();
     return account;
   }
 
   async findOneByEmail(email: string): Promise<AccountModel | null> {
-    const account = await this.userModel
+    const account = await this.account
       .findOne({ email }, {}, { lean: true })
       .exec();
     return account;

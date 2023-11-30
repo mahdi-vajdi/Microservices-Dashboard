@@ -10,7 +10,7 @@ export class GetByIdHandler implements IQueryHandler<GetByIdQuery> {
   async execute(query: GetByIdQuery): Promise<ChannelModel | null> {
     const channel = await this.channelRepo.findOneById(query.channelId);
 
-    if (channel && channel.account.equals(query.userId)) {
+    if (channel && channel.account.equals(query.accountId)) {
       return channel;
     } else return null;
   }

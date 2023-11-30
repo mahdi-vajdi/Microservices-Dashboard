@@ -20,18 +20,18 @@ export class AgentHttpController {
     @Req() req: Request,
     @Body() dto: CreateAgentDto,
   ): Promise<void> {
-    const user = req['user'] as JwtPayload;
+    const agent = req['user'] as JwtPayload;
     await this.commandBus.execute<CreateAgentCommand, void>(
-      new CreateAgentCommand(user.sub, dto),
+      new CreateAgentCommand(agent.sub, dto),
     );
   }
 
   @UseGuards(CommonAccessTokenGuard)
   @Get()
-  async getUserAgents(@Req() req: Request): Promise<AgentModel[]> {
-    const user = req['user'] as JwtPayload;
+  async getAccountAgents(@Req() req: Request): Promise<AgentModel[]> {
+    const agent = req['user'] as JwtPayload;
     return await this.queryBus.execute<GetAccountAgentsQuery, AgentModel[]>(
-      new GetAccountAgentsQuery(user.sub),
+      new GetAccountAgentsQuery(agent.sub),
     );
   }
 }

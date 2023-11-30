@@ -63,7 +63,7 @@ export class ChannelController {
 
     if (!channel)
       throw new NotFoundException(
-        `Could not find a channel for user with id ${channelId}`,
+        `Could not find a channel for account with id ${channelId}`,
       );
 
     return channel;

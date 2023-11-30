@@ -32,8 +32,8 @@ export class Account extends AggregateRoot {
 
   // Static factory method
   static create(id: string, owner: string): Account {
-    const user = new Account(id, new Date(), new Date(), owner);
-    // user.apply(new UserCreatedEvent(id, owner));
-    return user;
+    const account = new Account(id, new Date(), new Date(), owner);
+    // account.apply(new UserCreatedEvent(id, owner));
+    return account;
   }
 }

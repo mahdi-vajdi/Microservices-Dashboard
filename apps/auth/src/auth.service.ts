@@ -21,7 +21,7 @@ import { AccountDto } from '@app/common/dto/account.dto';
 
 export type AuthResponse = {
   email: string;
-  userId: string;
+  agentId: string;
   access_token: string;
   refresh_token: string;
 };
@@ -38,13 +38,13 @@ export class AuthService {
     signupDto: SignupDto,
   ): Promise<Observable<Promise<AuthResponse>>> {
     // check if email or phone exists
-    const userExists = await lastValueFrom(
+    const agentExists = await lastValueFrom(
       this.agentService.send<boolean>('agentExists', {
         email: signupDto.email,
         phone: signupDto.phone,
       }),
     );
-    if (userExists) throw new ConflictException('User already exists');
+    if (agentExists) throw new ConflictException('Agent already exists');
 
     // create an account for the new signup
     const account = await lastValueFrom(
@@ -68,14 +68,14 @@ export class AuthService {
       })
       .pipe(
         map(async (agent) => {
-          // generate tokens for the user
+          // generate tokens for the agent
           const tokens = await this.jwtUtils.generateTokens(
             agent.id,
             agent.email,
             account.id,
           );
 
-          // insert the new refresh token in user database
+          // insert the new refresh token in agent database
           this.agentService.emit<void>('updateRefreshToken', {
             agentId: agent.id,
             newToken: tokens.refresh_token,
@@ -84,7 +84,7 @@ export class AuthService {
           console.debug(`agent ${JSON.stringify(agent)}`);
           return {
             email: agent.email,
-            userId: agent.id,
+            agentId: agent.id,
             ...tokens,
           };
         }),
@@ -105,22 +105,22 @@ export class AuthService {
 
     return {
       email: agent.email,
-      userId: agent.id,
+      agentId: agent.id,
       ...tokens,
     };
   }
 
-  signout(user: JwtPayload): void {
+  signout(agent: JwtPayload): void {
     this.agentService.emit<void>('updateRefreshToken', {
-      agentId: user.sub,
+      agentId: agent.sub,
       newToken: null,
     });
   }
 
-  async refreshTokens(userPayload: JwtPayload, refreshToken: string) {
+  async refreshTokens(agentPayload: JwtPayload, refreshToken: string) {
     const agent = await lastValueFrom(
       this.agentService.send<AgentDto | null>('getAgentById', {
-        agentId: userPayload.sub,
+        agentId: agentPayload.sub,
       }),
     );
 
@@ -128,7 +128,7 @@ export class AuthService {
       throw new ForbiddenException('Access Denied');
     }
 
-    // const tokenMatches =  await bcrypt.compare(refreshToken, user.refreshToken);
+    // const tokenMatches =  await bcrypt.compare(refreshToken, agent.refreshToken);
     const tokenMatches = refreshToken === agent.refreshToken;
 
     if (!tokenMatches) throw new ForbiddenException('Acess Denied');
@@ -151,7 +151,7 @@ export class AuthService {
     email: string,
     password: string,
   ): Promise<AgentDto | null> {
-    const user = this.agentService
+    const agent = this.agentService
       .send<AgentDto>('getAgentByEmail', { email })
       .pipe(
         map(async (agent) => {
@@ -162,7 +162,7 @@ export class AuthService {
         }),
       );
 
-    return await lastValueFrom(user);
+    return await lastValueFrom(agent);
   }
 
   setTokensToCookies(
