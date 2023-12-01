@@ -20,12 +20,10 @@ export class CreateChannelHandler
   async execute({ accountId, dto }: CreateChannelCommand): Promise<void> {
     let agents: string[] = [];
     // get agents ids if caller wants
-    console.debug('accont id: ', accountId);
     if (dto.addAllAgents) {
       agents = await lastValueFrom(
         this.agentService.send<string[]>('getAgentsIds', { accountId }),
       );
-      console.debug('agents', agents);
     }
 
     const channel = Channel.create(
@@ -37,7 +35,6 @@ export class CreateChannelHandler
       agents,
     );
 
-    console.debug('channel agents: ', channel.agents);
     await this.channelRepo.add(channel);
     channel.commit();
   }

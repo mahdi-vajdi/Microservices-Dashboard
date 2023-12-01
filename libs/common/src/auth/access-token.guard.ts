@@ -42,13 +42,11 @@ export class CommonAccessTokenGuard implements CanActivate {
           // Get the method required method roles and see if user has them
           console.log('requester role: ', jwtPayload.role);
           if (roles && !roles.includes(jwtPayload.role)) {
-            console.debug('roles prevented you');
             throw new ForbiddenException(
               'The agent does not have the authorization to perform this action',
             );
           }
 
-          console.debug('roles granted you');
           context.switchToHttp().getRequest().user = jwtPayload;
         }),
         map(() => true),

@@ -40,8 +40,6 @@ export class AgentHttpController {
       void
     >(new CreateAgentCommand(agent.account, dto));
 
-    console.debug('agent createor account: ', agent.account);
-
     // null value means agent info was duplicate
     if (createdAgent === null)
       throw new BadRequestException('Agent email and phone are duplicate');

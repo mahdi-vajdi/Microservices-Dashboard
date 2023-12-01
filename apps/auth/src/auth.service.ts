@@ -70,7 +70,6 @@ export class AuthService {
       .pipe(
         map(async (agent) => {
           // generate tokens for the agent
-          console.debug('generating tokens, role: ', agent.role);
           const tokens = await this.jwtUtils.generateTokens(
             agent.id,
             agent.email,
@@ -84,7 +83,6 @@ export class AuthService {
             newToken: tokens.refresh_token,
           });
 
-          console.debug(`agent ${JSON.stringify(agent)}`);
           return {
             email: agent.email,
             agentId: agent.id,
@@ -160,7 +158,6 @@ export class AuthService {
       .send<AgentDto>('getAgentByEmail', { email })
       .pipe(
         map(async (agent) => {
-          console.debug('validate agent', agent.role);
           if (
             agent &&
             (await bcrypt.compare(password, agent.password)) &&

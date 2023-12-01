@@ -47,7 +47,6 @@ export class CreateOwnerAgentHandler
       password: agent.password,
       refreshToken: agent.refreshToken,
     };
-    console.debug('owner agent created. role: ', agentDto.role);
     return agentDto;
   }
 }

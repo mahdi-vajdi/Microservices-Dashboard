@@ -29,7 +29,6 @@ export class AgentQueryRepository {
       .find({ account: accountId }, {}, { lean: true })
       .exec();
 
-    console.debug('found agents: ', JSON.stringify(agents));
     return agents;
   }
 
@@ -40,7 +39,6 @@ export class AgentQueryRepository {
       { lean: true },
     );
 
-    console.debug('agent ids models', models);
     return models.map((model) => model._id.toHexString());
   }
 
