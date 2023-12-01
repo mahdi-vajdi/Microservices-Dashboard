@@ -12,7 +12,12 @@ import { CreateAgentCommand } from '../Application/commands/impl/create-agent.co
 import { CreateAgentDto } from '../Application/dto/create-agent.dto';
 import { AgentModel } from '../Infrastructure/models/agent.model';
 import { GetAccountAgentsQuery } from '../Application/queries/impl/get-account-agents.query';
-import { CommonAccessTokenGuard, JwtPayload } from '@app/common';
+import {
+  AgentRole,
+  CommonAccessTokenGuard,
+  JwtPayload,
+  Roles,
+} from '@app/common';
 import { Request } from 'express';
 
 @Controller('agent')
@@ -23,6 +28,7 @@ export class AgentHttpController {
   ) {}
 
   @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER)
   @Post()
   async createAgent(
     @Req() req: Request,
@@ -45,6 +51,7 @@ export class AgentHttpController {
   }
 
   @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get()
   async getAccountAgents(@Req() req: Request): Promise<AgentModel[]> {
     const agent = req['user'] as JwtPayload;

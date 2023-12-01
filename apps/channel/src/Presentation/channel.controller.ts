@@ -46,6 +46,7 @@ export class ChannelController {
   }
 
   @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get()
   async getAccountChannels(@Req() req: Request) {
     const user = req['user'] as JwtPayload;
@@ -57,6 +58,7 @@ export class ChannelController {
   }
 
   @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get(':id')
   async getById(
     @Req() req: Request,
@@ -76,6 +78,7 @@ export class ChannelController {
   }
 
   @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Patch(':id/agents')
   async updateChannelAgents(
     @Req() req: Request,

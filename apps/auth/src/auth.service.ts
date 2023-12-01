@@ -10,6 +10,7 @@ import {
   JwtPayload,
   AgentDto,
   ACCOUNT_SERVICE,
+  AgentRole,
 } from '@app/common';
 import { SignupDto } from './dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
@@ -160,7 +161,11 @@ export class AuthService {
       .pipe(
         map(async (agent) => {
           console.debug('validate agent', agent.role);
-          if (agent && (await bcrypt.compare(password, agent.password)))
+          if (
+            agent &&
+            (await bcrypt.compare(password, agent.password)) &&
+            [AgentRole.OWNER, AgentRole.ADMIN].includes(agent.role)
+          )
             return agent;
           else return null;
         }),
