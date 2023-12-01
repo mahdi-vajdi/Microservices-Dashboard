@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import {
+  BadRequestException,
+  Body,
+  Controller,
+  Get,
+  Post,
+  Req,
+  UseGuards,
+} from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
 import { CreateAgentCommand } from '../Application/commands/impl/create-agent.command';
 import { CreateAgentDto } from '../Application/dto/create-agent.dto';
@@ -21,9 +29,19 @@ export class AgentHttpController {
     @Body() dto: CreateAgentDto,
   ): Promise<void> {
     const agent = req['user'] as JwtPayload;
-    await this.commandBus.execute<CreateAgentCommand, void>(
-      new CreateAgentCommand(agent.sub, dto),
-    );
+    const createdAgent = await this.commandBus.execute<
+      CreateAgentCommand,
+      void
+    >(new CreateAgentCommand(agent.account, dto));
+
+    console.debug('agent createor account: ', agent.account);
+
+    // null value means agent info was duplicate
+    if (createdAgent === null)
+      throw new BadRequestException('Agent email and phone are duplicate');
+
+    // just return means operation was successfull
+    return;
   }
 
   @UseGuards(CommonAccessTokenGuard)
@@ -31,7 +49,7 @@ export class AgentHttpController {
   async getAccountAgents(@Req() req: Request): Promise<AgentModel[]> {
     const agent = req['user'] as JwtPayload;
     return await this.queryBus.execute<GetAccountAgentsQuery, AgentModel[]>(
-      new GetAccountAgentsQuery(agent.sub),
+      new GetAccountAgentsQuery(agent.account),
     );
   }
 }

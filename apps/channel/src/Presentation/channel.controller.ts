@@ -1,4 +1,9 @@
-import { CommonAccessTokenGuard, JwtPayload } from '@app/common';
+import {
+  AgentRole,
+  CommonAccessTokenGuard,
+  JwtPayload,
+  Roles,
+} from '@app/common';
 import {
   Body,
   Controller,
@@ -28,6 +33,7 @@ export class ChannelController {
   ) {}
 
   @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER)
   @Post()
   async create(
     @Req() req: Request,

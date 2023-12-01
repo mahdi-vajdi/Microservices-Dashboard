@@ -3,14 +3,23 @@ import { CreateAgentCommand } from '../impl/create-agent.command';
 import { AgentEntityRepository } from 'apps/agent/src/Domain/base-agent.entity-repo';
 import { Agent } from 'apps/agent/src/Domain/entities/agent.entity';
 import { Types } from 'mongoose';
+import { AgentQueryRepository } from 'apps/agent/src/Infrastructure/repositories/agent.query-repo';
+import * as bcrypt from 'bcryptjs';
 
 @CommandHandler(CreateAgentCommand)
 export class CreateAgentHandler
-  implements ICommandHandler<CreateAgentCommand, void>
+  implements ICommandHandler<CreateAgentCommand, void | null>
 {
-  constructor(private readonly agentRepo: AgentEntityRepository) {}
+  constructor(
+    private readonly agentEntityRepo: AgentEntityRepository,
+    private readonly agentQueryRepo: AgentQueryRepository,
+  ) {}
 
-  async execute({ accountId, dto }: CreateAgentCommand): Promise<void> {
+  async execute({ accountId, dto }: CreateAgentCommand): Promise<void | null> {
+    // Check if agent info are duplicate; null means duplicate
+    if (await this.agentQueryRepo.agentExists(dto.email, dto.phone))
+      return null;
+
     const agent = Agent.create(
       new Types.ObjectId().toHexString(),
       accountId,
@@ -19,13 +28,13 @@ export class CreateAgentHandler
       dto.firstName,
       dto.lastName,
       dto.title,
-      dto.password,
+      await bcrypt.hash(dto.password, 10),
       null,
       dto.role,
       'default',
     );
 
-    await this.agentRepo.add(agent);
+    await this.agentEntityRepo.add(agent);
     agent.commit();
   }
 }

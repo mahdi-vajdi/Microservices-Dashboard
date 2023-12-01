@@ -1,9 +1,10 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { AgentModel as AgentModel } from '../models/agent.model';
 import { Model } from 'mongoose';
-import { AgentDto } from '@app/common';
+import { AgentDto, AgentRole } from '@app/common';
+import { DomainAgentRole } from '../../Domain/value-objects/agent-roles.enum';
 
-export class AgentQueryepository {
+export class AgentQueryRepository {
   constructor(
     @InjectModel(AgentModel.name)
     private readonly agentModel: Model<AgentModel>,
@@ -23,8 +24,13 @@ export class AgentQueryepository {
     else return null;
   }
 
-  async findByAdmin(adminId: string): Promise<AgentModel[]> {
-    return this.agentModel.find({ admin: adminId }, {}, { lean: true }).exec();
+  async findByAccount(accountId: string): Promise<AgentModel[]> {
+    const agents = await this.agentModel
+      .find({ account: accountId }, {}, { lean: true })
+      .exec();
+
+    console.debug('found agents: ', JSON.stringify(agents));
+    return agents;
   }
 
   async findIdsByAccount(accountId: string): Promise<string[]> {
@@ -53,6 +59,7 @@ export class AgentQueryepository {
       firstName: agent.firstName,
       lastName: agent.lastName,
       title: agent.title,
+      role: agent.role as unknown as AgentRole,
       password: agent.password,
       refreshToken: agent.refreshToken,
     };

@@ -6,7 +6,7 @@ import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
 import { AgentModel, AgentSchema } from './Infrastructure/models/agent.model';
 import { AgentEntityRepositoryImpl } from './Infrastructure/repositories/impl-agent.entity-repo';
-import { AgentQueryepository } from './Infrastructure/repositories/agent.query-repo';
+import { AgentQueryRepository } from './Infrastructure/repositories/agent.query-repo';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTH_SERVICE } from '@app/common';
 import { AgentCommandHandlers } from './Application/commands/handlers';
@@ -49,7 +49,7 @@ import { AgentNatsController } from './Presentation/agent.nats-cotroller';
   controllers: [AgentHttpController, AgentNatsController],
   providers: [
     { provide: AgentEntityRepository, useClass: AgentEntityRepositoryImpl },
-    AgentQueryepository,
+    AgentQueryRepository,
     ...AgentCommandHandlers,
     ...AgentQueryHandlers,
   ],

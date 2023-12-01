@@ -33,7 +33,7 @@ export class CreateOwnerAgentHandler
   }
 
   private toAgentDto(agent: Agent): AgentDto {
-    return {
+    const agentDto = {
       id: agent.id,
       createdAt: agent.createdAt,
       updatedAt: agent.updatedAt,
@@ -43,9 +43,11 @@ export class CreateOwnerAgentHandler
       firstName: agent.firstName,
       lastName: agent.lastName,
       title: agent.title,
-      role: AgentRole[DomainAgentRole[agent.role] as keyof typeof AgentRole],
+      role: AgentRole.OWNER,
       password: agent.password,
       refreshToken: agent.refreshToken,
     };
+    console.debug('owner agent created. role: ', agentDto.role);
+    return agentDto;
   }
 }

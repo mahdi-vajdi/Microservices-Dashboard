@@ -13,11 +13,11 @@ import {
 } from '@app/common';
 import { SignupDto } from './dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { JwtHelperService } from './jwt-helper.service';
 import { Observable, lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { AccountDto } from '@app/common/dto/account.dto';
+import { JwtHelperService } from './jwt-helper.service';
 
 export type AuthResponse = {
   email: string;
@@ -69,6 +69,7 @@ export class AuthService {
       .pipe(
         map(async (agent) => {
           // generate tokens for the agent
+          console.debug('generating tokens, role: ', agent.role);
           const tokens = await this.jwtUtils.generateTokens(
             agent.id,
             agent.email,
@@ -158,7 +159,7 @@ export class AuthService {
       .send<AgentDto>('getAgentByEmail', { email })
       .pipe(
         map(async (agent) => {
-          console.debug('validate agent', JSON.stringify(agent));
+          console.debug('validate agent', agent.role);
           if (agent && (await bcrypt.compare(password, agent.password)))
             return agent;
           else return null;
