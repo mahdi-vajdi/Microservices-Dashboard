@@ -43,7 +43,7 @@ export class CreateOwnerAgentHandler
       firstName: agent.firstName,
       lastName: agent.lastName,
       title: agent.title,
-      role: AgentRole.OWNER,
+      role: agent.role as unknown as AgentRole,
       password: agent.password,
       refreshToken: agent.refreshToken,
     };

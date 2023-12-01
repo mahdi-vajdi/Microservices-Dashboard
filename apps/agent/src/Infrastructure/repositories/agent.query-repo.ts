@@ -2,7 +2,6 @@ import { InjectModel } from '@nestjs/mongoose';
 import { AgentModel as AgentModel } from '../models/agent.model';
 import { Model } from 'mongoose';
 import { AgentDto, AgentRole } from '@app/common';
-import { DomainAgentRole } from '../../Domain/value-objects/agent-roles.enum';
 
 export class AgentQueryRepository {
   constructor(

@@ -15,9 +15,6 @@ export class AccountQueryRepository {
   }
 
   async findOneByEmail(email: string): Promise<AccountModel | null> {
-    const account = await this.account
-      .findOne({ email }, {}, { lean: true })
-      .exec();
-    return account;
+    return await this.account.findOne({ email }, {}, { lean: true }).exec();
   }
 }
