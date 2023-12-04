@@ -12,12 +12,11 @@ export class AccountEntityRepositoryImpl implements AccountEntityRepository {
     private readonly accountModel: Model<AccountModel>,
   ) {}
 
-  async add(accountEntity: Account): Promise<Account> {
+  async add(accountEntity: Account): Promise<void> {
     const newAccount = await this.accountModel.create(
       this.fromEntity(accountEntity),
     );
-
-    return this.toEntity(newAccount);
+    console.log('created account: ', JSON.stringify(newAccount));
   }
 
   async save(account: Account): Promise<void> {
@@ -39,7 +38,7 @@ export class AccountEntityRepositoryImpl implements AccountEntityRepository {
       _id: new Types.ObjectId(account.id),
       createdAt: account.createdAt,
       updatedAt: account.updatedAt,
-      email: new Types.ObjectId(account.email),
+      email: account.email,
     };
   }
 
@@ -48,7 +47,7 @@ export class AccountEntityRepositoryImpl implements AccountEntityRepository {
       model._id.toHexString(),
       model.createdAt,
       model.updatedAt,
-      model.email.toHexString(),
+      model.email,
     );
   }
 }

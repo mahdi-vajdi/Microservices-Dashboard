@@ -38,7 +38,15 @@ export class AuthService {
   async signup(
     signupDto: SignupDto,
   ): Promise<Observable<Promise<AuthResponse>>> {
-    // check if email or phone exists
+    // check if account exists
+    const accountExists = await lastValueFrom(
+      this.accountService.send<boolean>('accountExists', {
+        email: signupDto.email,
+      }),
+    );
+    if (accountExists) throw new ConflictException('Account already exists');
+
+    // check if agent exists
     const agentExists = await lastValueFrom(
       this.agentService.send<boolean>('agentExists', {
         email: signupDto.email,
@@ -48,27 +56,46 @@ export class AuthService {
     if (agentExists) throw new ConflictException('Agent already exists');
 
     // create an account for the new signup
-    const account = await lastValueFrom(
-      this.accountService.send<AccountDto>('createAccount', {
+    await lastValueFrom(
+      this.accountService.emit<void>('createAccount', {
         email: signupDto.email,
       }),
     );
-    if (!account)
+
+    // get the created account
+    const account = await lastValueFrom(
+      this.accountService.send<AccountDto>('getAccountByEmail', {
+        email: signupDto.email,
+      }),
+    );
+    if (!account) {
+      console.debug('there is no account');
       throw new InternalServerErrorException(
         'something went wrong while creating account',
       );
+    }
 
-    return this.agentService
-      .send<AgentDto>('createOwnerAgent', {
+    // create a defualt agent for the new account
+    await lastValueFrom(
+      this.agentService.emit('createOwnerAgent', {
         accountId: account.id,
         firstName: signupDto.firstName,
         lastName: signupDto.lastName,
         email: signupDto.email,
         phone: signupDto.phone,
         password: await bcrypt.hash(signupDto.password, 10),
-      })
+      }),
+    );
+
+    // get the create agent info
+    return this.agentService
+      .send<AgentDto | null>('getAgentByEmail', { email: signupDto.email })
       .pipe(
         map(async (agent) => {
+          if (!agent)
+            throw new InternalServerErrorException(
+              'something went wrong while creating account',
+            );
           // generate tokens for the agent
           const tokens = await this.jwtUtils.generateTokens(
             agent.id,
