@@ -68,12 +68,10 @@ export class AuthService {
         email: signupDto.email,
       }),
     );
-    if (!account) {
-      console.debug('there is no account');
+    if (!account)
       throw new InternalServerErrorException(
         'something went wrong while creating account',
       );
-    }
 
     // create a defualt agent for the new account
     await lastValueFrom(

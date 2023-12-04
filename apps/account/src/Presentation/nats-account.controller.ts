@@ -22,8 +22,6 @@ export class NatsAccountController {
     await this.commandBus.execute<CreateAccountCommand, void>(
       new CreateAccountCommand(email),
     );
-    console.debug('account created');
-    return;
   }
 
   @MessagePattern('getAccountById')
