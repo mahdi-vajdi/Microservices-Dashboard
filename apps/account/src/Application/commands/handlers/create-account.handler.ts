@@ -17,6 +17,7 @@ export class CreateAccountHandler
     const account = this.eventPublisher.mergeObjectContext(
       Account.create(new Types.ObjectId().toHexString(), email),
     );
+
     await this.accountRepository.add(account);
     account.commit();
   }

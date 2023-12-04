@@ -23,10 +23,8 @@ export class AgentNatsController {
   ) {}
 
   @MessagePattern('createOwnerAgent')
-  async createOwnerAgent(
-    @Payload() dto: CreateOwnerAgentDto,
-  ): Promise<AgentDto> {
-    return await this.commandBus.execute<CreateOwnerAgentCommand, AgentDto>(
+  async createOwnerAgent(@Payload() dto: CreateOwnerAgentDto): Promise<void> {
+    await this.commandBus.execute<CreateOwnerAgentCommand, AgentDto>(
       new CreateOwnerAgentCommand(dto),
     );
   }
