@@ -59,6 +59,25 @@ services:
     depends_on:
       - nats
 
+  gateway:
+    build:
+      context: .
+      dockerfile: ./apps/gateway/Dockerfile
+      target: development
+      command: npm run start:dev gateway
+    env_file:
+      - ./apps/channel/.env
+    ports:
+      - '3004:3004'
+    volumes:
+      - .:/usr/src/app
+    depends_on:
+      - nats
+      - account
+      - auth
+      - channel
+      - agent
+
   mongo:
     image: mongo
 
