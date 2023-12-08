@@ -29,5 +29,6 @@ COPY package-lock.json ./
 RUN npm install --omit=dev --loglevel verbose
 
 COPY --from=development /usr/src/app/dist ./dist
+COPY proto proto
 
 CMD ["node", "dist/apps/auth/main"]

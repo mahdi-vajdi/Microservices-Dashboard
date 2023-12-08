@@ -64,9 +64,9 @@ services:
       context: .
       dockerfile: ./apps/gateway/Dockerfile
       target: development
-      command: npm run start:dev gateway
+    command: npm run start:dev gateway
     env_file:
-      - ./apps/channel/.env
+      - ./apps/gateway/.env
     ports:
       - '3004:3004'
     volumes:

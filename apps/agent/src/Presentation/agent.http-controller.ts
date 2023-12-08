@@ -15,7 +15,7 @@ import { GetAccountAgentsQuery } from '../Application/queries/impl/get-account-a
 import {
   AgentRole,
   CommonAccessTokenGuard,
-  JwtPayload,
+  JwtPayloadDto,
   Roles,
 } from '@app/common';
 import { Request } from 'express';
@@ -34,7 +34,7 @@ export class AgentHttpController {
     @Req() req: Request,
     @Body() dto: CreateAgentDto,
   ): Promise<void> {
-    const agent = req['user'] as JwtPayload;
+    const agent = req['user'] as JwtPayloadDto;
     const createdAgent = await this.commandBus.execute<
       CreateAgentCommand,
       void
@@ -52,7 +52,7 @@ export class AgentHttpController {
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get()
   async getAccountAgents(@Req() req: Request): Promise<AgentModel[]> {
-    const agent = req['user'] as JwtPayload;
+    const agent = req['user'] as JwtPayloadDto;
     return await this.queryBus.execute<GetAccountAgentsQuery, AgentModel[]>(
       new GetAccountAgentsQuery(agent.account),
     );

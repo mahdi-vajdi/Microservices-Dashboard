@@ -1,4 +1,4 @@
-import { JwtPayload } from '@app/common';
+import { JwtPayloadDto } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { PassportStrategy } from '@nestjs/passport';
@@ -22,7 +22,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
     });
   }
 
-  validate(req: Request, payload: JwtPayload) {
+  validate(req: Request, payload: JwtPayloadDto) {
     // TODO: here you can look up the userId in a list of revoked tokens.
     return payload;
   }

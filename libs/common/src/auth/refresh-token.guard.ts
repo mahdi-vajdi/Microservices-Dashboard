@@ -15,8 +15,8 @@ import { ROLES_DECORATOR_KEY } from '../decorators';
 import { AUTH_SERVICE_NAME, AuthServiceClient } from '../proto';
 
 @Injectable()
-export class CommonAccessTokenGuard implements CanActivate, OnModuleInit {
-  private readonly logger = new Logger(CommonAccessTokenGuard.name);
+export class CommonRefreshTokenGuard implements CanActivate, OnModuleInit {
+  private readonly logger = new Logger(CommonRefreshTokenGuard.name);
 
   private authService: AuthServiceClient;
 
@@ -33,17 +33,17 @@ export class CommonAccessTokenGuard implements CanActivate, OnModuleInit {
   canActivate(
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
-    // Get the access token ans see if it's not null
-    const accessToken =
-      context.switchToHttp().getRequest().cookies?.access_token || null;
-    if (!accessToken) return false;
+    // Get the refresh token ans see if it's not null
+    const refreshToken =
+      context.switchToHttp().getRequest().cookies?.refresh_token || null;
+    if (!refreshToken) return false;
 
     const roles = this.reflector.get<AgentRole[]>(
       ROLES_DECORATOR_KEY,
       context.getHandler(),
     );
 
-    return this.authService.authenticateAccessToken({ accessToken }).pipe(
+    return this.authService.authenticateRefreshToken({ refreshToken }).pipe(
       tap((jwtPayload) => {
         // Get the method required method roles and see if user has them
         console.log('requester role: ', jwtPayload.role);
@@ -55,6 +55,7 @@ export class CommonAccessTokenGuard implements CanActivate, OnModuleInit {
             'The agent does not have the authorization to perform this action',
           );
         }
+
         context.switchToHttp().getRequest().user = jwtPayload;
       }),
       map(() => true),

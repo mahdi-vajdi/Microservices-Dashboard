@@ -1,24 +1,24 @@
 import {
   ConflictException,
-  ForbiddenException,
   Inject,
   Injectable,
   InternalServerErrorException,
 } from '@nestjs/common';
 import {
   AGENT_SERVICE,
-  JwtPayload,
   AgentDto,
   ACCOUNT_SERVICE,
   AgentRole,
+  SigninDto,
 } from '@app/common';
 import { SignupDto } from './dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
-import { Observable, lastValueFrom, map } from 'rxjs';
+import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { AccountDto } from '@app/common/dto/account.dto';
 import { JwtHelperService } from './jwt-helper.service';
+import { AuthTokensDto } from '@app/common';
 
 export type AuthResponse = {
   email: string;
@@ -35,9 +35,7 @@ export class AuthService {
     private readonly jwtUtils: JwtHelperService,
   ) {}
 
-  async signup(
-    signupDto: SignupDto,
-  ): Promise<Observable<Promise<AuthResponse>>> {
+  async signup(signupDto: SignupDto): Promise<AuthTokensDto | null> {
     // check if account exists
     const accountExists = await lastValueFrom(
       this.accountService.send<boolean>('accountExists', {
@@ -86,38 +84,48 @@ export class AuthService {
     );
 
     // get the create agent info
-    return this.agentService
-      .send<AgentDto | null>('getAgentByEmail', { email: signupDto.email })
-      .pipe(
-        map(async (agent) => {
-          if (!agent)
-            throw new InternalServerErrorException(
-              'something went wrong while creating account',
-            );
-          // generate tokens for the agent
-          const tokens = await this.jwtUtils.generateTokens(
-            agent.id,
-            agent.email,
-            account.id,
-            agent.role,
-          );
+    const agent = await lastValueFrom(
+      this.agentService.send<AgentDto | null>('getAgentByEmail', {
+        email: signupDto.email,
+      }),
+    );
+    if (!agent) return null;
 
-          // insert the new refresh token in agent database
-          this.agentService.emit<void>('updateRefreshToken', {
-            agentId: agent.id,
-            newToken: tokens.refresh_token,
-          });
+    const tokens = await this.jwtUtils.generateTokens(
+      agent.id,
+      agent.email,
+      account.id,
+      agent.role,
+    );
 
-          return {
-            email: agent.email,
-            agentId: agent.id,
-            ...tokens,
-          };
-        }),
-      );
+    // update the refresh token for the agent
+    this.agentService.emit<void>('updateRefreshToken', {
+      agentId: agent.id,
+      newToken: tokens.refreshToken,
+    });
+
+    return tokens;
   }
 
-  async signin(agent: AgentDto): Promise<AuthResponse> {
+  async signin({ email, password }: SigninDto): Promise<AuthTokensDto | null> {
+    const agent = await lastValueFrom(
+      this.agentService
+        .send<AgentDto | null>('getAgentByEmail', { email })
+        .pipe(
+          map(async (agent) => {
+            if (
+              agent &&
+              (await bcrypt.compare(password, agent.password)) &&
+              [AgentRole.OWNER, AgentRole.ADMIN].includes(agent.role)
+            )
+              return agent;
+            else return null;
+          }),
+        ),
+    );
+
+    if (!agent) return null;
+
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
       agent.email,
@@ -127,38 +135,35 @@ export class AuthService {
 
     this.agentService.emit<void>('updateRefreshToken', {
       agentId: agent.id,
-      newToken: tokens.refresh_token,
+      newToken: tokens.refreshToken,
     });
 
-    return {
-      email: agent.email,
-      agentId: agent.id,
-      ...tokens,
-    };
+    return tokens;
   }
 
-  signout(agent: JwtPayload): void {
+  signout(agentId: string): void {
     this.agentService.emit<void>('updateRefreshToken', {
-      agentId: agent.sub,
+      agentId: agentId,
       newToken: null,
     });
   }
 
-  async refreshTokens(agentPayload: JwtPayload, refreshToken: string) {
+  async refreshTokens(
+    agentId: string,
+    refreshToken: string,
+  ): Promise<AuthTokensDto | null> {
     const agent = await lastValueFrom(
       this.agentService.send<AgentDto | null>('getAgentById', {
-        agentId: agentPayload.sub,
+        agentId,
       }),
     );
 
-    if (!agent || !agent.refreshToken) {
-      throw new ForbiddenException('Access Denied');
-    }
+    if (!agent || !agent.refreshToken) return null;
 
     // const tokenMatches =  await bcrypt.compare(refreshToken, agent.refreshToken);
     const tokenMatches = refreshToken === agent.refreshToken;
 
-    if (!tokenMatches) throw new ForbiddenException('Acess Denied');
+    if (!tokenMatches) return null;
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -169,7 +174,7 @@ export class AuthService {
 
     this.agentService.emit<void>('updateRefreshToken', {
       agentId: agent.id,
-      newToken: tokens.refresh_token,
+      newToken: tokens.refreshToken,
     });
 
     return tokens;

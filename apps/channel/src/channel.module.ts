@@ -15,6 +15,8 @@ import {
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChannelController } from './Presentation/channel.controller';
 import { ChannelQueryRepository } from './Infrastructure/repositories/channel.query-repo';
+import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from '@app/common';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -25,6 +27,7 @@ import { ChannelQueryRepository } from './Infrastructure/repositories/channel.qu
         HTTP_PORT: Joi.number().required(),
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
+        AUTH_GRPC_URL: Joi.string().required(),
       }),
     }),
     MongooseModule.forRootAsync({
@@ -44,6 +47,18 @@ import { ChannelQueryRepository } from './Infrastructure/repositories/channel.qu
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
             queue: AUTH_SERVICE,
+          },
+        }),
+        inject: [ConfigService],
+      },
+      {
+        name: AUTH_SERVICE_NAME,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: AUTH_PACKAGE_NAME,
+            protoPath: join(__dirname, '../../../proto/auth.proto'),
+            url: configService.getOrThrow('AUTH_GRPC_URL'),
           },
         }),
         inject: [ConfigService],

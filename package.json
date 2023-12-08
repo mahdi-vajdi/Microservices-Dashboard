@@ -20,6 +20,8 @@
     "test:e2e": "jest --config ./apps/dashboard-ms/test/jest-e2e.json"
   },
   "dependencies": {
+    "@grpc/grpc-js": "^1.9.12",
+    "@grpc/proto-loader": "^0.7.10",
     "@nestjs/common": "^10.0.0",
     "@nestjs/config": "^3.1.1",
     "@nestjs/core": "^10.0.0",
@@ -37,7 +39,8 @@
     "nats": "^2.18.0",
     "nestjs": "^0.0.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1"
+    "rxjs": "^7.8.1",
+    "ts-proto": "^1.165.0"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

@@ -1,7 +1,7 @@
 import {
   AgentRole,
   CommonAccessTokenGuard,
-  JwtPayload,
+  JwtPayloadDto,
   Roles,
 } from '@app/common';
 import {
@@ -39,7 +39,7 @@ export class ChannelController {
     @Req() req: Request,
     @Body() dto: CreateChannelDto,
   ): Promise<void> {
-    const user = req['user'] as JwtPayload;
+    const user = req['user'] as JwtPayloadDto;
     await this.commandBus.execute<CreateChannelCommand, void>(
       new CreateChannelCommand(user.account, dto),
     );
@@ -49,7 +49,7 @@ export class ChannelController {
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get()
   async getAccountChannels(@Req() req: Request) {
-    const user = req['user'] as JwtPayload;
+    const user = req['user'] as JwtPayloadDto;
 
     return await this.queryBus.execute<
       GetAccountChannelsQuery,
@@ -64,7 +64,7 @@ export class ChannelController {
     @Req() req: Request,
     @Param('id', ParseMongoIdPipe) channelId: string,
   ): Promise<ChannelModel> {
-    const user = req['user'] as JwtPayload;
+    const user = req['user'] as JwtPayloadDto;
     const channel = await this.queryBus.execute<GetByIdQuery, ChannelModel>(
       new GetByIdQuery(user.sub, channelId),
     );
@@ -85,7 +85,7 @@ export class ChannelController {
     @Param('id', ParseMongoIdPipe) channelId: string,
     @Body() { agents }: UpdateChannelAgentsDto,
   ) {
-    const user = req['user'] as JwtPayload;
+    const user = req['user'] as JwtPayloadDto;
     await this.commandBus.execute<UpdateChannelAgentsCommand, void>(
       new UpdateChannelAgentsCommand(user.sub, channelId, agents),
     );

@@ -1,4 +1,4 @@
-import { AgentRole, JwtPayload } from '@app/common';
+import { AgentRole, AuthTokensDto, JwtPayloadDto } from '@app/common';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
@@ -15,15 +15,15 @@ export class JwtHelperService {
     email: string,
     account: string,
     role: AgentRole,
-  ) {
-    const payload: JwtPayload = {
+  ): Promise<AuthTokensDto> {
+    const payload: JwtPayloadDto = {
       sub: id,
       email,
       account,
       role,
     };
 
-    const [access_token, refresh_token] = await Promise.all([
+    const [accessToken, refreshToken] = await Promise.all([
       this.jwtService.signAsync(payload, {
         secret: this.configService.getOrThrow<string>('JWT_ACCESS_SECRET'),
         expiresIn: '1h',
@@ -34,6 +34,6 @@ export class JwtHelperService {
       }),
     ]);
 
-    return { access_token, refresh_token };
+    return { accessToken, refreshToken };
   }
 }

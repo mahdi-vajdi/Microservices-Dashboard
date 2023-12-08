@@ -1,0 +1,25 @@
+syntax = "proto3";
+
+package auth;
+
+service AuthService {
+  rpc AuthenticateAccessToken(AuthenticateAccessTokenMessage)
+      returns (JwtPayloadMessage) {}
+  rpc AuthenticateRefreshToken(AuthenticateRefreshTokenMessage)
+      returns (JwtPayloadMessage) {}
+}
+
+message AuthenticateAccessTokenMessage {
+  string accessToken = 1;
+}
+
+message AuthenticateRefreshTokenMessage {
+  string refreshToken = 1;
+}
+
+message JwtPayloadMessage {
+  string sub = 1;
+  string email = 2;
+  string account = 3;
+  string role = 4;
+}

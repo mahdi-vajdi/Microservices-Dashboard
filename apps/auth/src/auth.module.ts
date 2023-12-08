@@ -1,9 +1,8 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { AuthController } from './auth.controller';
+import { AuthGrpcController } from './auth.grpc-controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { LocalStrategy } from './strategies/local.strategy';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
@@ -11,6 +10,7 @@ import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ACCOUNT_SERVICE, AGENT_SERVICE } from '@app/common';
 import { JwtHelperService } from './jwt-helper.service';
+import { AuthNatsController } from './auth.nats-controller';
 
 @Module({
   imports: [
@@ -50,10 +50,9 @@ import { JwtHelperService } from './jwt-helper.service';
     JwtModule.register({}),
     PassportModule.register({ defaultStrategy: 'jwt' }),
   ],
-  controllers: [AuthController],
+  controllers: [AuthNatsController, AuthGrpcController],
   providers: [
     AuthService,
-    LocalStrategy,
     AccessTokenStrategy,
     RefreshTokenStrategy,
     JwtHelperService,
