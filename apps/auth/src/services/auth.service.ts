@@ -1,9 +1,4 @@
-import {
-  ConflictException,
-  Inject,
-  Injectable,
-  InternalServerErrorException,
-} from '@nestjs/common';
+import { Inject, Injectable } from '@nestjs/common';
 import {
   AGENT_SERVICE,
   AgentDto,
@@ -12,7 +7,7 @@ import {
   SigninDto,
 } from '@app/common';
 import { SignupDto } from '../dto/signup.dto';
-import { ClientProxy } from '@nestjs/microservices';
+import { ClientProxy, RpcException } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
@@ -42,7 +37,11 @@ export class AuthService {
         email: signupDto.email,
       }),
     );
-    if (accountExists) throw new ConflictException('Account already exists');
+    if (accountExists)
+      throw new RpcException({
+        statusCode: 409,
+        message: 'Account already exists',
+      });
 
     // check if agent exists
     const agentExists = await lastValueFrom(
@@ -51,7 +50,11 @@ export class AuthService {
         phone: signupDto.phone,
       }),
     );
-    if (agentExists) throw new ConflictException('Agent already exists');
+    if (agentExists)
+      throw new RpcException({
+        statusCode: 409,
+        message: 'Agent already exists',
+      });
 
     // create an account for the new signup
     await lastValueFrom(
@@ -67,9 +70,10 @@ export class AuthService {
       }),
     );
     if (!account)
-      throw new InternalServerErrorException(
-        'something went wrong while creating account',
-      );
+      throw new RpcException({
+        statusCode: 500,
+        message: 'Something went wrong while creating account',
+      });
 
     // create a defualt agent for the new account
     await lastValueFrom(
