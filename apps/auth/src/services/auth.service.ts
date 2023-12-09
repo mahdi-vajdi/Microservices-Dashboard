@@ -11,7 +11,7 @@ import {
   AgentRole,
   SigninDto,
 } from '@app/common';
-import { SignupDto } from './dto/signup.dto';
+import { SignupDto } from '../dto/signup.dto';
 import { ClientProxy } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';

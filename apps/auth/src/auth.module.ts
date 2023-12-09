@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
-import { AuthService } from './auth.service';
-import { AuthGrpcController } from './auth.grpc-controller';
+import { AuthService } from './services/auth.service';
+import { AuthGrpcController } from './controllers/auth.grpc-controller';
 import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
@@ -9,16 +9,16 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ACCOUNT_SERVICE, AGENT_SERVICE } from '@app/common';
-import { JwtHelperService } from './jwt-helper.service';
-import { AuthNatsController } from './auth.nats-controller';
+import { JwtHelperService } from './services/jwt-helper.service';
+import { AuthNatsController } from './controllers/auth.nats-controller';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        HTTP_PORT: Joi.number().required(),
         NATS_URI: Joi.string().required(),
+        AUTH_GRPC_URL: Joi.string().required(),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
       }),

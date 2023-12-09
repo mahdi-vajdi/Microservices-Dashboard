@@ -13,8 +13,7 @@ export class RefreshTokenStrategy extends PassportStrategy(
   constructor(configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => request?.cookies?.refresh_token || null,
-        ExtractJwt.fromAuthHeaderAsBearerToken(),
+        (request: any) => request?.refreshToken || null,
       ]),
       ignoreExpiration: false,
       secretOrKey: configService.getOrThrow('JWT_REFRESH_SECRET'),

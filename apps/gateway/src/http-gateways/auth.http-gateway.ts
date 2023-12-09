@@ -86,6 +86,7 @@ export class AuthHttpGateway {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ) {
+    // the refreshToken jwt has been validated by refreshTokenGuard
     const refreshToken = req.cookies.refresh_token;
     const user = req['user'] as JwtPayloadDto;
     const newTokens = await lastValueFrom(

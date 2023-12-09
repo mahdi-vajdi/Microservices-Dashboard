@@ -1,5 +1,5 @@
 import { Controller } from '@nestjs/common';
-import { AuthService } from './auth.service';
+import { AuthService } from '../services/auth.service';
 import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
 import {
   AuthTokensDto,
@@ -28,7 +28,7 @@ export class AuthNatsController {
     this.authService.signout(agentId);
   }
 
-  @MessagePattern('refersh')
+  @MessagePattern('refreshTokens')
   async refresh(@Payload() { agentId, refreshToken }: RefreshTokensDto) {
     return await this.authService.refreshTokens(agentId, refreshToken);
   }

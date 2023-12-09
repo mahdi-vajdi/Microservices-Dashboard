@@ -12,8 +12,7 @@ export class AccessTokenStrategy extends PassportStrategy(
   constructor(configService: ConfigService) {
     super({
       jwtFromRequest: ExtractJwt.fromExtractors([
-        (request: any) => request?.cookies?.access_token || null,
-        (request: any) => request?.access_token || null,
+        (request: any) => request?.accessToken || null,
       ]),
       ignoreExpiration: false,
       secretOrKey: configService.getOrThrow('JWT_ACCESS_SECRET'),
