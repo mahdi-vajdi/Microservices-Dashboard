@@ -1,0 +1,39 @@
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+
+package account;
+
+service AccountService {
+  rpc GetAccountById(GetAccountByIdRequest) returns (AccountMessageResponse) {}
+  rpc GetAccountByEmail(GetAccountByEmailRequest)
+      returns (AccountMessageResponse) {}
+  rpc AccountExists(AccountExistsRequest) returns (AccountExistsResponse) {}
+}
+
+message GetAccountByIdRequest {
+  string id = 1;
+}
+
+message GetAccountByEmailRequest {
+  string email = 1;
+}
+
+message AccountMessageResponse {
+  AccountMessage account = 1;
+}
+
+message AccountMessage {
+  string id = 2;
+  google.protobuf.Timestamp createdAt = 3;
+  google.protobuf.Timestamp updatedAt = 4;
+  string email = 5;
+}
+
+message AccountExistsRequest {
+  string email = 1;
+}
+
+message AccountExistsResponse {
+  bool exists = 1;
+}

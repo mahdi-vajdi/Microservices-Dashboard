@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { NatsAccountController } from './Presentation/nats-account.controller';
+import { AccountNatsController } from './Presentation/account.nats-controller';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { MongooseModule } from '@nestjs/mongoose';
@@ -23,8 +23,8 @@ import { AGENT_SERVICE } from '@app/common';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        HTTP_PORT: Joi.number().required(),
         NATS_URI: Joi.string().required(),
+        ACCOUNT_GRPC_URL: Joi.string().required(),
         MONGODB_URI: Joi.string().required(),
       }),
     }),
@@ -51,7 +51,7 @@ import { AGENT_SERVICE } from '@app/common';
       },
     ]),
   ],
-  controllers: [NatsAccountController],
+  controllers: [AccountNatsController],
   providers: [
     AccountQueryRepository,
     { provide: AccountEntityRepository, useClass: AccountEntityRepositoryImpl },
