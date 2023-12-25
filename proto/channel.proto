@@ -13,7 +13,8 @@ message GetAccountChannelsRequest {
 }
 
 message GetChannelByIdRequest {
-  string channel_id = 1;
+  string user_id = 1;
+  string channel_id = 2;
 }
 
 message ChannelsMessageResponse {

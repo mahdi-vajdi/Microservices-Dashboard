@@ -13,9 +13,10 @@ import {
   ChannelSchema,
 } from './Infrastructure/models/channel.model';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ChannelController } from './Presentation/channel.controller';
+import { ChannelController } from './Presentation/channel.nats-controller';
 import { ChannelQueryRepository } from './Infrastructure/repositories/channel.query-repo';
 import { join } from 'path';
+import { ChannelGrpcController } from './Presentation/channel.grpc-controller';
 
 @Module({
   imports: [
@@ -75,7 +76,7 @@ import { join } from 'path';
       },
     ]),
   ],
-  controllers: [ChannelController],
+  controllers: [ChannelController, ChannelGrpcController],
   providers: [
     { provide: ChannelEntityRepository, useClass: ChannelEntityRepositoryImpl },
     ChannelQueryRepository,
