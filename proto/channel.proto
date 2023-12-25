@@ -9,11 +9,11 @@ service ChannelService {
 }
 
 message GetAccountChannelsRequest {
-  string accountId = 1;
+  string account_id = 1;
 }
 
 message GetChannelByIdRequest {
-  string id = 1;
+  string channel_id = 1;
 }
 
 message ChannelsMessageResponse {
@@ -26,15 +26,15 @@ message ChannelMessageResponse {
 
 message ChannelMessage {
   string id = 1;
-  string createdAt = 2;
-  string updatedAt = 3;
+  string created_at = 2;
+  string updated_at = 3;
   string account = 4;
   string title = 5;
   string url = 6;
   string token = 7;
-  bool isEnabled = 8;
+  bool is_enabled = 8;
   repeated string agents = 9;
-  ChannelSettingsMessage settings = 10;
+  ChannelSettingsMessage chennel_settings = 10;
 }
 
 message ChannelSettingsMessage {
@@ -43,6 +43,8 @@ message ChannelSettingsMessage {
     bool see_while_typing = 2;
     bool send_voice = 3;
     bool show_raychat_credit = 4;
+    InfoForm info_form = 5;
+
     message InfoForm {
       bool is_enabled = 1;
       bool is_optional = 2;
