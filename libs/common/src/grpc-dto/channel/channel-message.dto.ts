@@ -37,7 +37,7 @@ export interface ChannelSettingsMessage {
     bg_color: string;
     lo_bg_color: string;
     secondary_color: string;
-    bgbg_themeTheme: string;
+    bg_theme: string;
   };
 
   WidgetDisplay: {
