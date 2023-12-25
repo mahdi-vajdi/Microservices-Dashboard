@@ -12,7 +12,7 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { AgentRole } from '../dto';
 import { Reflector } from '@nestjs/core';
 import { ROLES_DECORATOR_KEY } from '../decorators';
-import { AUTH_SERVICE_NAME, AuthServiceClient } from '../proto';
+import { AuthServiceClient } from '../grpc-dto';
 
 @Injectable()
 export class CommonRefreshTokenGuard implements CanActivate, OnModuleInit {
@@ -21,13 +21,12 @@ export class CommonRefreshTokenGuard implements CanActivate, OnModuleInit {
   private authService: AuthServiceClient;
 
   constructor(
-    @Inject(AUTH_SERVICE_NAME) private readonly client: ClientGrpc,
+    @Inject('AUTH_PACKAGE') private readonly client: ClientGrpc,
     private readonly reflector: Reflector,
   ) {}
 
   onModuleInit() {
-    this.authService =
-      this.client.getService<AuthServiceClient>(AUTH_SERVICE_NAME);
+    this.authService = this.client.getService<AuthServiceClient>('AuthService');
   }
 
   canActivate(

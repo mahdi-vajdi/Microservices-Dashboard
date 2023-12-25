@@ -5,63 +5,73 @@ import { AccountExistsQuery } from '../Application/queries/impl/account-exists.q
 import { QueryBus } from '@nestjs/cqrs';
 import { Controller } from '@nestjs/common';
 import {
+  AccountExistsRequest,
   AccountExistsResponse,
   AccountMessageResponse,
-  AccountServiceClient,
-  AuthServiceControllerMethods,
-  GetAccountByEmailDto,
-  GetAccountByIdDto,
+  GetAccountByEmailRequest,
+  GetAccountByIdRequest,
 } from '@app/common';
-import { Observable } from 'rxjs/internal/Observable';
-import { from } from 'rxjs/internal/observable/from';
-import { map } from 'rxjs/operators';
+import { GrpcMethod } from '@nestjs/microservices';
+import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 
 @Controller()
-@AuthServiceControllerMethods()
-export class AccountGrpcController implements AccountServiceClient {
+export class AccountGrpcController {
   constructor(private readonly queryBus: QueryBus) {}
 
-  getAccountById(
-    request: GetAccountByIdDto,
-  ): Observable<AccountMessageResponse> {
-    return from(
-      this.queryBus.execute<GetByIdQuery, AccountDto | null>(
-        new GetByIdQuery(request.id),
-      ),
-    ).pipe(
-      map((account) => {
-        if (account) return { account };
-        else return { account: undefined };
-      }),
-    );
+  @GrpcMethod('AccountService', 'GetAccountById')
+  async getAccountById(
+    data: GetAccountByIdRequest,
+    metadata: Metadata,
+    call: ServerUnaryCall<any, any>,
+  ): Promise<AccountMessageResponse> {
+    const account = await this.queryBus.execute<
+      GetByIdQuery,
+      AccountDto | null
+    >(new GetByIdQuery(data.id));
+
+    if (account)
+      return {
+        account: {
+          ...account,
+          createdAt: account.createdAt.toISOString(),
+          updatedAt: account.updatedAt.toISOString(),
+        },
+      };
+    else return { account: undefined };
   }
 
-  getAccountByEmail(
-    request: GetAccountByEmailDto,
-  ): Observable<AccountMessageResponse> {
-    return from(
-      this.queryBus.execute<GetByEmailQuery, AccountDto | null>(
-        new GetByEmailQuery(request.email),
-      ),
-    ).pipe(
-      map((account) => {
-        if (account) return { account };
-        else return { account: undefined };
-      }),
-    );
+  @GrpcMethod('AccountService', 'GetAccountByEmail')
+  async getAccountByEmail(
+    data: GetAccountByEmailRequest,
+    metadata: Metadata,
+    call: ServerUnaryCall<any, any>,
+  ): Promise<AccountMessageResponse> {
+    const account = await this.queryBus.execute<
+      GetByEmailQuery,
+      AccountDto | null
+    >(new GetByEmailQuery(data.email));
+
+    if (account)
+      return {
+        account: {
+          ...account,
+          createdAt: account.createdAt.toISOString(),
+          updatedAt: account.updatedAt.toISOString(),
+        },
+      };
+    else return { account: undefined };
   }
 
-  accountExists(
-    request: GetAccountByEmailDto,
-  ): Observable<AccountExistsResponse> {
-    return from(
-      this.queryBus.execute<AccountExistsQuery, boolean>(
-        new AccountExistsQuery(request.email),
-      ),
-    ).pipe(
-      map((exists) => {
-        return { exists };
-      }),
+  @GrpcMethod('AccountService', 'AccountExists')
+  async accountExists(
+    data: AccountExistsRequest,
+    metadata: Metadata,
+    call: ServerUnaryCall<any, any>,
+  ): Promise<AccountExistsResponse> {
+    const exists = await this.queryBus.execute<AccountExistsQuery, boolean>(
+      new AccountExistsQuery(data.email),
     );
+
+    return { exists };
   }
 }

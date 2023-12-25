@@ -11,6 +11,7 @@ import { ClientsModule, Transport } from '@nestjs/microservices';
 import { ACCOUNT_SERVICE, AGENT_SERVICE } from '@app/common';
 import { JwtHelperService } from './services/jwt-helper.service';
 import { AuthNatsController } from './controllers/auth.nats-controller';
+import { join } from 'path';
 
 @Module({
   imports: [
@@ -23,6 +24,8 @@ import { AuthNatsController } from './controllers/auth.nats-controller';
         JWT_REFRESH_SECRET: Joi.string().required(),
       }),
     }),
+    JwtModule.register({}),
+    PassportModule.register({ defaultStrategy: 'jwt' }),
     ClientsModule.registerAsync([
       {
         name: AGENT_SERVICE,
@@ -46,9 +49,20 @@ import { AuthNatsController } from './controllers/auth.nats-controller';
         }),
         inject: [ConfigService],
       },
+      {
+        name: 'ACCOUNT_PACKAGE',
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'account',
+            protoPath: join(__dirname, '../../../proto/account.proto'),
+            url: configService.getOrThrow('ACCOUNT_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
-    JwtModule.register({}),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
+    ClientsModule.register([]),
   ],
   controllers: [AuthNatsController, AuthGrpcController],
   providers: [

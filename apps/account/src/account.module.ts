@@ -16,6 +16,7 @@ import { AccountEntityRepositoryImpl } from './Infrastructure/repositories/impl-
 import { AccountEntityRepository } from './Domain/base-account.entity-repo';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AGENT_SERVICE } from '@app/common';
+import { AccountGrpcController } from './Presentation/account.grpc-controller';
 
 @Module({
   imports: [
@@ -51,7 +52,7 @@ import { AGENT_SERVICE } from '@app/common';
       },
     ]),
   ],
-  controllers: [AccountNatsController],
+  controllers: [AccountNatsController, AccountGrpcController],
   providers: [
     AccountQueryRepository,
     { provide: AccountEntityRepository, useClass: AccountEntityRepositoryImpl },

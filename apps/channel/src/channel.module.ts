@@ -15,7 +15,6 @@ import {
 import { CqrsModule } from '@nestjs/cqrs';
 import { ChannelController } from './Presentation/channel.controller';
 import { ChannelQueryRepository } from './Infrastructure/repositories/channel.query-repo';
-import { AUTH_PACKAGE_NAME, AUTH_SERVICE_NAME } from '@app/common';
 import { join } from 'path';
 
 @Module({
@@ -52,11 +51,11 @@ import { join } from 'path';
         inject: [ConfigService],
       },
       {
-        name: AUTH_SERVICE_NAME,
+        name: 'AUTH_PACKAGE',
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: AUTH_PACKAGE_NAME,
+            package: 'auth',
             protoPath: join(__dirname, '../../../proto/auth.proto'),
             url: configService.getOrThrow('AUTH_GRPC_URL'),
           },

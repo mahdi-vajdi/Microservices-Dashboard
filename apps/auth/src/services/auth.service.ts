@@ -1,19 +1,19 @@
-import { Inject, Injectable } from '@nestjs/common';
-import {
-  AGENT_SERVICE,
-  AgentDto,
-  ACCOUNT_SERVICE,
-  AgentRole,
-  SigninDto,
-} from '@app/common';
+import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { SignupDto } from '../dto/signup.dto';
-import { ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientGrpc, ClientProxy, RpcException } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
-import { AccountDto } from '@app/common/dto/account.dto';
 import { JwtHelperService } from './jwt-helper.service';
-import { AuthTokensDto } from '@app/common';
+import {
+  ACCOUNT_SERVICE,
+  AGENT_SERVICE,
+  AccountServiceClient,
+  AgentDto,
+  AgentRole,
+  AuthTokensDto,
+  SigninDto,
+} from '@app/common';
 
 export type AuthResponse = {
   email: string;
@@ -23,21 +23,31 @@ export type AuthResponse = {
 };
 
 @Injectable()
-export class AuthService {
+export class AuthService implements OnModuleInit {
+  private accountQueryService: AccountServiceClient;
+
   constructor(
     @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
-    @Inject(ACCOUNT_SERVICE) private readonly accountService: ClientProxy,
+    @Inject(ACCOUNT_SERVICE)
+    private readonly accountCommandService: ClientProxy,
+    @Inject('ACCOUNT_PACKAGE') private readonly client: ClientGrpc,
     private readonly jwtUtils: JwtHelperService,
   ) {}
 
+  onModuleInit() {
+    this.accountQueryService =
+      this.client.getService<AccountServiceClient>('AccountService');
+  }
+
   async signup(signupDto: SignupDto): Promise<AuthTokensDto | null> {
     // check if account exists
-    const accountExists = await lastValueFrom(
-      this.accountService.send<boolean>('accountExists', {
+    const { exists: itExists } = await lastValueFrom(
+      this.accountQueryService.accountExists({
         email: signupDto.email,
       }),
     );
-    if (accountExists)
+
+    if (itExists)
       throw new RpcException({
         statusCode: 409,
         message: 'Account already exists',
@@ -58,14 +68,14 @@ export class AuthService {
 
     // create an account for the new signup
     await lastValueFrom(
-      this.accountService.emit<void>('createAccount', {
+      this.accountCommandService.emit<void>('createAccount', {
         email: signupDto.email,
       }),
     );
 
     // get the created account
-    const account = await lastValueFrom(
-      this.accountService.send<AccountDto>('getAccountByEmail', {
+    const { account } = await lastValueFrom(
+      this.accountQueryService.getAccountByEmail({
         email: signupDto.email,
       }),
     );

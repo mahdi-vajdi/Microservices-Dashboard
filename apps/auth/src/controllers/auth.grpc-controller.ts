@@ -1,32 +1,35 @@
 import { Controller, UseGuards } from '@nestjs/common';
 import {
-  AuthServiceClient,
-  AuthServiceControllerMethods,
-  AuthenticateAccessTokenDto,
-  AuthenticateRefreshTokenDto,
-  JwtPayloadDto,
+  AuthenticateAccessTokenMessage,
+  AuthenticateRefreshTokenMessage,
   JwtPayloadMessage,
 } from '@app/common';
-import { Observable, of } from 'rxjs';
 import { AccessTokenGuard } from '../guards/access-token.guard';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
+import { GrpcMethod } from '@nestjs/microservices';
+import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 
 @Controller()
-@AuthServiceControllerMethods()
-export class AuthGrpcController implements AuthServiceClient {
+export class AuthGrpcController {
   @UseGuards(AccessTokenGuard)
+  @GrpcMethod('AuthService', 'AuthenticateAccessToken')
   authenticateAccessToken(
-    request: AuthenticateAccessTokenDto,
-  ): Observable<JwtPayloadDto> {
-    const jwtPayload = request['user'] as JwtPayloadDto;
-    return of(jwtPayload);
+    data: AuthenticateAccessTokenMessage,
+    metadata: Metadata,
+    call: ServerUnaryCall<any, any>,
+  ): JwtPayloadMessage {
+    const jwtPayload = call.request['user'] as JwtPayloadMessage;
+    return jwtPayload;
   }
 
   @UseGuards(RefreshTokenGuard)
+  @GrpcMethod('AuthService', 'AuthenticateRefreshToken')
   authenticateRefreshToken(
-    request: AuthenticateRefreshTokenDto,
-  ): Observable<JwtPayloadMessage> {
-    const jwtPayload = request['user'] as JwtPayloadDto;
-    return of(jwtPayload);
+    data: AuthenticateRefreshTokenMessage,
+    metadata: Metadata,
+    call: ServerUnaryCall<any, any>,
+  ): JwtPayloadMessage {
+    const jwtPayload = call.request['user'] as JwtPayloadMessage;
+    return jwtPayload;
   }
 }

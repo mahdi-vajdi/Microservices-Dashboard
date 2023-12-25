@@ -1,7 +1,5 @@
 syntax = "proto3";
 
-import "google/protobuf/timestamp.proto";
-
 package account;
 
 service AccountService {
@@ -25,8 +23,8 @@ message AccountMessageResponse {
 
 message AccountMessage {
   string id = 2;
-  google.protobuf.Timestamp createdAt = 3;
-  google.protobuf.Timestamp updatedAt = 4;
+  string createdAt = 3;
+  string updatedAt = 4;
   string email = 5;
 }
 

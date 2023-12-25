@@ -7,5 +7,3 @@ export * from './signin.dto';
 export * from './auth-tokens.dto';
 export * from './signout.dto';
 export * from './refresh-tokens.dto';
-export * from './auth-access-token.dto';
-export * from './auth-refresh-token.dto';

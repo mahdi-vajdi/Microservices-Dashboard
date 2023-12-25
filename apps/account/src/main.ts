@@ -4,6 +4,7 @@ import { AccountModule } from './account.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
 import { ACCOUNT_SERVICE } from '@app/common';
+import { join } from 'path';
 
 async function bootstrap() {
   const app = await NestFactory.create(AccountModule);
@@ -18,6 +19,16 @@ async function bootstrap() {
       queue: ACCOUNT_SERVICE,
     },
   });
+  app.connectMicroservice<MicroserviceOptions>({
+    transport: Transport.GRPC,
+    options: {
+      package: 'account',
+      protoPath: join(__dirname, '../../../proto/account.proto'),
+      url: configService.getOrThrow('ACCOUNT_GRPC_URL'),
+    },
+  });
+
+  await app.init();
   await app.startAllMicroservices();
 }
 bootstrap();

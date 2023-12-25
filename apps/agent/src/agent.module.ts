@@ -8,11 +8,7 @@ import { AgentModel, AgentSchema } from './Infrastructure/models/agent.model';
 import { AgentEntityRepositoryImpl } from './Infrastructure/repositories/impl-agent.entity-repo';
 import { AgentQueryRepository } from './Infrastructure/repositories/agent.query-repo';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  AUTH_PACKAGE_NAME,
-  AUTH_SERVICE,
-  AUTH_SERVICE_NAME,
-} from '@app/common';
+import { AUTH_SERVICE } from '@app/common';
 import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
@@ -51,13 +47,13 @@ import { join } from 'path';
         inject: [ConfigService],
       },
       {
-        name: AUTH_SERVICE_NAME,
+        name: 'AUTH_PACKAGE',
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: AUTH_PACKAGE_NAME,
+            package: 'auth',
             protoPath: join(__dirname, '../../../proto/auth.proto'),
-            url: configService.getOrThrow('AUTH_GRPC_URL'),
+            // url: configService.getOrThrow('AUTH_GRPC_URL'),
           },
         }),
         inject: [ConfigService],
