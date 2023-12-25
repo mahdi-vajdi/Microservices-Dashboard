@@ -1,0 +1,92 @@
+syntax = "proto3";
+
+package channel;
+
+service ChannelService {
+  rpc GetAccountChannels(GetAccountChannelsRequest)
+      returns (ChannelsMessageResponse) {}
+  rpc GetChannelById(GetChannelByIdRequest) returns (ChannelMessageResponse) {}
+}
+
+message GetAccountChannelsRequest {
+  string accountId = 1;
+}
+
+message GetChannelByIdRequest {
+  string id = 1;
+}
+
+message ChannelsMessageResponse {
+  repeated ChannelMessage channels = 1;
+}
+
+message ChannelMessageResponse {
+  ChannelMessage channel = 1;
+}
+
+message ChannelMessage {
+  string id = 1;
+  string createdAt = 2;
+  string updatedAt = 3;
+  string account = 4;
+  string title = 5;
+  string url = 6;
+  string token = 7;
+  bool isEnabled = 8;
+  repeated string agents = 9;
+  ChannelSettingsMessage settings = 10;
+}
+
+message ChannelSettingsMessage {
+  message Main {
+    string logo = 1;
+    bool see_while_typing = 2;
+    bool send_voice = 3;
+    bool show_raychat_credit = 4;
+    message InfoForm {
+      bool is_enabled = 1;
+      bool is_optional = 2;
+      string type = 3;
+    }
+  }
+
+  message WidgetLandings {
+    string language = 1;
+    string title = 2;
+    string description = 3;
+    string start_message = 4;
+    string start_reply = 5;
+  }
+
+  message WidgetCustomization {
+    string logo = 1;
+    string bg_color = 2;
+    string lo_bg_color = 3;
+    string secondary_color = 4;
+    string bg_theme = 5;
+  }
+
+  message WidgetDisplay {
+    bool show_in_pages_enabled = 1;
+    repeated string show_pages = 2;
+    bool hide_in_pages_enabled = 3;
+    repeated string hide_in_pages = 4;
+  }
+
+  message WidgetPosition {
+    string ltr_position = 1;
+    int32 ltr_bottom = 2;
+    int32 ltr_right = 3;
+    bool ltr_show_in_mobile = 4;
+    string rtl_position = 5;
+    int32 rtl_bottom = 6;
+    int32 rtl_left = 7;
+    bool rtl_show_in_mobile = 8;
+  }
+
+  Main main = 1;
+  repeated WidgetLandings landings = 2;
+  WidgetCustomization customization = 3;
+  WidgetDisplay display = 4;
+  WidgetPosition position = 5;
+}
