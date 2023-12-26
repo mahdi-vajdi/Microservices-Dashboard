@@ -13,7 +13,7 @@ import {
   ChannelSchema,
 } from './Infrastructure/models/channel.model';
 import { CqrsModule } from '@nestjs/cqrs';
-import { ChannelController } from './Presentation/channel.nats-controller';
+import { ChannelController } from './Presentation/channel.http-controller';
 import { ChannelQueryRepository } from './Infrastructure/repositories/channel.query-repo';
 import { join } from 'path';
 import { ChannelGrpcController } from './Presentation/channel.grpc-controller';

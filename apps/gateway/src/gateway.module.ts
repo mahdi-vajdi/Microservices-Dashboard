@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthHttpGateway } from './http-gateways/auth.http-gateway';
 import { join } from 'path';
 import * as Joi from 'joi';
+import { ChannelHttpGateway } from './http-gateways/channel.http-gateway';
 
 @Module({
   imports: [
@@ -40,9 +41,21 @@ import * as Joi from 'joi';
         }),
         inject: [ConfigService],
       },
+      {
+        name: 'CHANNEL_GPRC',
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'channel',
+            protoPath: join(__dirname, '../../../proto/channel.proto'),
+            url: configService.getOrThrow('CHANNEL_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
   ],
-  controllers: [AuthHttpGateway],
+  controllers: [AuthHttpGateway, ChannelHttpGateway],
   providers: [],
 })
 export class GatewayModule {}

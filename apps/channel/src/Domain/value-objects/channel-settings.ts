@@ -11,40 +11,38 @@ export class ChannelSettings {
     };
   };
 
-  widget: {
-    landings: {
-      laguage: string;
-      title: string;
-      description: string;
-      startMessage: string;
-      startReply: string;
-    }[];
+  widgetLandings: {
+    laguage: string;
+    title: string;
+    description: string;
+    startMessage: string;
+    startReply: string;
+  }[];
 
-    customization: {
-      logo: string;
-      bgColor: string;
-      loBgColor: string;
-      secondaryColor: string;
-      bgTheme: string;
-    };
+  widgetCustomization: {
+    logo: string;
+    bgColor: string;
+    loBgColor: string;
+    secondaryColor: string;
+    bgTheme: string;
+  };
 
-    display: {
-      showInPagesEnabled: boolean;
-      showPages: string[];
-      hideInPagesEnabled: boolean;
-      hideInPages: string[];
-    };
+  widgetDisplay: {
+    showInPagesEnabled: boolean;
+    showPages: string[];
+    hideInPagesEnabled: boolean;
+    hideInPages: string[];
+  };
 
-    position: {
-      ltrPosition: string;
-      ltrBottom: number;
-      ltrRight: number;
-      ltrShowInMobile: boolean;
-      rtlPosition: string;
-      rtlBottom: number;
-      rtlLeft: number;
-      rtlShowInMobile: boolean;
-    };
+  widgetPosition: {
+    ltrPosition: string;
+    ltrBottom: number;
+    ltrRight: number;
+    ltrShowInMobile: boolean;
+    rtlPosition: string;
+    rtlBottom: number;
+    rtlLeft: number;
+    rtlShowInMobile: boolean;
   };
 
   // FIXME: office hours, email settings, triggers need to be added

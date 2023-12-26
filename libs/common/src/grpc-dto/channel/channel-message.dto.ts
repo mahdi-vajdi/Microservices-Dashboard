@@ -1,25 +1,25 @@
 export interface ChannelMessage {
   id: string;
-  created_at: string;
-  updated_at: string;
+  createdAt: string;
+  updatedAt: string;
   account: string;
   title: string;
   url: string;
   token: string;
-  is_enabled: boolean;
+  isEnabled: boolean;
   agents: string[];
-  channel_settings: ChannelSettingsMessage;
+  channelSettings: ChannelSettingsMessage;
 }
 
 export interface ChannelSettingsMessage {
   Main: {
     logo: string;
-    see_while_typing: boolean;
-    send_voice: boolean;
-    show_raychat_credit: boolean;
+    seeWhileTyping: boolean;
+    sendVoice: boolean;
+    showRaychatCredit: boolean;
     InfoForm: {
-      is_enabled: boolean;
-      is_optional: boolean;
+      isEnabled: boolean;
+      isOptional: boolean;
       type: string;
     };
   };
@@ -28,33 +28,33 @@ export interface ChannelSettingsMessage {
     laguage: string;
     title: string;
     description: string;
-    start_message: string;
-    start_reply: string;
+    startMessage: string;
+    startReply: string;
   }[];
 
   WidgetCustomization: {
     logo: string;
-    bg_color: string;
-    lo_bg_color: string;
-    secondary_color: string;
-    bg_theme: string;
+    bgColor: string;
+    loBgColor: string;
+    secondaryColor: string;
+    bgTheme: string;
   };
 
   WidgetDisplay: {
-    show_in_pages_enabled: boolean;
-    show_pages: string[];
-    hide_in_pages_enabled: boolean;
-    hide_in_pages: string[];
+    showInPagesEnabled: boolean;
+    showPages: string[];
+    hideInPagesEnabled: boolean;
+    hideInPages: string[];
   };
 
   WidgetPosition: {
-    ltr_position: string;
-    ltr_bottom: number;
-    ltr_right: number;
-    ltr_show_in_mobile: boolean;
-    rtl_position: string;
-    rtl_bottom: number;
-    rtl_left: number;
-    rtl_show_in_mobile: boolean;
+    ltrPosition: string;
+    ltrBottom: number;
+    ltrRight: number;
+    ltrShowInMobile: boolean;
+    rtlPosition: string;
+    rtlBottom: number;
+    rtlLeft: number;
+    rtlShowInMobile: boolean;
   };
 }

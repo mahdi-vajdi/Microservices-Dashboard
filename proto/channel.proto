@@ -9,12 +9,12 @@ service ChannelService {
 }
 
 message GetAccountChannelsRequest {
-  string account_id = 1;
+  string accountId = 1;
 }
 
 message GetChannelByIdRequest {
-  string user_id = 1;
-  string channel_id = 2;
+  string userId = 1;
+  string channelId = 2;
 }
 
 message ChannelsMessageResponse {
@@ -27,28 +27,28 @@ message ChannelMessageResponse {
 
 message ChannelMessage {
   string id = 1;
-  string created_at = 2;
-  string updated_at = 3;
+  string createdAt = 2;
+  string updatedAt = 3;
   string account = 4;
   string title = 5;
   string url = 6;
   string token = 7;
-  bool is_enabled = 8;
+  bool isEnabled = 8;
   repeated string agents = 9;
-  ChannelSettingsMessage chennel_settings = 10;
+  ChannelSettingsMessage chennelSettings = 10;
 }
 
 message ChannelSettingsMessage {
   message Main {
     string logo = 1;
-    bool see_while_typing = 2;
-    bool send_voice = 3;
-    bool show_raychat_credit = 4;
-    InfoForm info_form = 5;
+    bool seeWhileTyping = 2;
+    bool sendVoice = 3;
+    bool showRaychatCredit = 4;
+    InfoForm infoForm = 5;
 
     message InfoForm {
-      bool is_enabled = 1;
-      bool is_optional = 2;
+      bool isEnabled = 1;
+      bool isOptional = 2;
       string type = 3;
     }
   }
@@ -57,34 +57,34 @@ message ChannelSettingsMessage {
     string language = 1;
     string title = 2;
     string description = 3;
-    string start_message = 4;
-    string start_reply = 5;
+    string startMessage = 4;
+    string startReply = 5;
   }
 
   message WidgetCustomization {
     string logo = 1;
-    string bg_color = 2;
-    string lo_bg_color = 3;
-    string secondary_color = 4;
-    string bg_theme = 5;
+    string bgColor = 2;
+    string loBgColor = 3;
+    string secondaryColor = 4;
+    string bgTheme = 5;
   }
 
   message WidgetDisplay {
-    bool show_in_pages_enabled = 1;
-    repeated string show_pages = 2;
-    bool hide_in_pages_enabled = 3;
-    repeated string hide_in_pages = 4;
+    bool showInPagesEnabled = 1;
+    repeated string showPages = 2;
+    bool hideInPagesEnabled = 3;
+    repeated string hideInPages = 4;
   }
 
   message WidgetPosition {
-    string ltr_position = 1;
-    int32 ltr_bottom = 2;
-    int32 ltr_right = 3;
-    bool ltr_show_in_mobile = 4;
-    string rtl_position = 5;
-    int32 rtl_bottom = 6;
-    int32 rtl_left = 7;
-    bool rtl_show_in_mobile = 8;
+    string ltrPosition = 1;
+    int32 ltrBottom = 2;
+    int32 ltrRight = 3;
+    bool ltrShowInMobile = 4;
+    string rtlPosition = 5;
+    int32 rtlBottom = 6;
+    int32 rtlLeft = 7;
+    bool rtlShowInMobile = 8;
   }
 
   Main main = 1;
