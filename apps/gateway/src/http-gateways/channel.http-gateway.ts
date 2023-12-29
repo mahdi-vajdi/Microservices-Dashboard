@@ -1,9 +1,11 @@
 import {
   AgentRole,
+  CHANNEL_SERVICE,
   ChannelServiceClient,
   ChannelsMessageResponse,
   CommonAccessTokenGuard,
   JwtPayloadDto,
+  ParseMongoIdPipe,
   Roles,
 } from '@app/common';
 import {
@@ -14,10 +16,16 @@ import {
   Param,
   Req,
   UseGuards,
+  Post,
+  Body,
+  Patch,
 } from '@nestjs/common';
-import { ClientGrpc } from '@nestjs/microservices';
+import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
 import { Request } from 'express';
 import { Observable } from 'rxjs/internal/Observable';
+import { CreateChannelDto } from '../dto/channel/create-channel.dto';
+import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
+import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
 
 @Controller('channel')
 export class ChannelHttpGateway implements OnModuleInit {
@@ -25,13 +33,12 @@ export class ChannelHttpGateway implements OnModuleInit {
 
   constructor(
     @Inject('CHANNEL_GPRC') private readonly grpcClient: ClientGrpc,
+    @Inject(CHANNEL_SERVICE) private readonly commandService: ClientProxy,
   ) {}
 
   onModuleInit() {
-    console.log('client: ', this.grpcClient);
     this.queryService =
       this.grpcClient.getService<ChannelServiceClient>('ChannelService');
-    console.log('query  service: ', this.queryService);
   }
 
   @UseGuards(CommonAccessTokenGuard)
@@ -40,7 +47,6 @@ export class ChannelHttpGateway implements OnModuleInit {
   getAccountChannels(@Req() req: Request): Observable<ChannelsMessageResponse> {
     const jwtPayload = req['user'] as JwtPayloadDto;
 
-    console.log('agent account', jwtPayload.account);
     return this.queryService.GetAccountChannels({
       accountId: jwtPayload.account,
     });
@@ -56,5 +62,39 @@ export class ChannelHttpGateway implements OnModuleInit {
       userId: jwtPayload.sub,
       channelId: channelId,
     });
+  }
+
+  @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER)
+  @Post()
+  async create(
+    @Req() req: Request,
+    @Body() dto: CreateChannelDto,
+  ): Promise<void> {
+    const jwtPaylaod = req['user'] as JwtPayloadDto;
+    await lastValueFrom(
+      this.commandService.emit<void>('createChannel', {
+        accountId: jwtPaylaod.account,
+        ...dto,
+      }),
+    );
+  }
+
+  @UseGuards(CommonAccessTokenGuard)
+  @Roles(AgentRole.OWNER, AgentRole.ADMIN)
+  @Patch(':id/agents')
+  async updateChannelAgents(
+    @Req() req: Request,
+    @Param('id', ParseMongoIdPipe) channelId: string,
+    @Body() dto: UpdateChannelAgentsDto,
+  ) {
+    const jwtPaylaod = req['user'] as JwtPayloadDto;
+    await lastValueFrom(
+      this.commandService.emit<void>('updateChannelAgents', {
+        requesterAccountId: jwtPaylaod.account,
+        channelId,
+        ...dto,
+      }),
+    );
   }
 }

@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE } from '@app/common';
+import { AUTH_SERVICE, CHANNEL_SERVICE } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AuthHttpGateway } from './http-gateways/auth.http-gateway';
 import { join } from 'path';
@@ -49,6 +49,17 @@ import { ChannelHttpGateway } from './http-gateways/channel.http-gateway';
             package: 'channel',
             protoPath: join(__dirname, '../../../proto/channel.proto'),
             url: configService.getOrThrow('CHANNEL_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
+      },
+      {
+        name: CHANNEL_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [configService.getOrThrow('NATS_URI')],
+            queue: CHANNEL_SERVICE,
           },
         }),
         inject: [ConfigService],

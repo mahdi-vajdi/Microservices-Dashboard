@@ -1,8 +1,6 @@
 import { IsBoolean, IsNotEmpty, IsString, Length } from 'class-validator';
 
 export class CreateChannelDto {
-  accountId: string;
-
   @IsNotEmpty()
   @IsString()
   @Length(4, 40)

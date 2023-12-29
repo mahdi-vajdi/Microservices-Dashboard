@@ -22,14 +22,10 @@ export class ChannelGrpcController {
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
   ): Promise<ChannelsMessageResponse> {
-    console.debug('get channels accountId', data);
-
     const channels = await this.queryBus.execute<
       GetAccountChannelsQuery,
       ChannelModel[] | null
     >(new GetAccountChannelsQuery(data.accountId));
-
-    console.debug('channels: ', channels);
 
     if (channels)
       return { channels: channels.map((channel) => this.toGrpcModel(channel)) };
@@ -42,7 +38,6 @@ export class ChannelGrpcController {
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
   ): Promise<ChannelMessageResponse> {
-    console.debug('getChannelById: userid: ', data);
     const channel = await this.queryBus.execute<GetByIdQuery, ChannelModel>(
       new GetByIdQuery(data.userId, data.channelId),
     );

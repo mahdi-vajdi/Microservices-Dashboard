@@ -53,7 +53,7 @@ import { join } from 'path';
           options: {
             package: 'auth',
             protoPath: join(__dirname, '../../../proto/auth.proto'),
-            // url: configService.getOrThrow('AUTH_GRPC_URL'),
+            url: configService.getOrThrow('AUTH_GRPC_URL'),
           },
         }),
         inject: [ConfigService],

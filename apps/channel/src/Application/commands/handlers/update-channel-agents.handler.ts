@@ -13,9 +13,8 @@ export class UpdateChannelAgentsHandler
 
     if (!channel || channel.account !== command.accountId) return;
 
-    if (channel && channel.account === command.accountId) {
+    if (channel && channel.account === command.accountId)
       channel.updateAgents(command.agentIds);
-    }
 
     await this.channelRepo.save(channel);
     channel.commit();

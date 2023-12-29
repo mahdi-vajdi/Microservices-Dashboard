@@ -13,10 +13,7 @@ export class AccountEntityRepositoryImpl implements AccountEntityRepository {
   ) {}
 
   async add(accountEntity: Account): Promise<void> {
-    const newAccount = await this.accountModel.create(
-      this.fromEntity(accountEntity),
-    );
-    console.log('created account: ', JSON.stringify(newAccount));
+    await this.accountModel.create(this.fromEntity(accountEntity));
   }
 
   async save(account: Account): Promise<void> {
