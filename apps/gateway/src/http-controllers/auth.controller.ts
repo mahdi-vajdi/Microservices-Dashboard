@@ -27,7 +27,7 @@ import { Request, Response } from 'express';
 import { lastValueFrom } from 'rxjs';
 
 @Controller('auth')
-export class AuthHttpGateway {
+export class AuthHttpController {
   constructor(
     @Inject(AUTH_SERVICE) private readonly authServiceNats: ClientProxy,
   ) {}

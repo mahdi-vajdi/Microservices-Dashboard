@@ -2,10 +2,10 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import { AUTH_SERVICE, CHANNEL_SERVICE } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthHttpGateway } from './http-gateways/auth.http-gateway';
+import { AuthHttpController } from './http-controllers/auth.controller';
 import { join } from 'path';
 import * as Joi from 'joi';
-import { ChannelHttpGateway } from './http-gateways/channel.http-gateway';
+import { ChannelHttpController } from './http-controllers/channel.controller';
 
 @Module({
   imports: [
@@ -66,7 +66,7 @@ import { ChannelHttpGateway } from './http-gateways/channel.http-gateway';
       },
     ]),
   ],
-  controllers: [AuthHttpGateway, ChannelHttpGateway],
+  controllers: [AuthHttpController, ChannelHttpController],
   providers: [],
 })
 export class GatewayModule {}

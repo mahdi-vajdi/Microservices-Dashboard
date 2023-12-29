@@ -28,7 +28,7 @@ import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
 import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
 
 @Controller('channel')
-export class ChannelHttpGateway implements OnModuleInit {
+export class ChannelHttpController implements OnModuleInit {
   queryService: ChannelServiceClient;
 
   constructor(
