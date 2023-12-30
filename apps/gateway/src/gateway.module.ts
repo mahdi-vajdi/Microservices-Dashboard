@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE, CHANNEL_SERVICE } from '@app/common';
+import { AGENT_SERVICE, AUTH_SERVICE, CHANNEL_SERVICE } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
-import { AuthHttpController } from './http-controllers/auth.controller';
 import { join } from 'path';
 import * as Joi from 'joi';
 import { ChannelHttpController } from './http-controllers/channel.controller';
+import { AgentHttpController } from './http-controllers/agent.controller';
+import { AuthHttpController } from './http-controllers/auth.controller';
 
 @Module({
   imports: [
@@ -64,9 +65,20 @@ import { ChannelHttpController } from './http-controllers/channel.controller';
         }),
         inject: [ConfigService],
       },
+      {
+        name: AGENT_SERVICE,
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.NATS,
+          options: {
+            servers: [configService.getOrThrow('NATS_URI')],
+            queue: AGENT_SERVICE,
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
   ],
-  controllers: [AuthHttpController, ChannelHttpController],
+  controllers: [AuthHttpController, ChannelHttpController, AgentHttpController],
   providers: [],
 })
 export class GatewayModule {}

@@ -22,31 +22,7 @@ import { Request } from 'express';
 
 @Controller('agent')
 export class AgentHttpController {
-  constructor(
-    private readonly commandBus: CommandBus,
-    private readonly queryBus: QueryBus,
-  ) {}
-
-  @UseGuards(CommonAccessTokenGuard)
-  @Roles(AgentRole.OWNER)
-  @Post()
-  async createAgent(
-    @Req() req: Request,
-    @Body() dto: CreateAgentDto,
-  ): Promise<void> {
-    const agent = req['user'] as JwtPayloadDto;
-    const createdAgent = await this.commandBus.execute<
-      CreateAgentCommand,
-      void
-    >(new CreateAgentCommand(agent.account, dto));
-
-    // null value means agent info was duplicate
-    if (createdAgent === null)
-      throw new BadRequestException('Agent email and phone are duplicate');
-
-    // just return means operation was successfull
-    return;
-  }
+  constructor(private readonly queryBus: QueryBus) {}
 
   @UseGuards(CommonAccessTokenGuard)
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)

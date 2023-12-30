@@ -1,3 +1,4 @@
+import { AgentRole } from '@app/common';
 import {
   IsArray,
   IsEmail,
@@ -9,11 +10,8 @@ import {
   IsStrongPassword,
   Length,
 } from 'class-validator';
-import { DomainAgentRole } from '../../Domain/value-objects/agent-roles.enum';
 
 export class CreateAgentDto {
-  requesterAccountId: string;
-
   @IsEmail()
   @Length(5, 50)
   email: string;
@@ -44,6 +42,6 @@ export class CreateAgentDto {
   @Length(8, 20)
   password: string;
 
-  @IsEnum(DomainAgentRole)
-  role: DomainAgentRole;
+  @IsEnum(AgentRole)
+  role: AgentRole;
 }

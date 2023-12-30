@@ -1,6 +1,11 @@
 import { Controller } from '@nestjs/common';
 import { CommandBus, QueryBus } from '@nestjs/cqrs';
-import { EventPattern, MessagePattern, Payload } from '@nestjs/microservices';
+import {
+  EventPattern,
+  MessagePattern,
+  Payload,
+  RpcException,
+} from '@nestjs/microservices';
 import { GetAgentIdsDto } from '../Application/dto/get-agents-ids.dto';
 import { GetAccountAgentsIdsQuery } from '../Application/queries/impl/get-account-agents-ids.query';
 import { UpdateRefreshTokenDto } from '../Application/dto/update-refresh-token.dto';
@@ -14,6 +19,8 @@ import { GetByEmailDto } from '../Application/dto/get-by-email.dto';
 import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query';
 import { CreateOwnerAgentDto } from '../Application/dto/create-owner-agent.dto';
 import { CreateOwnerAgentCommand } from '../Application/commands/impl/create-owner-agent.command';
+import { CreateAgentCommand } from '../Application/commands/impl/create-agent.command';
+import { CreateAgentDto } from '../Application/dto/create-agent.dto';
 
 @Controller()
 export class AgentNatsController {
@@ -27,6 +34,21 @@ export class AgentNatsController {
     await this.commandBus.execute<CreateOwnerAgentCommand, AgentDto>(
       new CreateOwnerAgentCommand(dto),
     );
+  }
+
+  @EventPattern('createAgent')
+  async createAgent(@Payload() dto: CreateAgentDto): Promise<void | null> {
+    const agent = await this.commandBus.execute<
+      CreateAgentCommand,
+      void | null
+    >(new CreateAgentCommand(dto));
+
+    // null value means agent info was duplicate
+    if (agent === null)
+      throw new RpcException({
+        statusCode: 409,
+        message: 'Agent email/phone is duplicate',
+      });
   }
 
   @MessagePattern('getAgentsIds')

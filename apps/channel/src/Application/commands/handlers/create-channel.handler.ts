@@ -3,7 +3,7 @@ import { CreateChannelCommand } from '../impl/create-channel.command';
 import { Inject } from '@nestjs/common';
 import { AGENT_SERVICE } from '@app/common';
 import { ClientProxy } from '@nestjs/microservices';
-import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
+import { lastValueFrom } from 'rxjs';
 import { Types } from 'mongoose';
 import { ChannelEntityRepository } from 'apps/channel/src/Domain/base-channel.repo';
 import { Channel } from 'apps/channel/src/Domain/entities/channel.entity';

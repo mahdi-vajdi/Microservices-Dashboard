@@ -24,7 +24,7 @@ import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
 import { Request } from 'express';
 import { Observable } from 'rxjs/internal/Observable';
 import { CreateChannelDto } from '../dto/channel/create-channel.dto';
-import { lastValueFrom } from 'rxjs/internal/lastValueFrom';
+import { lastValueFrom } from 'rxjs';
 import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
 
 @Controller('channel')

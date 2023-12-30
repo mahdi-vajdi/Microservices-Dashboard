@@ -15,14 +15,14 @@ export class CreateAgentHandler
     private readonly agentQueryRepo: AgentQueryRepository,
   ) {}
 
-  async execute({ accountId, dto }: CreateAgentCommand): Promise<void | null> {
+  async execute({ dto }: CreateAgentCommand): Promise<void | null> {
     // Check if agent info are duplicate; null means duplicate
     if (await this.agentQueryRepo.agentExists(dto.email, dto.phone))
       return null;
 
     const agent = Agent.create(
       new Types.ObjectId().toHexString(),
-      accountId,
+      dto.requesterAccountId,
       dto.email,
       dto.phone,
       dto.firstName,
@@ -36,5 +36,6 @@ export class CreateAgentHandler
 
     await this.agentEntityRepo.add(agent);
     agent.commit();
+    return;
   }
 }
