@@ -1,0 +1,69 @@
+syntax = "proto3";
+
+package agent;
+
+service AgentService {
+  rpc GetAccountAgents(GetAccountAgentsRequest) returns (AgentsResponse) {}
+  rpc GetAgnetsIds(GetAgnetsIdsRequest) returns (AgentIdsResponse) {}
+  rpc GetAgentById(GetAgentByIdRequest) returns (AgentResponse) {}
+  rpc GetAgentByEmail(GetAgentByEmailReqeust) returns (AgentResponse) {}
+  rpc AgentExists(AgentExistsRequest) returns (AgentExistsResponse) {}
+}
+
+message GetAccountAgentsRequest {
+  string accountId = 1;
+}
+
+message GetAgnetsIdsRequest {
+  string accountId = 1;
+}
+
+message GetAgentByIdRequest {
+  string agentId = 1;
+}
+
+message GetAgentByEmailReqeust {
+  string agentEmail = 1;
+}
+
+message AgentExistsRequest {
+  string email = 1;
+  string phone = 2;
+}
+
+message AgentMessage {
+  string id = 1;
+  string createdAt = 2;
+  string updatedAt = 3;
+  string account = 4;
+  string email = 5;
+  string phone = 6;
+  string firstName = 7;
+  string lastName = 8;
+  string title = 9;
+  AgentRole role = 10;
+  string password = 11;
+  string refreshToken = 12;
+
+  enum AgentRole {
+    OWNER = 0;
+    ADMIN = 1;
+    AGENT = 2;
+  }
+}
+
+message AgentsResponse {
+  repeated AgentMessage agents = 1;
+}
+
+message AgentIdsResponse {
+  repeated string agentsIds = 1;
+}
+
+message AgentResponse {
+  AgentMessage agent = 1;
+}
+
+message AgentExistsResponse {
+  bool agentExists = 1;
+}
