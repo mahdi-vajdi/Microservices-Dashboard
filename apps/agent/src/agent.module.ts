@@ -1,5 +1,5 @@
 import { Module } from '@nestjs/common';
-import { AgentHttpController } from './Presentation/agent.http-controller';
+import { AgentHttpController } from './Presentation/agent.grpc-controller';
 import { CqrsModule } from '@nestjs/cqrs';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
@@ -21,7 +21,6 @@ import { join } from 'path';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        HTTP_PORT: Joi.number().required(),
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),

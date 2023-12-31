@@ -1,9 +1,9 @@
-import { AgentRole } from './agent-roles.enum';
+import { AgentRole } from './agent-role.enum';
 
 export type AgentDto = {
   id: string;
-  createdAt: Date;
-  updatedAt: Date;
+  createdAt: string;
+  updatedAt: string;
   account: string;
   email: string;
   phone: string;

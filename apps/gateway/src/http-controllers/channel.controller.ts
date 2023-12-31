@@ -47,7 +47,7 @@ export class ChannelHttpController implements OnModuleInit {
   getAccountChannels(@Req() req: Request): Observable<ChannelsMessageResponse> {
     const jwtPayload = req['user'] as JwtPayloadDto;
 
-    return this.queryService.GetAccountChannels({
+    return this.queryService.getAccountChannels({
       accountId: jwtPayload.account,
     });
   }
@@ -58,8 +58,8 @@ export class ChannelHttpController implements OnModuleInit {
   async getChannelById(@Req() req: Request, @Param('id') channelId: string) {
     const jwtPayload = req['user'] as JwtPayloadDto;
 
-    return this.queryService.GetChannelById({
-      userId: jwtPayload.sub,
+    return this.queryService.getChannelById({
+      accountId: jwtPayload.account,
       channelId: channelId,
     });
   }

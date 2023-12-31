@@ -9,7 +9,7 @@ export class AccountCreatedHandler
   implements IEventHandler<AccountCreatedEvent>
 {
   constructor(
-    @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
+    @Inject(AGENT_SERVICE) private readonly agentCommandService: ClientProxy,
   ) {}
 
   async handle(event: AccountCreatedEvent): Promise<void> {

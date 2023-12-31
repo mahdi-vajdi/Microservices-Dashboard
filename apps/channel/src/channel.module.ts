@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AGENT_SERVICE, AUTH_SERVICE } from '@app/common/constants';
+import { AUTH_SERVICE } from '@app/common';
 import { ChannelEntityRepository } from './Domain/base-channel.repo';
 import { ChannelEntityRepositoryImpl } from './Infrastructure/repositories/impl-channel.entity-repo';
 import { ChannelChannelHandlers } from './Application/commands/handlers';
@@ -24,7 +24,6 @@ import { ChannelGrpcController } from './Presentation/channel.grpc-controller';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        HTTP_PORT: Joi.number().required(),
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),
@@ -64,12 +63,13 @@ import { ChannelGrpcController } from './Presentation/channel.grpc-controller';
         inject: [ConfigService],
       },
       {
-        name: AGENT_SERVICE,
+        name: 'AGENT_PACKAGE',
         useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
+          transport: Transport.GRPC,
           options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: AGENT_SERVICE,
+            package: 'agent',
+            protoPath: join(__dirname, '../../../proto/agent.proto'),
+            url: configService.getOrThrow('AGENT_GRPC_URL'),
           },
         }),
         inject: [ConfigService],

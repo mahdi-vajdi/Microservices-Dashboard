@@ -76,6 +76,18 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         }),
         inject: [ConfigService],
       },
+      {
+        name: 'AGENT_PACKAGE',
+        useFactory: (configService: ConfigService) => ({
+          transport: Transport.GRPC,
+          options: {
+            package: 'agent',
+            protoPath: join(__dirname, '../../../proto/agent.proto'),
+            url: configService.getOrThrow('AGENT_GRPC_URL'),
+          },
+        }),
+        inject: [ConfigService],
+      },
     ]),
   ],
   controllers: [AuthHttpController, ChannelHttpController, AgentHttpController],

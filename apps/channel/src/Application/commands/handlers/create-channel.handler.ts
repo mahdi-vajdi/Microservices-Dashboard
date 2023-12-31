@@ -1,8 +1,8 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateChannelCommand } from '../impl/create-channel.command';
-import { Inject } from '@nestjs/common';
-import { AGENT_SERVICE } from '@app/common';
-import { ClientProxy } from '@nestjs/microservices';
+import { Inject, OnModuleInit } from '@nestjs/common';
+import { AgentServiceClient } from '@app/common';
+import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { Types } from 'mongoose';
 import { ChannelEntityRepository } from 'apps/channel/src/Domain/base-channel.repo';
@@ -10,22 +10,30 @@ import { Channel } from 'apps/channel/src/Domain/entities/channel.entity';
 
 @CommandHandler(CreateChannelCommand)
 export class CreateChannelHandler
-  implements ICommandHandler<CreateChannelCommand, void>
+  implements OnModuleInit, ICommandHandler<CreateChannelCommand, void>
 {
+  private agentQueryService: AgentServiceClient;
+
   constructor(
-    @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
+    @Inject('AGENT_PACKAGE') private readonly agentGrpcClient: ClientGrpc,
     private readonly channelRepo: ChannelEntityRepository,
   ) {}
+
+  onModuleInit() {
+    this.agentQueryService =
+      this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
+  }
 
   async execute({ dto }: CreateChannelCommand): Promise<void> {
     let agents: string[] = [];
     // get agents ids if caller wants
     if (dto.addAllAgents) {
-      agents = await lastValueFrom(
-        this.agentService.send<string[]>('getAgentsIds', {
+      const { agentsIds } = await lastValueFrom(
+        this.agentQueryService.getAgentsIds({
           accountId: dto.accountId,
         }),
       );
+      if (agentsIds) agents = agentsIds;
     }
 
     const channel = Channel.create(

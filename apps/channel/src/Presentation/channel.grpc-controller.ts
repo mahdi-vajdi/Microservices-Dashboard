@@ -39,7 +39,7 @@ export class ChannelGrpcController {
     call: ServerUnaryCall<any, any>,
   ): Promise<ChannelMessageResponse> {
     const channel = await this.queryBus.execute<GetByIdQuery, ChannelModel>(
-      new GetByIdQuery(data.userId, data.channelId),
+      new GetByIdQuery(data.accountId, data.channelId),
     );
 
     if (channel) return { channel: this.toGrpcModel(channel) };

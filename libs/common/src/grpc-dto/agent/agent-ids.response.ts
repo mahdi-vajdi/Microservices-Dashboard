@@ -1,3 +1,3 @@
-export interface AgentIdsResponse {
-  agentIds: string[] | undefined;
+export interface AgentsIdsResponse {
+  agentsIds: string[] | undefined;
 }

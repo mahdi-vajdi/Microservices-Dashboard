@@ -2,8 +2,8 @@ import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateOwnerAgentCommand } from '../impl/create-owner-agent.command';
 import { AgentEntityRepository } from 'apps/agent/src/Domain/base-agent.entity-repo';
 import { Agent } from 'apps/agent/src/Domain/entities/agent.entity';
-import { DomainAgentRole } from 'apps/agent/src/Domain/value-objects/agent-roles.enum';
 import { Types } from 'mongoose';
+import { AgentRole } from '@app/common';
 
 @CommandHandler(CreateOwnerAgentCommand)
 export class CreateOwnerAgentHandler
@@ -22,7 +22,7 @@ export class CreateOwnerAgentHandler
       dto.firstName,
       dto.password,
       null,
-      DomainAgentRole.OWNER,
+      AgentRole.OWNER,
       'default',
     );
 

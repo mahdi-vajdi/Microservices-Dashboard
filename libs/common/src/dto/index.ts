@@ -1,6 +1,6 @@
 export * from './jwt-payload.dto';
 export * from './agent.dto';
-export * from './agent-roles.enum';
+export * from './agent-role.enum';
 export * from './account.dto';
 export * from './signup.dto';
 export * from './signin.dto';

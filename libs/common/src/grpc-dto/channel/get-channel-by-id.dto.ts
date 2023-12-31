@@ -1,4 +1,4 @@
 export interface GetChannelByIdRequest {
-  userId: string;
+  accountId: string;
   channelId: string;
 }

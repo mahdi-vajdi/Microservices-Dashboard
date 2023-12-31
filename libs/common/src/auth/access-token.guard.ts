@@ -46,10 +46,7 @@ export class CommonAccessTokenGuard implements CanActivate, OnModuleInit {
       tap((jwtPayload) => {
         // Get the method required method roles and see if user has them
         console.log('requester role: ', jwtPayload.role);
-        if (
-          roles &&
-          !roles.map((role) => role.toString()).includes(jwtPayload.role)
-        ) {
+        if (roles && !roles.includes(AgentRole[jwtPayload.role])) {
           throw new ForbiddenException(
             'The agent does not have the authorization to perform this action',
           );

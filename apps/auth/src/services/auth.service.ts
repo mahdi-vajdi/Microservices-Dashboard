@@ -11,6 +11,7 @@ import {
   AccountServiceClient,
   AgentDto,
   AgentRole,
+  AgentServiceClient,
   AuthTokensDto,
   SigninDto,
 } from '@app/common';
@@ -25,37 +26,42 @@ export type AuthResponse = {
 @Injectable()
 export class AuthService implements OnModuleInit {
   private accountQueryService: AccountServiceClient;
+  private agentQueryService: AgentServiceClient;
 
   constructor(
-    @Inject(AGENT_SERVICE) private readonly agentService: ClientProxy,
+    @Inject(AGENT_SERVICE) private readonly agentCommandService: ClientProxy,
+    @Inject('AGENT_PACKAGE') private readonly agentGrpcClient: ClientGrpc,
     @Inject(ACCOUNT_SERVICE)
     private readonly accountCommandService: ClientProxy,
-    @Inject('ACCOUNT_PACKAGE') private readonly client: ClientGrpc,
+    @Inject('ACCOUNT_PACKAGE') private readonly accountGrpcClient: ClientGrpc,
     private readonly jwtUtils: JwtHelperService,
   ) {}
 
   onModuleInit() {
     this.accountQueryService =
-      this.client.getService<AccountServiceClient>('AccountService');
+      this.accountGrpcClient.getService<AccountServiceClient>('AccountService');
+
+    this.agentQueryService =
+      this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
   }
 
   async signup(signupDto: SignupDto): Promise<AuthTokensDto | null> {
     // check if account exists
-    const { exists: itExists } = await lastValueFrom(
+    const { exists: accountExists } = await lastValueFrom(
       this.accountQueryService.accountExists({
         email: signupDto.email,
       }),
     );
 
-    if (itExists)
+    if (accountExists)
       throw new RpcException({
         statusCode: 409,
         message: 'Account already exists',
       });
 
     // check if agent exists
-    const agentExists = await lastValueFrom(
-      this.agentService.send<boolean>('agentExists', {
+    const { agentExists } = await lastValueFrom(
+      this.agentQueryService.agentExists({
         email: signupDto.email,
         phone: signupDto.phone,
       }),
@@ -87,7 +93,7 @@ export class AuthService implements OnModuleInit {
 
     // create a defualt agent for the new account
     await lastValueFrom(
-      this.agentService.emit('createOwnerAgent', {
+      this.agentCommandService.emit('createOwnerAgent', {
         accountId: account.id,
         firstName: signupDto.firstName,
         lastName: signupDto.lastName,
@@ -98,9 +104,9 @@ export class AuthService implements OnModuleInit {
     );
 
     // get the create agent info
-    const agent = await lastValueFrom(
-      this.agentService.send<AgentDto | null>('getAgentByEmail', {
-        email: signupDto.email,
+    const { agent } = await lastValueFrom(
+      this.agentQueryService.getAgentByEmail({
+        agentEmail: signupDto.email,
       }),
     );
     if (!agent) return null;
@@ -109,11 +115,11 @@ export class AuthService implements OnModuleInit {
       agent.id,
       agent.email,
       account.id,
-      agent.role,
+      AgentRole[agent.role],
     );
 
     // update the refresh token for the agent
-    this.agentService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>('updateRefreshToken', {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -123,19 +129,19 @@ export class AuthService implements OnModuleInit {
 
   async signin({ email, password }: SigninDto): Promise<AuthTokensDto | null> {
     const agent = await lastValueFrom(
-      this.agentService
-        .send<AgentDto | null>('getAgentByEmail', { email })
-        .pipe(
-          map(async (agent) => {
-            if (
-              agent &&
-              (await bcrypt.compare(password, agent.password)) &&
-              [AgentRole.OWNER, AgentRole.ADMIN].includes(agent.role)
+      this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
+        map(async ({ agent }) => {
+          if (
+            agent &&
+            (await bcrypt.compare(password, agent.password)) &&
+            [AgentRole[AgentRole.OWNER], AgentRole[AgentRole.ADMIN]].includes(
+              AgentRole[agent.role],
             )
-              return agent;
-            else return null;
-          }),
-        ),
+          ) {
+            return agent;
+          } else return null;
+        }),
+      ),
     );
 
     if (!agent) return null;
@@ -144,10 +150,10 @@ export class AuthService implements OnModuleInit {
       agent.id,
       agent.email,
       agent.account,
-      agent.role,
+      AgentRole[agent.role],
     );
 
-    this.agentService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>('updateRefreshToken', {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -156,7 +162,7 @@ export class AuthService implements OnModuleInit {
   }
 
   signout(agentId: string): void {
-    this.agentService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>('updateRefreshToken', {
       agentId: agentId,
       newToken: null,
     });
@@ -166,8 +172,8 @@ export class AuthService implements OnModuleInit {
     agentId: string,
     refreshToken: string,
   ): Promise<AuthTokensDto | null> {
-    const agent = await lastValueFrom(
-      this.agentService.send<AgentDto | null>('getAgentById', {
+    const { agent } = await lastValueFrom(
+      this.agentQueryService.getAgentById({
         agentId,
       }),
     );
@@ -183,10 +189,10 @@ export class AuthService implements OnModuleInit {
       agent.id,
       agent.email,
       agent.account,
-      agent.role,
+      AgentRole[agent.role],
     );
 
-    this.agentService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>('updateRefreshToken', {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -198,21 +204,22 @@ export class AuthService implements OnModuleInit {
     email: string,
     password: string,
   ): Promise<AgentDto | null> {
-    const agent = this.agentService
-      .send<AgentDto>('getAgentByEmail', { email })
-      .pipe(
-        map(async (agent) => {
+    const agent = await lastValueFrom(
+      this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
+        map(async ({ agent }) => {
           if (
             agent &&
             (await bcrypt.compare(password, agent.password)) &&
-            [AgentRole.OWNER, AgentRole.ADMIN].includes(agent.role)
+            [AgentRole.OWNER, AgentRole.ADMIN].includes(AgentRole[agent.role])
           )
             return agent;
           else return null;
         }),
-      );
+      ),
+    );
 
-    return await lastValueFrom(agent);
+    if (!agent) return null;
+    else return { ...agent, role: AgentRole[agent.role] };
   }
 
   setTokensToCookies(

@@ -4,7 +4,7 @@ package agent;
 
 service AgentService {
   rpc GetAccountAgents(GetAccountAgentsRequest) returns (AgentsResponse) {}
-  rpc GetAgnetsIds(GetAgnetsIdsRequest) returns (AgentIdsResponse) {}
+  rpc GetAgentsIds(GetAgnetsIdsRequest) returns (AgentsIdsResponse) {}
   rpc GetAgentById(GetAgentByIdRequest) returns (AgentResponse) {}
   rpc GetAgentByEmail(GetAgentByEmailReqeust) returns (AgentResponse) {}
   rpc AgentExists(AgentExistsRequest) returns (AgentExistsResponse) {}
@@ -56,7 +56,7 @@ message AgentsResponse {
   repeated AgentMessage agents = 1;
 }
 
-message AgentIdsResponse {
+message AgentsIdsResponse {
   repeated string agentsIds = 1;
 }
 

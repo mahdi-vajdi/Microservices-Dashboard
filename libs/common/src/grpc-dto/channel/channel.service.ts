@@ -5,10 +5,10 @@ import { ChannelsMessageResponse } from './channels-response.dto';
 import { ChannelMessageResponse } from './channel-response.dto';
 
 export interface ChannelServiceClient {
-  GetAccountChannels(
+  getAccountChannels(
     request: GetAccountChannelsRequest,
   ): Observable<ChannelsMessageResponse>;
-  GetChannelById(
+  getChannelById(
     request: GetChannelByIdRequest,
   ): Observable<ChannelMessageResponse>;
 }
