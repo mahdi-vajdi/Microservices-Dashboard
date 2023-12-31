@@ -18,10 +18,12 @@ import { join } from 'path';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
-        NATS_URI: Joi.string().required(),
-        AUTH_GRPC_URL: Joi.string().required(),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
+        NATS_URI: Joi.string().required(),
+        AUTH_GRPC_URL: Joi.string().required(),
+        ACCOUNT_GRPC_URL: Joi.string().required(),
+        AGENT_GRPC_URL: Joi.string().required(),
       }),
     }),
     JwtModule.register({}),

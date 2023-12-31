@@ -16,6 +16,8 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         HTTP_PORT: Joi.number().required(),
         NATS_URI: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),
+        CHANNEL_GRPC_URL: Joi.string().required(),
+        AGENT_GRPC_URL: Joi.string().required(),
       }),
     }),
     ClientsModule.registerAsync([

@@ -27,6 +27,9 @@ import { ChannelGrpcController } from './Presentation/channel.grpc-controller';
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),
+        CHANNEL_GRPC_URL: Joi.string().required(),
+        ACCOUNT_GRPC_URL: Joi.string().required(),
+        AGENT_GRPC_URL: Joi.string().required(),
       }),
     }),
     MongooseModule.forRootAsync({

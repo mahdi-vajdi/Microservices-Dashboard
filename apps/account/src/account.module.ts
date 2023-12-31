@@ -24,9 +24,9 @@ import { AccountGrpcController } from './Presentation/account.grpc-controller';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         ACCOUNT_GRPC_URL: Joi.string().required(),
-        MONGODB_URI: Joi.string().required(),
       }),
     }),
     MongooseModule.forRootAsync({

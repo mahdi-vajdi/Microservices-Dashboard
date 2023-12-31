@@ -24,6 +24,7 @@ import { join } from 'path';
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),
+        AGENT_GRPC_URL: Joi.string().required(),
       }),
     }),
     MongooseModule.forRootAsync({
