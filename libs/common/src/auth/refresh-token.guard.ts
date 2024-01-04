@@ -12,7 +12,7 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { AgentRole } from '../dto';
 import { Reflector } from '@nestjs/core';
 import { ROLES_DECORATOR_KEY } from '../decorators';
-import { AuthServiceClient } from '../grpc-dto';
+import { AuthServiceClient } from '../dto-query';
 
 @Injectable()
 export class CommonRefreshTokenGuard implements CanActivate, OnModuleInit {
