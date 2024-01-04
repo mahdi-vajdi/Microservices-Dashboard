@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Observable, catchError, map, of, tap } from 'rxjs';
 import { ClientGrpc } from '@nestjs/microservices';
-import { AgentRole } from '../dto';
+import { AgentRole } from '../dto-generic';
 import { Reflector } from '@nestjs/core';
 import { ROLES_DECORATOR_KEY } from '../decorators';
 import { AuthServiceClient } from '../dto-query';

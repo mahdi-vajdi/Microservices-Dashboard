@@ -1,5 +1,5 @@
 import { SetMetadata } from '@nestjs/common';
-import { AgentRole } from '../dto';
+import { AgentRole } from '../dto-generic';
 
 export const ROLES_DECORATOR_KEY = 'roles';
 
