@@ -9,7 +9,6 @@ import {
   ACCOUNT_SERVICE,
   AGENT_SERVICE,
   AccountServiceClient,
-  AgentDto,
   AgentRole,
   AgentServiceClient,
   AuthTokensDto,
@@ -200,27 +199,27 @@ export class AuthService implements OnModuleInit {
     return tokens;
   }
 
-  async validateUser(
-    email: string,
-    password: string,
-  ): Promise<AgentDto | null> {
-    const agent = await lastValueFrom(
-      this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
-        map(async ({ agent }) => {
-          if (
-            agent &&
-            (await bcrypt.compare(password, agent.password)) &&
-            [AgentRole.OWNER, AgentRole.ADMIN].includes(AgentRole[agent.role])
-          )
-            return agent;
-          else return null;
-        }),
-      ),
-    );
+  // async validateUser(
+  //   email: string,
+  //   password: string,
+  // ): Promise<AgentMessage | null> {
+  //   const agent = await lastValueFrom(
+  //     this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
+  //       map(async ({ agent }) => {
+  //         if (
+  //           agent &&
+  //           (await bcrypt.compare(password, agent.password)) &&
+  //           [AgentRole.OWNER, AgentRole.ADMIN].includes(AgentRole[agent.role])
+  //         )
+  //           return agent;
+  //         else return null;
+  //       }),
+  //     ),
+  //   );
 
-    if (!agent) return null;
-    else return { ...agent, role: AgentRole[agent.role] };
-  }
+  //   if (!agent) return null;
+  //   else return { ...agent, role: AgentRole[agent.role] };
+  // }
 
   setTokensToCookies(
     res: Response,

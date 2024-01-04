@@ -8,7 +8,7 @@ import * as bcrypt from 'bcryptjs';
 
 @CommandHandler(CreateAgentCommand)
 export class CreateAgentHandler
-  implements ICommandHandler<CreateAgentCommand, void | null>
+  implements ICommandHandler<CreateAgentCommand, void>
 {
   constructor(
     private readonly agentEntityRepo: AgentEntityRepository,
@@ -37,6 +37,5 @@ export class CreateAgentHandler
 
     await this.agentEntityRepo.add(agent);
     agent.commit();
-    return;
   }
 }
