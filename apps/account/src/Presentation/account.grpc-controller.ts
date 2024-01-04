@@ -1,5 +1,4 @@
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
-import { AccountDto } from '@app/common/dto/account.dto';
 import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query';
 import { AccountExistsQuery } from '../Application/queries/impl/account-exists.query';
 import { QueryBus } from '@nestjs/cqrs';
@@ -7,12 +6,14 @@ import { Controller } from '@nestjs/common';
 import {
   AccountExistsRequest,
   AccountExistsResponse,
+  AccountMessage,
   AccountMessageResponse,
   GetAccountByEmailRequest,
   GetAccountByIdRequest,
 } from '@app/common';
 import { GrpcMethod } from '@nestjs/microservices';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
+import { AccountModel } from '../Infrastructure/models/account.model';
 
 @Controller()
 export class AccountGrpcController {
@@ -26,16 +27,12 @@ export class AccountGrpcController {
   ): Promise<AccountMessageResponse> {
     const account = await this.queryBus.execute<
       GetByIdQuery,
-      AccountDto | null
+      AccountModel | null
     >(new GetByIdQuery(data.id));
 
     if (account)
       return {
-        account: {
-          ...account,
-          createdAt: account.createdAt.toISOString(),
-          updatedAt: account.updatedAt.toISOString(),
-        },
+        account: this.toAccountMessage(account),
       };
     else return { account: undefined };
   }
@@ -48,16 +45,12 @@ export class AccountGrpcController {
   ): Promise<AccountMessageResponse> {
     const account = await this.queryBus.execute<
       GetByEmailQuery,
-      AccountDto | null
+      AccountModel | null
     >(new GetByEmailQuery(data.email));
 
     if (account)
       return {
-        account: {
-          ...account,
-          createdAt: account.createdAt.toISOString(),
-          updatedAt: account.updatedAt.toISOString(),
-        },
+        account: this.toAccountMessage(account),
       };
     else return { account: undefined };
   }
@@ -73,5 +66,14 @@ export class AccountGrpcController {
     );
 
     return { exists };
+  }
+
+  private toAccountMessage(model: AccountModel): AccountMessage {
+    return {
+      id: model._id.toHexString(),
+      createdAt: model.createdAt.toISOString(),
+      updatedAt: model.updatedAt.toISOString(),
+      email: model.email,
+    };
   }
 }
