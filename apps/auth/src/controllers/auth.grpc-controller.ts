@@ -1,35 +1,60 @@
-import { Controller, UseGuards } from '@nestjs/common';
+import { Controller } from '@nestjs/common';
 import {
   AuthenticateAccessTokenMessage,
   AuthenticateRefreshTokenMessage,
+  JwtPayloadDto,
   JwtPayloadMessage,
 } from '@app/common';
-import { AccessTokenGuard } from '../guards/access-token.guard';
-import { RefreshTokenGuard } from '../guards/refresh-token.guard';
-import { GrpcMethod } from '@nestjs/microservices';
+import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
+import { JwtHelperService } from '../services/jwt-helper.service';
 
 @Controller()
 export class AuthGrpcController {
-  @UseGuards(AccessTokenGuard)
+  constructor(private readonly jwtService: JwtHelperService) {}
+
   @GrpcMethod('AuthService', 'AuthenticateAccessToken')
-  authenticateAccessToken(
+  async authenticateAccessToken(
     data: AuthenticateAccessTokenMessage,
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
-  ): JwtPayloadMessage {
-    const jwtPayload = call.request['user'] as JwtPayloadMessage;
-    return jwtPayload;
+  ): Promise<JwtPayloadMessage> {
+    try {
+      const payload = await this.jwtService.verifyAccessToken(data.accessToken);
+      return this.toJwtPayloadMessage(payload);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 401,
+        message: error.message,
+      });
+    }
   }
 
-  @UseGuards(RefreshTokenGuard)
   @GrpcMethod('AuthService', 'AuthenticateRefreshToken')
-  authenticateRefreshToken(
+  async authenticateRefreshToken(
     data: AuthenticateRefreshTokenMessage,
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
-  ): JwtPayloadMessage {
-    const jwtPayload = call.request['user'] as JwtPayloadMessage;
-    return jwtPayload;
+  ): Promise<JwtPayloadMessage> {
+    try {
+      const payload = await this.jwtService.verifyRefreshToken(
+        data.refreshToken,
+      );
+      return this.toJwtPayloadMessage(payload);
+    } catch (error) {
+      throw new RpcException({
+        statusCode: 401,
+        message: error.message,
+      });
+    }
+  }
+
+  private toJwtPayloadMessage(dto: JwtPayloadDto): JwtPayloadMessage {
+    return {
+      sub: dto.sub,
+      account: dto.account,
+      email: dto.email,
+      role: dto.role.toString(),
+    };
   }
 }
