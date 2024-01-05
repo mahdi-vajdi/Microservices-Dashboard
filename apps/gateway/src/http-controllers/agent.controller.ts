@@ -13,7 +13,6 @@ import {
   AgentRole,
   AgentServiceClient,
   AgentsResponse,
-  CommonAccessTokenGuard,
   JwtPayloadDto,
   Roles,
 } from '@app/common';
@@ -21,6 +20,7 @@ import { Request } from 'express';
 import { CreateAgentDto } from '../dto/agent/create-agent.dto';
 import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
 import { Observable, defaultIfEmpty } from 'rxjs';
+import { AccessTokenGuard } from '../guards/access-token.guard';
 
 @Controller('agent')
 export class AgentHttpController implements OnModuleInit {
@@ -36,7 +36,7 @@ export class AgentHttpController implements OnModuleInit {
       this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
   }
 
-  @UseGuards(CommonAccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER)
   @Post()
   createAgent(
@@ -52,7 +52,7 @@ export class AgentHttpController implements OnModuleInit {
       .pipe(defaultIfEmpty('Agent Created'));
   }
 
-  @UseGuards(CommonAccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get()
   getAccountAgents(@Req() req: Request): Observable<AgentsResponse> {

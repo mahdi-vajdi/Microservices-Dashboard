@@ -1,10 +1,8 @@
 import {
   AUTH_SERVICE,
   SigninDto,
-  CommonAccessTokenGuard,
   JwtPayloadDto,
   SignupDto,
-  CommonRefreshTokenGuard,
   RefreshTokensDto,
   SignoutDto,
 } from '@app/common';
@@ -25,6 +23,7 @@ import {
 import { ClientProxy } from '@nestjs/microservices';
 import { Request, Response } from 'express';
 import { lastValueFrom } from 'rxjs';
+import { RefreshTokenGuard } from '../guards/refresh-token.guard';
 
 @Controller('auth')
 export class AuthHttpController {
@@ -66,7 +65,6 @@ export class AuthHttpController {
     } else throw new UnauthorizedException('Invalid Credentials');
   }
 
-  @UseGuards(CommonAccessTokenGuard)
   @Post('signout')
   signout(
     @Req() req: Request,
@@ -80,7 +78,7 @@ export class AuthHttpController {
     res.clearCookie('refresh_token');
   }
 
-  @UseGuards(CommonRefreshTokenGuard)
+  @UseGuards(RefreshTokenGuard)
   @Get('refresh')
   async refreshTokens(
     @Req() req: Request,

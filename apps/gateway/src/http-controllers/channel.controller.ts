@@ -3,7 +3,6 @@ import {
   CHANNEL_SERVICE,
   ChannelServiceClient,
   ChannelsMessageResponse,
-  CommonAccessTokenGuard,
   JwtPayloadDto,
   ParseMongoIdPipe,
   Roles,
@@ -26,6 +25,7 @@ import { Observable } from 'rxjs/internal/Observable';
 import { CreateChannelDto } from '../dto/channel/create-channel.dto';
 import { lastValueFrom } from 'rxjs';
 import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
+import { AccessTokenGuard } from '../guards/access-token.guard';
 
 @Controller('channel')
 export class ChannelHttpController implements OnModuleInit {
@@ -41,7 +41,7 @@ export class ChannelHttpController implements OnModuleInit {
       this.grpcClient.getService<ChannelServiceClient>('ChannelService');
   }
 
-  @UseGuards(CommonAccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get()
   getAccountChannels(@Req() req: Request): Observable<ChannelsMessageResponse> {
@@ -52,7 +52,7 @@ export class ChannelHttpController implements OnModuleInit {
     });
   }
 
-  @UseGuards(CommonAccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Get(':id')
   async getChannelById(@Req() req: Request, @Param('id') channelId: string) {
@@ -64,7 +64,7 @@ export class ChannelHttpController implements OnModuleInit {
     });
   }
 
-  @UseGuards(CommonAccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER)
   @Post()
   async create(
@@ -80,7 +80,7 @@ export class ChannelHttpController implements OnModuleInit {
     );
   }
 
-  @UseGuards(CommonAccessTokenGuard)
+  @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER, AgentRole.ADMIN)
   @Patch(':id/agents')
   async updateChannelAgents(

@@ -1,22 +1,22 @@
+import { AuthServiceClient, AgentRole, ROLES_DECORATOR_KEY } from '@app/common';
 import {
+  Injectable,
   CanActivate,
+  OnModuleInit,
+  Logger,
+  Inject,
   ExecutionContext,
   ForbiddenException,
-  Inject,
-  Injectable,
-  Logger,
-  OnModuleInit,
 } from '@nestjs/common';
-import { Observable, catchError, map, of, tap } from 'rxjs';
-import { ClientGrpc } from '@nestjs/microservices';
-import { AgentRole } from '../dto-generic';
 import { Reflector } from '@nestjs/core';
-import { ROLES_DECORATOR_KEY } from '../decorators';
-import { AuthServiceClient } from '../dto-query';
+import { ClientGrpc } from '@nestjs/microservices';
+import { Observable } from 'rxjs/internal/Observable';
+import { of } from 'rxjs/internal/observable/of';
+import { tap, map, catchError } from 'rxjs/operators';
 
 @Injectable()
-export class CommonRefreshTokenGuard implements CanActivate, OnModuleInit {
-  private readonly logger = new Logger(CommonRefreshTokenGuard.name);
+export class RefreshTokenGuard implements CanActivate, OnModuleInit {
+  private readonly logger = new Logger(RefreshTokenGuard.name);
 
   private authService: AuthServiceClient;
 
