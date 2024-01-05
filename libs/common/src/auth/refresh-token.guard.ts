@@ -45,7 +45,6 @@ export class CommonRefreshTokenGuard implements CanActivate, OnModuleInit {
     return this.authService.authenticateRefreshToken({ refreshToken }).pipe(
       tap((jwtPayload) => {
         // Get the method required method roles and see if user has them
-        console.log('requester role: ', jwtPayload.role);
         if (
           roles &&
           !roles.map((role) => role.toString()).includes(jwtPayload.role)

@@ -33,7 +33,6 @@ export class CreateAgentHandler
       dto.role,
       'default',
     );
-    console.log('agent entity: ', agent);
 
     await this.agentEntityRepo.add(agent);
     agent.commit();
