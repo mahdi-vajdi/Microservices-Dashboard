@@ -28,7 +28,6 @@
     "@nestjs/cqrs": "^10.2.6",
     "@nestjs/microservices": "^10.2.10",
     "@nestjs/mongoose": "^10.0.2",
-    "@nestjs/passport": "^10.0.2",
     "@nestjs/platform-express": "^10.0.0",
     "bcryptjs": "^2.4.3",
     "class-transformer": "^0.5.1",
@@ -39,8 +38,7 @@
     "nats": "^2.18.0",
     "nestjs": "^0.0.1",
     "reflect-metadata": "^0.1.13",
-    "rxjs": "^7.8.1",
-    "ts-proto": "^1.165.0"
+    "rxjs": "^7.8.1"
   },
   "devDependencies": {
     "@nestjs/cli": "^10.0.0",

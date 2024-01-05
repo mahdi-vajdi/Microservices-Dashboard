@@ -1,10 +1,7 @@
 import { Module } from '@nestjs/common';
 import { AuthService } from './services/auth.service';
 import { AuthGrpcController } from './controllers/auth.grpc-controller';
-import { PassportModule } from '@nestjs/passport';
 import { JwtModule } from '@nestjs/jwt';
-import { AccessTokenStrategy } from './strategies/access-token.strategy';
-import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
@@ -27,7 +24,6 @@ import { join } from 'path';
       }),
     }),
     JwtModule.register({}),
-    PassportModule.register({ defaultStrategy: 'jwt' }),
     ClientsModule.registerAsync([
       {
         name: AGENT_SERVICE,
@@ -79,12 +75,7 @@ import { join } from 'path';
     ClientsModule.register([]),
   ],
   controllers: [AuthNatsController, AuthGrpcController],
-  providers: [
-    AuthService,
-    AccessTokenStrategy,
-    RefreshTokenStrategy,
-    JwtHelperService,
-  ],
+  providers: [AuthService, JwtHelperService],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}
