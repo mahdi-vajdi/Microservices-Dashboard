@@ -8,7 +8,7 @@ import { AgentModel, AgentSchema } from './Infrastructure/models/agent.model';
 import { AgentEntityRepositoryImpl } from './Infrastructure/repositories/impl-agent.entity-repo';
 import { AgentQueryRepository } from './Infrastructure/repositories/agent.query-repo';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_SERVICE } from '@app/common';
+import { AUTH_NATS } from '@app/common';
 import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
@@ -36,12 +36,12 @@ import { join } from 'path';
     MongooseModule.forFeature([{ name: AgentModel.name, schema: AgentSchema }]),
     ClientsModule.registerAsync([
       {
-        name: AUTH_SERVICE,
+        name: AUTH_NATS,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AUTH_SERVICE,
+            queue: AUTH_NATS,
           },
         }),
         inject: [ConfigService],

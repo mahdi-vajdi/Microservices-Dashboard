@@ -6,8 +6,8 @@ import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { JwtHelperService } from './jwt-helper.service';
 import {
-  ACCOUNT_SERVICE,
-  AGENT_SERVICE,
+  ACCOUNT_NATS,
+  AGENT_NATS,
   AccountServiceClient,
   AgentRole,
   AgentServiceClient,
@@ -28,9 +28,9 @@ export class AuthService implements OnModuleInit {
   private agentQueryService: AgentServiceClient;
 
   constructor(
-    @Inject(AGENT_SERVICE) private readonly agentCommandService: ClientProxy,
+    @Inject(AGENT_NATS) private readonly agentCommandService: ClientProxy,
     @Inject('AGENT_PACKAGE') private readonly agentGrpcClient: ClientGrpc,
-    @Inject(ACCOUNT_SERVICE)
+    @Inject(ACCOUNT_NATS)
     private readonly accountCommandService: ClientProxy,
     @Inject('ACCOUNT_PACKAGE') private readonly accountGrpcClient: ClientGrpc,
     private readonly jwtUtils: JwtHelperService,

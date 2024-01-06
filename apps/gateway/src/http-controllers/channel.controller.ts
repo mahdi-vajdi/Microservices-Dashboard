@@ -1,6 +1,6 @@
 import {
   AgentRole,
-  CHANNEL_SERVICE,
+  CHANNEL_NATS,
   ChannelServiceClient,
   ChannelsMessageResponse,
   JwtPayloadDto,
@@ -33,7 +33,7 @@ export class ChannelHttpController implements OnModuleInit {
 
   constructor(
     @Inject('CHANNEL_GPRC') private readonly grpcClient: ClientGrpc,
-    @Inject(CHANNEL_SERVICE) private readonly commandService: ClientProxy,
+    @Inject(CHANNEL_NATS) private readonly commandService: ClientProxy,
   ) {}
 
   onModuleInit() {

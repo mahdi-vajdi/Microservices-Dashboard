@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AGENT_SERVICE, AUTH_SERVICE, CHANNEL_SERVICE } from '@app/common';
+import { AGENT_NATS, AUTH_NATS, CHANNEL_NATS } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as Joi from 'joi';
@@ -22,12 +22,12 @@ import { AuthHttpController } from './http-controllers/auth.controller';
     }),
     ClientsModule.registerAsync([
       {
-        name: AUTH_SERVICE,
+        name: AUTH_NATS,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AUTH_SERVICE,
+            queue: AUTH_NATS,
           },
         }),
         inject: [ConfigService],
@@ -57,23 +57,23 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         inject: [ConfigService],
       },
       {
-        name: CHANNEL_SERVICE,
+        name: CHANNEL_NATS,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: CHANNEL_SERVICE,
+            queue: CHANNEL_NATS,
           },
         }),
         inject: [ConfigService],
       },
       {
-        name: AGENT_SERVICE,
+        name: AGENT_NATS,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AGENT_SERVICE,
+            queue: AGENT_NATS,
           },
         }),
         inject: [ConfigService],

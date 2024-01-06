@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ACCOUNT_SERVICE, AGENT_SERVICE } from '@app/common';
+import { ACCOUNT_NATS, AGENT_NATS } from '@app/common';
 import { JwtHelperService } from './services/jwt-helper.service';
 import { AuthNatsController } from './controllers/auth.nats-controller';
 import { join } from 'path';
@@ -26,12 +26,12 @@ import { join } from 'path';
     JwtModule.register({}),
     ClientsModule.registerAsync([
       {
-        name: AGENT_SERVICE,
+        name: AGENT_NATS,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AGENT_SERVICE,
+            queue: AGENT_NATS,
           },
         }),
         inject: [ConfigService],
@@ -49,12 +49,12 @@ import { join } from 'path';
         inject: [ConfigService],
       },
       {
-        name: ACCOUNT_SERVICE,
+        name: ACCOUNT_NATS,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: ACCOUNT_SERVICE,
+            queue: ACCOUNT_NATS,
           },
         }),
         inject: [ConfigService],

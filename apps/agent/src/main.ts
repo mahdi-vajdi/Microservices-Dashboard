@@ -3,7 +3,7 @@ import { AgentModule } from './agent.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AGENT_SERVICE } from '@app/common';
+import { AGENT_NATS } from '@app/common';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -15,7 +15,7 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: [configService.getOrThrow('NATS_URI')],
-      queue: AGENT_SERVICE,
+      queue: AGENT_NATS,
     },
   });
   app.connectMicroservice<MicroserviceOptions>({

@@ -4,7 +4,7 @@ import { ChannelModule } from './channel.module';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { CHANNEL_SERVICE } from '@app/common';
+import { CHANNEL_NATS } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(ChannelModule);
@@ -16,7 +16,7 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: [configService.getOrThrow('NATS_URI')],
-      queue: CHANNEL_SERVICE,
+      queue: CHANNEL_NATS,
     },
   });
 
