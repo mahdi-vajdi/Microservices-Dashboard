@@ -13,7 +13,6 @@ import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
 import { AgentNatsController } from './Presentation/agent.nats-cotroller';
-import { join } from 'path';
 
 @Module({
   imports: [
@@ -34,31 +33,6 @@ import { join } from 'path';
       inject: [ConfigService],
     }),
     MongooseModule.forFeature([{ name: AgentModel.name, schema: AgentSchema }]),
-    ClientsModule.registerAsync([
-      {
-        name: AUTH_NATS,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: AUTH_NATS,
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: 'AUTH_PACKAGE',
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: 'auth',
-            protoPath: join(__dirname, '../../../proto/auth.proto'),
-            url: configService.getOrThrow('AUTH_GRPC_URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-    ]),
   ],
   controllers: [AgentHttpController, AgentNatsController],
   providers: [

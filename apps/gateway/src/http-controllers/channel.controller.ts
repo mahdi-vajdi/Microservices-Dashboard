@@ -3,6 +3,7 @@ import {
   CHANNEL_NATS,
   ChannelServiceClient,
   ChannelsMessageResponse,
+  GRPC_CHANNEL,
   JwtPayloadDto,
   ParseMongoIdPipe,
   Roles,
@@ -32,7 +33,7 @@ export class ChannelHttpController implements OnModuleInit {
   queryService: ChannelServiceClient;
 
   constructor(
-    @Inject('CHANNEL_GPRC') private readonly grpcClient: ClientGrpc,
+    @Inject(GRPC_CHANNEL) private readonly grpcClient: ClientGrpc,
     @Inject(CHANNEL_NATS) private readonly commandService: ClientProxy,
   ) {}
 

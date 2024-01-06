@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package account;
+package grpc_account;
 
 service AccountService {
   rpc GetAccountById(GetAccountByIdRequest) returns (AccountMessageResponse) {}

@@ -2,7 +2,7 @@ import { Module } from '@nestjs/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_NATS } from '@app/common';
+import { GRPC_AGENT } from '@app/common';
 import { ChannelEntityRepository } from './Domain/base-channel.repo';
 import { ChannelEntityRepositoryImpl } from './Infrastructure/repositories/impl-channel.entity-repo';
 import { ChannelChannelHandlers } from './Application/commands/handlers';
@@ -43,34 +43,11 @@ import { ChannelGrpcController } from './Presentation/channel.grpc-controller';
     ]),
     ClientsModule.registerAsync([
       {
-        name: AUTH_NATS,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: AUTH_NATS,
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: 'AUTH_PACKAGE',
+        name: GRPC_AGENT,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: 'auth',
-            protoPath: join(__dirname, '../../../proto/auth.proto'),
-            url: configService.getOrThrow('AUTH_GRPC_URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: 'AGENT_PACKAGE',
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.GRPC,
-          options: {
-            package: 'agent',
+            package: GRPC_AGENT,
             protoPath: join(__dirname, '../../../proto/agent.proto'),
             url: configService.getOrThrow('AGENT_GRPC_URL'),
           },

@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package agent;
+package grpc_agent;
 
 service AgentService {
   rpc GetAccountAgents(GetAccountAgentsRequest) returns (AgentsResponse) {}

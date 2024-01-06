@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package channel;
+package grpc_channel;
 
 service ChannelService {
   rpc GetAccountChannels(GetAccountChannelsRequest)

@@ -1,6 +1,13 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AGENT_NATS, AUTH_NATS, CHANNEL_NATS } from '@app/common';
+import {
+  AGENT_NATS,
+  AUTH_NATS,
+  CHANNEL_NATS,
+  GRPC_AGENT,
+  GRPC_AUTH,
+  GRPC_CHANNEL,
+} from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as Joi from 'joi';
@@ -33,11 +40,11 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         inject: [ConfigService],
       },
       {
-        name: 'AUTH_PACKAGE',
+        name: GRPC_AUTH,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: 'auth',
+            package: GRPC_AUTH,
             protoPath: join(__dirname, '../../../proto/auth.proto'),
             url: configService.getOrThrow('AUTH_GRPC_URL'),
           },
@@ -45,11 +52,11 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         inject: [ConfigService],
       },
       {
-        name: 'CHANNEL_GPRC',
+        name: GRPC_CHANNEL,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: 'channel',
+            package: GRPC_CHANNEL,
             protoPath: join(__dirname, '../../../proto/channel.proto'),
             url: configService.getOrThrow('CHANNEL_GRPC_URL'),
           },
@@ -79,11 +86,11 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         inject: [ConfigService],
       },
       {
-        name: 'AGENT_PACKAGE',
+        name: GRPC_AGENT,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: 'agent',
+            package: GRPC_AGENT,
             protoPath: join(__dirname, '../../../proto/agent.proto'),
             url: configService.getOrThrow('AGENT_GRPC_URL'),
           },

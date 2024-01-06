@@ -13,6 +13,7 @@ import {
   AgentRole,
   AgentServiceClient,
   AgentsResponse,
+  GRPC_AGENT,
   JwtPayloadDto,
   Roles,
 } from '@app/common';
@@ -28,7 +29,7 @@ export class AgentHttpController implements OnModuleInit {
 
   constructor(
     @Inject(AGENT_NATS) private readonly commandService: ClientProxy,
-    @Inject('AGENT_PACKAGE') private readonly agentGrpcClient: ClientGrpc,
+    @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
   ) {}
 
   onModuleInit() {

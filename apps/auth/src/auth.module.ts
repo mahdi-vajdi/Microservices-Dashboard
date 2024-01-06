@@ -5,7 +5,12 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { ACCOUNT_NATS, AGENT_NATS } from '@app/common';
+import {
+  ACCOUNT_NATS,
+  AGENT_NATS,
+  GRPC_ACCOUNT,
+  GRPC_AGENT,
+} from '@app/common';
 import { JwtHelperService } from './services/jwt-helper.service';
 import { AuthNatsController } from './controllers/auth.nats-controller';
 import { join } from 'path';
@@ -37,11 +42,11 @@ import { join } from 'path';
         inject: [ConfigService],
       },
       {
-        name: 'AGENT_PACKAGE',
+        name: GRPC_AGENT,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: 'agent',
+            package: GRPC_AGENT,
             protoPath: join(__dirname, '../../../proto/agent.proto'),
             url: configService.getOrThrow('AGENT_GRPC_URL'),
           },
@@ -60,11 +65,11 @@ import { join } from 'path';
         inject: [ConfigService],
       },
       {
-        name: 'ACCOUNT_PACKAGE',
+        name: GRPC_ACCOUNT,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.GRPC,
           options: {
-            package: 'account',
+            package: GRPC_ACCOUNT,
             protoPath: join(__dirname, '../../../proto/account.proto'),
             url: configService.getOrThrow('ACCOUNT_GRPC_URL'),
           },

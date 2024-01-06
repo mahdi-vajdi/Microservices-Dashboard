@@ -3,7 +3,7 @@ import { AgentModule } from './agent.module';
 import { ConfigService } from '@nestjs/config';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AGENT_NATS } from '@app/common';
+import { AGENT_NATS, GRPC_AGENT } from '@app/common';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -21,7 +21,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      package: 'agent',
+      package: GRPC_AGENT,
       protoPath: join(__dirname, '../../../proto/agent.proto'),
       url: configService.getOrThrow('AGENT_GRPC_URL'),
     },

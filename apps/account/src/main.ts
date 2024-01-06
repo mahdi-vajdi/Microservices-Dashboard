@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { AccountModule } from './account.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
-import { ACCOUNT_NATS } from '@app/common';
+import { ACCOUNT_NATS, GRPC_ACCOUNT } from '@app/common';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -22,7 +22,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      package: 'account',
+      package: GRPC_ACCOUNT,
       protoPath: join(__dirname, '../../../proto/account.proto'),
       url: configService.getOrThrow('ACCOUNT_GRPC_URL'),
     },

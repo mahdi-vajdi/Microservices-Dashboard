@@ -4,7 +4,7 @@ import { ChannelModule } from './channel.module';
 import { ValidationPipe } from '@nestjs/common';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { join } from 'path';
-import { CHANNEL_NATS } from '@app/common';
+import { CHANNEL_NATS, GRPC_CHANNEL } from '@app/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(ChannelModule);
@@ -23,7 +23,7 @@ async function bootstrap() {
   app.connectMicroservice<MicroserviceOptions>({
     transport: Transport.GRPC,
     options: {
-      package: 'channel',
+      package: GRPC_CHANNEL,
       protoPath: join(__dirname, '../../../proto/channel.proto'),
       url: configService.getOrThrow('CHANNEL_GRPC_URL'),
     },

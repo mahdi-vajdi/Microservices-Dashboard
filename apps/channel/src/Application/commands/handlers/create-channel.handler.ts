@@ -1,7 +1,7 @@
 import { CommandHandler, ICommandHandler } from '@nestjs/cqrs';
 import { CreateChannelCommand } from '../impl/create-channel.command';
 import { Inject, OnModuleInit } from '@nestjs/common';
-import { AgentServiceClient } from '@app/common';
+import { AgentServiceClient, GRPC_AGENT } from '@app/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom } from 'rxjs';
 import { Types } from 'mongoose';
@@ -15,7 +15,7 @@ export class CreateChannelHandler
   private agentQueryService: AgentServiceClient;
 
   constructor(
-    @Inject('AGENT_PACKAGE') private readonly agentGrpcClient: ClientGrpc,
+    @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
     private readonly channelRepo: ChannelEntityRepository,
   ) {}
 

@@ -12,6 +12,8 @@ import {
   AgentRole,
   AgentServiceClient,
   AuthTokensDto,
+  GRPC_ACCOUNT,
+  GRPC_AGENT,
   SigninDto,
 } from '@app/common';
 
@@ -29,10 +31,10 @@ export class AuthService implements OnModuleInit {
 
   constructor(
     @Inject(AGENT_NATS) private readonly agentCommandService: ClientProxy,
-    @Inject('AGENT_PACKAGE') private readonly agentGrpcClient: ClientGrpc,
+    @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
     @Inject(ACCOUNT_NATS)
     private readonly accountCommandService: ClientProxy,
-    @Inject('ACCOUNT_PACKAGE') private readonly accountGrpcClient: ClientGrpc,
+    @Inject(GRPC_ACCOUNT) private readonly accountGrpcClient: ClientGrpc,
     private readonly jwtUtils: JwtHelperService,
   ) {}
 

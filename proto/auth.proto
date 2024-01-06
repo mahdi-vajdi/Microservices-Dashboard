@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package auth;
+package grpc_auth;
 
 service AuthService {
   rpc AuthenticateAccessToken(AuthenticateAccessTokenMessage)

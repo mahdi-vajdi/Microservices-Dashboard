@@ -1,4 +1,9 @@
-import { AgentRole, AuthServiceClient, ROLES_DECORATOR_KEY } from '@app/common';
+import {
+  AgentRole,
+  AuthServiceClient,
+  GRPC_AUTH,
+  ROLES_DECORATOR_KEY,
+} from '@app/common';
 import {
   CanActivate,
   ExecutionContext,
@@ -21,7 +26,7 @@ export class AccessTokenGuard implements CanActivate, OnModuleInit {
   private authService: AuthServiceClient;
 
   constructor(
-    @Inject('AUTH_PACKAGE') private readonly client: ClientGrpc,
+    @Inject(GRPC_AUTH) private readonly client: ClientGrpc,
     private readonly reflector: Reflector,
   ) {}
 
