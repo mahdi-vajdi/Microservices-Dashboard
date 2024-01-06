@@ -15,6 +15,8 @@ import {
   GRPC_ACCOUNT,
   GRPC_AGENT,
   SigninDto,
+  AccountSubjects,
+  AgentSubjects,
 } from '@app/common';
 
 export type AuthResponse = {
@@ -75,7 +77,7 @@ export class AuthService implements OnModuleInit {
 
     // create an account for the new signup
     await lastValueFrom(
-      this.accountCommandService.emit<void>('createAccount', {
+      this.accountCommandService.emit<void>(AccountSubjects.CREATE_ACCOUNT, {
         email: signupDto.email,
       }),
     );
@@ -94,7 +96,7 @@ export class AuthService implements OnModuleInit {
 
     // create a defualt agent for the new account
     await lastValueFrom(
-      this.agentCommandService.emit('createOwnerAgent', {
+      this.agentCommandService.emit(AgentSubjects.CREATE_OWNER_AGENT, {
         accountId: account.id,
         firstName: signupDto.firstName,
         lastName: signupDto.lastName,
@@ -120,7 +122,7 @@ export class AuthService implements OnModuleInit {
     );
 
     // update the refresh token for the agent
-    this.agentCommandService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -154,7 +156,7 @@ export class AuthService implements OnModuleInit {
       AgentRole[agent.role],
     );
 
-    this.agentCommandService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -163,7 +165,7 @@ export class AuthService implements OnModuleInit {
   }
 
   signout(agentId: string): void {
-    this.agentCommandService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agentId,
       newToken: null,
     });
@@ -193,7 +195,7 @@ export class AuthService implements OnModuleInit {
       AgentRole[agent.role],
     );
 
-    this.agentCommandService.emit<void>('updateRefreshToken', {
+    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });

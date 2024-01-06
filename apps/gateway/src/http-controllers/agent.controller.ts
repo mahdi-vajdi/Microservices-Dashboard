@@ -16,6 +16,7 @@ import {
   GRPC_AGENT,
   JwtPayloadDto,
   Roles,
+  AgentSubjects,
 } from '@app/common';
 import { Request } from 'express';
 import { CreateAgentDto } from '../dto/agent/create-agent.dto';
@@ -46,7 +47,7 @@ export class AgentHttpController implements OnModuleInit {
   ): Observable<any> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
     return this.commandService
-      .send('createAgent', {
+      .send(AgentSubjects.CREATE_AGENT, {
         requesterAccountId: jwtPaylaod.account,
         ...dto,
       })

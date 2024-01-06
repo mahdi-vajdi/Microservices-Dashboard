@@ -1,2 +1,2 @@
 export * from './auth';
-export * from './service-names-nats';
+export * from './constants';

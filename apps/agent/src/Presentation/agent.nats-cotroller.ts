@@ -12,19 +12,20 @@ import { CreateOwnerAgentDto } from '../Application/dto/create-owner-agent.dto';
 import { CreateOwnerAgentCommand } from '../Application/commands/impl/create-owner-agent.command';
 import { CreateAgentCommand } from '../Application/commands/impl/create-agent.command';
 import { CreateAgentDto } from '../Application/dto/create-agent.dto';
+import { AgentSubjects } from '@app/common';
 
 @Controller()
 export class AgentNatsController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @MessagePattern('createOwnerAgent')
+  @MessagePattern(AgentSubjects.CREATE_OWNER_AGENT)
   async createOwnerAgent(@Payload() dto: CreateOwnerAgentDto): Promise<void> {
     await this.commandBus.execute<CreateOwnerAgentCommand, void>(
       new CreateOwnerAgentCommand(dto),
     );
   }
 
-  @MessagePattern('createAgent')
+  @MessagePattern(AgentSubjects.CREATE_AGENT)
   async createAgent(@Payload() dto: CreateAgentDto): Promise<void> {
     try {
       await this.commandBus.execute<CreateAgentCommand, void>(
@@ -38,7 +39,7 @@ export class AgentNatsController {
     }
   }
 
-  @EventPattern('updateRefreshToken')
+  @EventPattern(AgentSubjects.UPDATE_REFRESH_TOKEN)
   async updateRefreshToken(
     @Payload() { agentId: id, newToken: token }: UpdateRefreshTokenDto,
   ): Promise<void> {

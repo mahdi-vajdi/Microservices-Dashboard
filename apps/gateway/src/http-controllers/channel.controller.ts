@@ -7,6 +7,7 @@ import {
   JwtPayloadDto,
   ParseMongoIdPipe,
   Roles,
+  ChannelSubjects,
 } from '@app/common';
 import {
   Controller,
@@ -74,7 +75,7 @@ export class ChannelHttpController implements OnModuleInit {
   ): Promise<void> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
     await lastValueFrom(
-      this.commandService.emit<void>('createChannel', {
+      this.commandService.emit<void>(ChannelSubjects.CREATE_CHANNEL, {
         accountId: jwtPaylaod.account,
         ...dto,
       }),
@@ -91,7 +92,7 @@ export class ChannelHttpController implements OnModuleInit {
   ) {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
     await lastValueFrom(
-      this.commandService.emit<void>('updateChannelAgents', {
+      this.commandService.emit<void>(ChannelSubjects.UPDATE_CHANNEL_AGENTS, {
         requesterAccountId: jwtPaylaod.account,
         channelId,
         ...dto,

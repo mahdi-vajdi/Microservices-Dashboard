@@ -5,6 +5,7 @@ import {
   SignupDto,
   RefreshTokensDto,
   SignoutDto,
+  AuthSubjects,
 } from '@app/common';
 import { AuthTokensDto } from '@app/common';
 import {
@@ -38,7 +39,7 @@ export class AuthHttpController {
   ): Promise<void> {
     const tokens = await lastValueFrom(
       this.authServiceNats.send<AuthTokensDto | null, SignupDto>(
-        'signup',
+        AuthSubjects.SIGNUP,
         signupDto,
       ),
     );
@@ -55,7 +56,7 @@ export class AuthHttpController {
   ): Promise<void> {
     const tokens = await lastValueFrom(
       this.authServiceNats.send<AuthTokensDto | null, SigninDto>(
-        'signin',
+        AuthSubjects.SIGNIN,
         signinDto,
       ),
     );
@@ -71,7 +72,7 @@ export class AuthHttpController {
     @Res({ passthrough: true }) res: Response,
   ): void {
     const user = req['user'] as JwtPayloadDto;
-    this.authServiceNats.emit<void, SignoutDto>('signout', {
+    this.authServiceNats.emit<void, SignoutDto>(AuthSubjects.SIGNOUT, {
       agentId: user.sub,
     });
     res.clearCookie('access_token');
@@ -89,7 +90,7 @@ export class AuthHttpController {
     const user = req['user'] as JwtPayloadDto;
     const newTokens = await lastValueFrom(
       this.authServiceNats.send<AuthTokensDto | null, RefreshTokensDto>(
-        'refreshTokens',
+        AuthSubjects.REFRESH_TOKENS,
         {
           agentId: user.sub,
           refreshToken,
