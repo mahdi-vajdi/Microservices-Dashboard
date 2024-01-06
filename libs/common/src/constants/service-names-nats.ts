@@ -1,4 +1,4 @@
-export const AUTH_NATS = 'nats-auth';
-export const ACCOUNT_NATS = 'nats-account';
-export const CHANNEL_NATS = 'nats-channel';
-export const AGENT_NATS = 'nats-agent';
+export const NATS_AUTH = 'nats-auth';
+export const NATS_ACCOUNT = 'nats-account';
+export const NATS_CHANNEL = 'nats-channel';
+export const NATS_AGENT = 'nats-agent';

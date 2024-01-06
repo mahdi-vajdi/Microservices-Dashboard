@@ -9,7 +9,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
-  AGENT_NATS,
+  NATS_AGENT,
   AgentRole,
   AgentServiceClient,
   AgentsResponse,
@@ -28,7 +28,7 @@ export class AgentHttpController implements OnModuleInit {
   private agentQueryService: AgentServiceClient;
 
   constructor(
-    @Inject(AGENT_NATS) private readonly commandService: ClientProxy,
+    @Inject(NATS_AGENT) private readonly commandService: ClientProxy,
     @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
   ) {}
 

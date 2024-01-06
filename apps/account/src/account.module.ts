@@ -15,7 +15,7 @@ import { AccountQueryRepository } from './Infrastructure/repositories/account.qu
 import { AccountEntityRepositoryImpl } from './Infrastructure/repositories/impl-account.entity-repo';
 import { AccountEntityRepository } from './Domain/base-account.entity-repo';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AGENT_NATS } from '@app/common';
+import { NATS_AGENT } from '@app/common';
 import { AccountGrpcController } from './Presentation/account.grpc-controller';
 
 @Module({
@@ -40,12 +40,12 @@ import { AccountGrpcController } from './Presentation/account.grpc-controller';
     ]),
     ClientsModule.registerAsync([
       {
-        name: AGENT_NATS,
+        name: NATS_AGENT,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AGENT_NATS,
+            queue: NATS_AGENT,
           },
         }),
         inject: [ConfigService],

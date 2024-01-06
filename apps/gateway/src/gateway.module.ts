@@ -1,9 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import {
-  AGENT_NATS,
-  AUTH_NATS,
-  CHANNEL_NATS,
+  NATS_AGENT,
+  NATS_AUTH,
+  NATS_CHANNEL,
   GRPC_AGENT,
   GRPC_AUTH,
   GRPC_CHANNEL,
@@ -29,12 +29,12 @@ import { AuthHttpController } from './http-controllers/auth.controller';
     }),
     ClientsModule.registerAsync([
       {
-        name: AUTH_NATS,
+        name: NATS_AUTH,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AUTH_NATS,
+            queue: NATS_AUTH,
           },
         }),
         inject: [ConfigService],
@@ -64,23 +64,23 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         inject: [ConfigService],
       },
       {
-        name: CHANNEL_NATS,
+        name: NATS_CHANNEL,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: CHANNEL_NATS,
+            queue: NATS_CHANNEL,
           },
         }),
         inject: [ConfigService],
       },
       {
-        name: AGENT_NATS,
+        name: NATS_AGENT,
         useFactory: (configService: ConfigService) => ({
           transport: Transport.NATS,
           options: {
             servers: [configService.getOrThrow('NATS_URI')],
-            queue: AGENT_NATS,
+            queue: NATS_AGENT,
           },
         }),
         inject: [ConfigService],

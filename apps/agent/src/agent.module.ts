@@ -7,8 +7,6 @@ import { MongooseModule } from '@nestjs/mongoose';
 import { AgentModel, AgentSchema } from './Infrastructure/models/agent.model';
 import { AgentEntityRepositoryImpl } from './Infrastructure/repositories/impl-agent.entity-repo';
 import { AgentQueryRepository } from './Infrastructure/repositories/agent.query-repo';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { AUTH_NATS } from '@app/common';
 import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';

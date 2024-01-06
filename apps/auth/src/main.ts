@@ -1,7 +1,7 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { AUTH_NATS, GRPC_AUTH } from '@app/common';
+import { NATS_AUTH, GRPC_AUTH } from '@app/common';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -15,7 +15,7 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: [configService.getOrThrow('NATS_URI')],
-      queue: AUTH_NATS,
+      queue: NATS_AUTH,
     },
   });
 

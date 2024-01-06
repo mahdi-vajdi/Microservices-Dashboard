@@ -1,5 +1,5 @@
 import {
-  AUTH_NATS,
+  NATS_AUTH,
   SigninDto,
   JwtPayloadDto,
   SignupDto,
@@ -28,7 +28,7 @@ import { RefreshTokenGuard } from '../guards/refresh-token.guard';
 @Controller('auth')
 export class AuthHttpController {
   constructor(
-    @Inject(AUTH_NATS) private readonly authServiceNats: ClientProxy,
+    @Inject(NATS_AUTH) private readonly authServiceNats: ClientProxy,
   ) {}
 
   @Post('signup')

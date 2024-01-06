@@ -3,7 +3,7 @@ import { ConfigService } from '@nestjs/config';
 import { AccountModule } from './account.module';
 import { MicroserviceOptions, Transport } from '@nestjs/microservices';
 import { ValidationPipe } from '@nestjs/common';
-import { ACCOUNT_NATS, GRPC_ACCOUNT } from '@app/common';
+import { NATS_ACCOUNT, GRPC_ACCOUNT } from '@app/common';
 import { join } from 'path';
 
 async function bootstrap() {
@@ -16,7 +16,7 @@ async function bootstrap() {
     transport: Transport.NATS,
     options: {
       servers: [configService.getOrThrow('NATS_URI')],
-      queue: ACCOUNT_NATS,
+      queue: NATS_ACCOUNT,
     },
   });
   app.connectMicroservice<MicroserviceOptions>({
