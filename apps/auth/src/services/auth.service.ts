@@ -6,7 +6,6 @@ import * as bcrypt from 'bcryptjs';
 import { Response } from 'express';
 import { JwtHelperService } from './jwt-helper.service';
 import {
-  NATS_ACCOUNT,
   NATS_AGENT,
   AccountServiceClient,
   AgentRole,
@@ -18,6 +17,7 @@ import {
   AccountSubjects,
   AgentSubjects,
 } from '@app/common';
+import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 export type AuthResponse = {
   email: string;
@@ -32,11 +32,11 @@ export class AuthService implements OnModuleInit {
   private agentQueryService: AgentServiceClient;
 
   constructor(
+    private readonly natsClient: NatsJetStreamClientProxy,
     @Inject(NATS_AGENT) private readonly agentCommandService: ClientProxy,
     @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
-    @Inject(NATS_ACCOUNT)
-    private readonly accountCommandService: ClientProxy,
-    @Inject(GRPC_ACCOUNT) private readonly accountGrpcClient: ClientGrpc,
+    @Inject(GRPC_ACCOUNT)
+    private readonly accountGrpcClient: ClientGrpc,
     private readonly jwtUtils: JwtHelperService,
   ) {}
 
@@ -77,7 +77,7 @@ export class AuthService implements OnModuleInit {
 
     // create an account for the new signup
     await lastValueFrom(
-      this.accountCommandService.emit<void>(AccountSubjects.CREATE_ACCOUNT, {
+      this.natsClient.emit<void>(AccountSubjects.CREATE_ACCOUNT, {
         email: signupDto.email,
       }),
     );

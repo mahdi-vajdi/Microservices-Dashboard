@@ -5,15 +5,11 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  NATS_ACCOUNT,
-  NATS_AGENT,
-  GRPC_ACCOUNT,
-  GRPC_AGENT,
-} from '@app/common';
+import { NATS_AGENT, GRPC_ACCOUNT, GRPC_AGENT } from '@app/common';
 import { JwtHelperService } from './services/jwt-helper.service';
 import { AuthNatsController } from './controllers/auth.nats-controller';
 import { join } from 'path';
+import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Module({
   imports: [
@@ -29,6 +25,12 @@ import { join } from 'path';
       }),
     }),
     JwtModule.register({}),
+    NatsJetStreamTransport.register({
+      connectionOptions: {
+        servers: 'nats:4222',
+        name: 'auth-publisher',
+      },
+    }),
     ClientsModule.registerAsync([
       {
         name: NATS_AGENT,
@@ -49,17 +51,6 @@ import { join } from 'path';
             package: GRPC_AGENT,
             protoPath: join(__dirname, '../../../proto/agent.proto'),
             url: configService.getOrThrow('AGENT_GRPC_URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: NATS_ACCOUNT,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: NATS_ACCOUNT,
           },
         }),
         inject: [ConfigService],
