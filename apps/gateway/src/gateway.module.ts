@@ -2,7 +2,6 @@ import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
 import {
   NATS_AGENT,
-  NATS_AUTH,
   NATS_CHANNEL,
   GRPC_AGENT,
   GRPC_AUTH,
@@ -14,6 +13,7 @@ import * as Joi from 'joi';
 import { ChannelHttpController } from './http-controllers/channel.controller';
 import { AgentHttpController } from './http-controllers/agent.controller';
 import { AuthHttpController } from './http-controllers/auth.controller';
+import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Module({
   imports: [
@@ -27,18 +27,13 @@ import { AuthHttpController } from './http-controllers/auth.controller';
         AGENT_GRPC_URL: Joi.string().required(),
       }),
     }),
-    ClientsModule.registerAsync([
-      {
-        name: NATS_AUTH,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: NATS_AUTH,
-          },
-        }),
-        inject: [ConfigService],
+    NatsJetStreamTransport.register({
+      connectionOptions: {
+        servers: 'nats:4222',
+        name: 'gateway-publisher',
       },
+    }),
+    ClientsModule.registerAsync([
       {
         name: GRPC_AUTH,
         useFactory: (configService: ConfigService) => ({

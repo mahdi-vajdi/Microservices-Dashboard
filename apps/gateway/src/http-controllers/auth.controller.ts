@@ -1,5 +1,4 @@
 import {
-  NATS_AUTH,
   SigninDto,
   JwtPayloadDto,
   SignupDto,
@@ -11,68 +10,75 @@ import { AuthTokensDto } from '@app/common';
 import {
   Body,
   Controller,
-  ForbiddenException,
   Get,
-  Inject,
   InternalServerErrorException,
   Post,
   Req,
   Res,
-  UnauthorizedException,
   UseGuards,
 } from '@nestjs/common';
-import { ClientProxy } from '@nestjs/microservices';
 import { Request, Response } from 'express';
-import { lastValueFrom } from 'rxjs';
+import { map } from 'rxjs';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
+import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { AccessTokenGuard } from '../guards/access-token.guard';
 
 @Controller('auth')
 export class AuthHttpController {
-  constructor(
-    @Inject(NATS_AUTH) private readonly authServiceNats: ClientProxy,
-  ) {}
+  constructor(private readonly natsClient: NatsJetStreamClientProxy) {}
 
   @Post('signup')
-  async signup(
+  signup(
     @Res({ passthrough: true }) res: Response,
     @Body() signupDto: SignupDto,
-  ): Promise<void> {
-    const tokens = await lastValueFrom(
-      this.authServiceNats.send<AuthTokensDto | null, SignupDto>(
-        AuthSubjects.SIGNUP,
-        signupDto,
-      ),
-    );
-    if (tokens) {
-      this.setTokensToCookies(res, tokens);
-      res.sendStatus(200);
-    } else throw new InternalServerErrorException('Invalid Credentials');
+  ) {
+    return this.natsClient
+      .send<AuthTokensDto, SignupDto>({ cmd: AuthSubjects.SIGNUP }, signupDto)
+      .pipe(
+        map((tokens) => {
+          if (tokens) {
+            this.setTokensToCookies(res, tokens);
+          } else {
+            throw new InternalServerErrorException(
+              'Something went wrong issuing tokens. please sign in',
+            );
+          }
+
+          return null;
+        }),
+      );
   }
 
   @Post('signin')
-  async signin(
+  signin(
     @Res({ passthrough: true }) res: Response,
     @Body() signinDto: SigninDto,
-  ): Promise<void> {
-    const tokens = await lastValueFrom(
-      this.authServiceNats.send<AuthTokensDto | null, SigninDto>(
-        AuthSubjects.SIGNIN,
-        signinDto,
-      ),
-    );
-    if (tokens) {
-      this.setTokensToCookies(res, tokens);
-      res.sendStatus(200);
-    } else throw new UnauthorizedException('Invalid Credentials');
+  ) {
+    return this.natsClient
+      .send<AuthTokensDto, SigninDto>({ cmd: AuthSubjects.SIGNIN }, signinDto)
+      .pipe(
+        map((tokens) => {
+          if (tokens) {
+            this.setTokensToCookies(res, tokens);
+          } else {
+            throw new InternalServerErrorException(
+              'Something went wrong issuing tokens. please sign in',
+            );
+          }
+
+          return null;
+        }),
+      );
   }
 
+  @UseGuards(AccessTokenGuard)
   @Post('signout')
   signout(
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): void {
     const user = req['user'] as JwtPayloadDto;
-    this.authServiceNats.emit<void, SignoutDto>(AuthSubjects.SIGNOUT, {
+    this.natsClient.emit<void, SignoutDto>(AuthSubjects.SIGNOUT, {
       agentId: user.sub,
     });
     res.clearCookie('access_token');
@@ -88,19 +94,27 @@ export class AuthHttpController {
     // the refreshToken jwt has been validated by refreshTokenGuard
     const refreshToken = req.cookies.refresh_token;
     const user = req['user'] as JwtPayloadDto;
-    const newTokens = await lastValueFrom(
-      this.authServiceNats.send<AuthTokensDto | null, RefreshTokensDto>(
-        AuthSubjects.REFRESH_TOKENS,
+    return this.natsClient
+      .send<AuthTokensDto | null, RefreshTokensDto>(
+        { cmd: AuthSubjects.REFRESH_TOKENS },
         {
           agentId: user.sub,
           refreshToken,
         },
-      ),
-    );
-    if (newTokens) {
-      this.setTokensToCookies(res, newTokens);
-      res.sendStatus(200);
-    } else throw new ForbiddenException('Access Denied');
+      )
+      .pipe(
+        map((tokens) => {
+          if (tokens) {
+            this.setTokensToCookies(res, tokens);
+          } else {
+            throw new InternalServerErrorException(
+              'Something went wrong issuing tokens. please sign in',
+            );
+          }
+
+          return null;
+        }),
+      );
   }
 
   private setTokensToCookies(res: Response, tokens: AuthTokensDto) {

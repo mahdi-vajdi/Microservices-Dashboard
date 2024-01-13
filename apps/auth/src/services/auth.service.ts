@@ -3,7 +3,6 @@ import { SignupDto } from '../dto/signup.dto';
 import { ClientGrpc, ClientProxy, RpcException } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
-import { Response } from 'express';
 import { JwtHelperService } from './jwt-helper.service';
 import {
   NATS_AGENT,
@@ -48,7 +47,7 @@ export class AuthService implements OnModuleInit {
       this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
   }
 
-  async signup(signupDto: SignupDto): Promise<AuthTokensDto | null> {
+  async signup(signupDto: SignupDto): Promise<AuthTokensDto> {
     // check if account exists
     const { exists: accountExists } = await lastValueFrom(
       this.accountQueryService.accountExists({
@@ -90,8 +89,8 @@ export class AuthService implements OnModuleInit {
     );
     if (!account)
       throw new RpcException({
-        statusCode: 500,
-        message: 'Something went wrong while creating account',
+        statusCode: 404,
+        message: 'Could not retrieve Account',
       });
 
     // create a defualt agent for the new account
@@ -112,7 +111,11 @@ export class AuthService implements OnModuleInit {
         agentEmail: signupDto.email,
       }),
     );
-    if (!agent) return null;
+    if (!agent)
+      throw new RpcException({
+        statusCode: 404,
+        message: 'Could not retrieve Agent',
+      });
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -130,7 +133,7 @@ export class AuthService implements OnModuleInit {
     return tokens;
   }
 
-  async signin({ email, password }: SigninDto): Promise<AuthTokensDto | null> {
+  async signin({ email, password }: SigninDto): Promise<AuthTokensDto> {
     const agent = await lastValueFrom(
       this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
         map(async ({ agent }) => {
@@ -147,7 +150,11 @@ export class AuthService implements OnModuleInit {
       ),
     );
 
-    if (!agent) return null;
+    if (!agent)
+      throw new RpcException({
+        statusCode: 404,
+        message: 'Could not retrieve Agent',
+      });
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -174,19 +181,27 @@ export class AuthService implements OnModuleInit {
   async refreshTokens(
     agentId: string,
     refreshToken: string,
-  ): Promise<AuthTokensDto | null> {
+  ): Promise<AuthTokensDto> {
     const { agent } = await lastValueFrom(
       this.agentQueryService.getAgentById({
         agentId,
       }),
     );
 
-    if (!agent || !agent.refreshToken) return null;
+    if (!agent || !agent.refreshToken)
+      throw new RpcException({
+        statusCode: 404,
+        message: 'Could not retrieve Agent or Its RefreshToken',
+      });
 
     // const tokenMatches =  await bcrypt.compare(refreshToken, agent.refreshToken);
     const tokenMatches = refreshToken === agent.refreshToken;
 
-    if (!tokenMatches) return null;
+    if (!tokenMatches)
+      throw new RpcException({
+        statusCode: 403,
+        message: 'Refresh Token is Invalid',
+      });
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -224,18 +239,4 @@ export class AuthService implements OnModuleInit {
   //   if (!agent) return null;
   //   else return { ...agent, role: AgentRole[agent.role] };
   // }
-
-  setTokensToCookies(
-    res: Response,
-    tokens: { access_token: string; refresh_token: string },
-  ) {
-    res.cookie('access_token', tokens.access_token, {
-      maxAge: 1000 * 60 * 60,
-      httpOnly: true,
-    });
-    res.cookie('refresh_token', tokens.refresh_token, {
-      maxAge: 1000 * 60 * 60 * 24 * 7,
-      httpOnly: true,
-    });
-  }
 }

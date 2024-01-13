@@ -1,22 +1,38 @@
 import { NestFactory } from '@nestjs/core';
 import { AuthModule } from './auth.module';
-import { MicroserviceOptions, Transport } from '@nestjs/microservices';
-import { NATS_AUTH, GRPC_AUTH } from '@app/common';
+import {
+  CustomStrategy,
+  MicroserviceOptions,
+  Transport,
+} from '@nestjs/microservices';
+import { GRPC_AUTH } from '@app/common';
 import { join } from 'path';
 import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
+import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 async function bootstrap() {
   const app = await NestFactory.create(AuthModule);
   const configService = app.get<ConfigService>(ConfigService);
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  app.connectMicroservice<MicroserviceOptions>({
-    transport: Transport.NATS,
-    options: {
-      servers: [configService.getOrThrow('NATS_URI')],
-      queue: NATS_AUTH,
-    },
+  app.connectMicroservice<CustomStrategy>({
+    strategy: new NatsJetStreamServer({
+      connectionOptions: {
+        servers: configService.getOrThrow<string>('NATS_URI'),
+        name: 'auth-listener',
+      },
+      consumerOptions: {
+        deliverGroup: 'auth-group',
+        durable: 'auth-durable',
+        deliverTo: 'auth-messages',
+        manualAck: true,
+      },
+      streamConfig: {
+        name: 'authStream',
+        subjects: ['auth.*'],
+      },
+    }),
   });
 
   app.connectMicroservice<MicroserviceOptions>({
