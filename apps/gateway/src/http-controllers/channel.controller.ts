@@ -1,6 +1,5 @@
 import {
   AgentRole,
-  NATS_CHANNEL,
   ChannelServiceClient,
   ChannelsMessageResponse,
   GRPC_CHANNEL,
@@ -21,13 +20,14 @@ import {
   Body,
   Patch,
 } from '@nestjs/common';
-import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { Request } from 'express';
 import { Observable } from 'rxjs/internal/Observable';
 import { CreateChannelDto } from '../dto/channel/create-channel.dto';
 import { lastValueFrom } from 'rxjs';
 import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
 import { AccessTokenGuard } from '../guards/access-token.guard';
+import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Controller('channel')
 export class ChannelHttpController implements OnModuleInit {
@@ -35,7 +35,7 @@ export class ChannelHttpController implements OnModuleInit {
 
   constructor(
     @Inject(GRPC_CHANNEL) private readonly grpcClient: ClientGrpc,
-    @Inject(NATS_CHANNEL) private readonly commandService: ClientProxy,
+    private readonly natsClient: NatsJetStreamClientProxy,
   ) {}
 
   onModuleInit() {
@@ -75,7 +75,7 @@ export class ChannelHttpController implements OnModuleInit {
   ): Promise<void> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
     await lastValueFrom(
-      this.commandService.emit<void>(ChannelSubjects.CREATE_CHANNEL, {
+      this.natsClient.emit<void>(ChannelSubjects.CREATE_CHANNEL, {
         accountId: jwtPaylaod.account,
         ...dto,
       }),
@@ -92,7 +92,7 @@ export class ChannelHttpController implements OnModuleInit {
   ) {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
     await lastValueFrom(
-      this.commandService.emit<void>(ChannelSubjects.UPDATE_CHANNEL_AGENTS, {
+      this.natsClient.emit<void>(ChannelSubjects.UPDATE_CHANNEL_AGENTS, {
         requesterAccountId: jwtPaylaod.account,
         channelId,
         ...dto,

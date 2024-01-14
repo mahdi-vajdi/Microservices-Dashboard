@@ -4,23 +4,29 @@ import { CreateChannelCommand } from '../Application/commands/impl/create-channe
 import { CreateChannelDto } from '../Application/dto/request/create-channel.dto';
 import { UpdateChannelAgentsCommand } from '../Application/commands/impl/update-channel-agents';
 import { UpdateChannelAgentsDto } from '../Application/dto/request/update-channel-agents.dto';
-import { EventPattern, Payload } from '@nestjs/microservices';
+import { Ctx, EventPattern, Payload } from '@nestjs/microservices';
 import { ChannelSubjects } from '@app/common';
+import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Controller()
 export class ChannelNatsController {
   constructor(private readonly commandBus: CommandBus) {}
 
   @EventPattern(ChannelSubjects.CREATE_CHANNEL)
-  async create(@Payload() dto: CreateChannelDto): Promise<void> {
+  async create(
+    @Payload() dto: CreateChannelDto,
+    @Ctx() context: NatsJetStreamContext,
+  ): Promise<void> {
     await this.commandBus.execute<CreateChannelCommand, void>(
       new CreateChannelCommand(dto),
     );
+    context.message.ack();
   }
 
   @EventPattern(ChannelSubjects.UPDATE_CHANNEL_AGENTS)
   async updateChannelAgents(
     @Payload() dto: UpdateChannelAgentsDto,
+    @Ctx() context: NatsJetStreamContext,
   ): Promise<void> {
     await this.commandBus.execute<UpdateChannelAgentsCommand, void>(
       new UpdateChannelAgentsCommand(
@@ -29,5 +35,6 @@ export class ChannelNatsController {
         dto.agents,
       ),
     );
+    context.message.ack();
   }
 }

@@ -1,12 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import {
-  NATS_AGENT,
-  NATS_CHANNEL,
-  GRPC_AGENT,
-  GRPC_AUTH,
-  GRPC_CHANNEL,
-} from '@app/common';
+import { NATS_AGENT, GRPC_AGENT, GRPC_AUTH, GRPC_CHANNEL } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as Joi from 'joi';
@@ -54,17 +48,6 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
             package: GRPC_CHANNEL,
             protoPath: join(__dirname, '../../../proto/channel.proto'),
             url: configService.getOrThrow('CHANNEL_GRPC_URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: NATS_CHANNEL,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: NATS_CHANNEL,
           },
         }),
         inject: [ConfigService],
