@@ -31,7 +31,7 @@ async function bootstrap() {
       },
       streamConfig: {
         name: 'accountStream',
-        subjects: ['account.*'],
+        subjects: ['account.>'],
       },
     }),
   });
