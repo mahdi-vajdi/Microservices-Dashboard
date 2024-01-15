@@ -6,7 +6,6 @@ import {
   MicroserviceOptions,
   Transport,
 } from '@nestjs/microservices';
-import { ValidationPipe } from '@nestjs/common';
 import { GRPC_ACCOUNT } from '@app/common';
 import { join } from 'path';
 import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
@@ -14,8 +13,6 @@ import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-trans
 async function bootstrap() {
   const app = await NestFactory.create(AccountModule);
   const configService = app.get(ConfigService);
-
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   app.connectMicroservice<CustomStrategy>({
     strategy: new NatsJetStreamServer({
