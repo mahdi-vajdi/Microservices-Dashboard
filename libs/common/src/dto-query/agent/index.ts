@@ -2,7 +2,7 @@ export * from './agent-exists.reponse';
 export * from './agent-ids.response';
 export * from './agent.message';
 export * from './agent.response';
-export * from './agent.service';
+export * from './agent-service-client';
 export * from './agents.exists-request.request';
 export * from './agents.response';
 export * from './get-account-agents.request';
