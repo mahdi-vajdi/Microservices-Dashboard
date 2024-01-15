@@ -25,11 +25,14 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
       }),
     }),
     JwtModule.register({}),
-    NatsJetStreamTransport.register({
-      connectionOptions: {
-        servers: 'nats:4222',
-        name: 'auth-publisher',
-      },
+    NatsJetStreamTransport.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        connectionOptions: {
+          servers: configService.getOrThrow<string>('NATS_URI'),
+          name: 'auth-publisher',
+        },
+      }),
+      inject: [ConfigService],
     }),
     ClientsModule.registerAsync([
       {

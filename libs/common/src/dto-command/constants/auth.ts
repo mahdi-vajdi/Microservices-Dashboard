@@ -1,5 +1,3 @@
-export const NATS_AUTH = 'nats-auth';
-
 export const AuthSubjects = {
   SIGNUP: 'auth.signup',
   SIGNIN: 'auth.signin',

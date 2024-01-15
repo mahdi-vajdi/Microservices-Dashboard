@@ -37,11 +37,14 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
     MongooseModule.forFeature([
       { name: ACCOUNT_DB_COLLECTION, schema: AccountSchema },
     ]),
-    NatsJetStreamTransport.register({
-      connectionOptions: {
-        servers: 'nats:4222',
-        name: 'account-publisher',
-      },
+    NatsJetStreamTransport.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        connectionOptions: {
+          servers: configService.getOrThrow<string>('NATS_URI'),
+          name: 'account-publisher',
+        },
+      }),
+      inject: [ConfigService],
     }),
   ],
   controllers: [AccountNatsController, AccountGrpcController],
