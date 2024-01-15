@@ -1,8 +1,8 @@
 import { AgentRole } from '@app/common';
 
-export type JwtPayloadDto = {
+export interface JwtPayloadDto {
   sub: string;
   email: string;
   account: string;
   role: AgentRole;
-};
+}
