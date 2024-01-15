@@ -3,7 +3,6 @@ import {
   ChannelServiceClient,
   ChannelsMessageResponse,
   GRPC_CHANNEL,
-  JwtPayloadDto,
   ParseMongoIdPipe,
   Roles,
   ChannelSubjects,
@@ -28,6 +27,7 @@ import { lastValueFrom } from 'rxjs';
 import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
 import { AccessTokenGuard } from '../guards/access-token.guard';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
 
 @Controller('channel')
 export class ChannelHttpController implements OnModuleInit {

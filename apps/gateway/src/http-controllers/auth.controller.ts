@@ -1,5 +1,4 @@
 import {
-  JwtPayloadDto,
   SignupDto,
   RefreshTokensDto,
   SignoutDto,
@@ -24,6 +23,7 @@ import { SignupDto as HtppSignupDto } from '../dto/auth/signup.dto';
 import { SigninDto as HtppSigninDto } from '../dto/auth/signin.dto';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { AccessTokenGuard } from '../guards/access-token.guard';
+import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
 
 @Controller('auth')
 export class AuthHttpController {
@@ -79,9 +79,9 @@ export class AuthHttpController {
     @Req() req: Request,
     @Res({ passthrough: true }) res: Response,
   ): void {
-    const user = req['user'] as JwtPayloadDto;
+    const jwtPayload = req['user'] as JwtPayloadDto;
     this.natsClient.emit<void, SignoutDto>(AuthSubjects.SIGNOUT, {
-      agentId: user.sub,
+      agentId: jwtPayload.sub,
     });
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
@@ -95,12 +95,12 @@ export class AuthHttpController {
   ) {
     // the refreshToken jwt has been validated by refreshTokenGuard
     const refreshToken = req.cookies.refresh_token;
-    const user = req['user'] as JwtPayloadDto;
+    const jwtPayload = req['user'] as JwtPayloadDto;
     return this.natsClient
       .send<AuthTokensDto | null, RefreshTokensDto>(
         { cmd: AuthSubjects.REFRESH_TOKENS },
         {
-          agentId: user.sub,
+          agentId: jwtPayload.sub,
           refreshToken,
         },
       )

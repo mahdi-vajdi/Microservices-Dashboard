@@ -1,4 +1,5 @@
-import { AgentRole, JwtPayloadDto } from '@app/common';
+import { AgentRole } from '@app/common';
+import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 import { AuthTokensDto } from '../dto/auth-tokens.dto';
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';

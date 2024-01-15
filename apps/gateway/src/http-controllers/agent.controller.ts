@@ -13,7 +13,6 @@ import {
   AgentServiceClient,
   AgentsResponse,
   GRPC_AGENT,
-  JwtPayloadDto,
   Roles,
   AgentSubjects,
 } from '@app/common';
@@ -23,6 +22,7 @@ import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { AccessTokenGuard } from '../guards/access-token.guard';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
 
 @Controller('agent')
 export class AgentHttpController implements OnModuleInit {

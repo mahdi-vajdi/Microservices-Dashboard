@@ -1,4 +1,4 @@
-import { AgentRole } from './agent-role.enum';
+import { AgentRole } from '@app/common';
 
 export type JwtPayloadDto = {
   sub: string;

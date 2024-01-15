@@ -2,12 +2,12 @@ import { Controller } from '@nestjs/common';
 import {
   AuthenticateAccessTokenMessage,
   AuthenticateRefreshTokenMessage,
-  JwtPayloadDto,
   JwtPayloadMessage,
 } from '@app/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 import { JwtHelperService } from '../services/jwt-helper.service';
+import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 
 @Controller()
 export class AuthGrpcController {
