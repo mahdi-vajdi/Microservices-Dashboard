@@ -47,7 +47,7 @@ export class AccessTokenGuard implements CanActivate, OnModuleInit {
       context.getHandler(),
     );
 
-    return this.authService.authenticateAccessToken({ accessToken }).pipe(
+    return this.authService.verifyAccessToken({ accessToken }).pipe(
       tap((jwtPayload) => {
         // Get the method required method roles and see if user has them
         if (roles && !roles.includes(AgentRole[jwtPayload.role])) {

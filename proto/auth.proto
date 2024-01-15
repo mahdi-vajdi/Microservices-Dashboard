@@ -3,17 +3,17 @@ syntax = "proto3";
 package grpc_auth;
 
 service AuthService {
-  rpc AuthenticateAccessToken(AuthenticateAccessTokenMessage)
+  rpc VerifyAccessToken(VerifyAccessTokenMessage)
       returns (JwtPayloadMessage) {}
-  rpc AuthenticateRefreshToken(AuthenticateRefreshTokenMessage)
+  rpc VerifyRefreshToken(VerifyRefreshTokenMessage)
       returns (JwtPayloadMessage) {}
 }
 
-message AuthenticateAccessTokenMessage {
+message VerifyAccessTokenMessage {
   string accessToken = 1;
 }
 
-message AuthenticateRefreshTokenMessage {
+message VerifyRefreshTokenMessage {
   string refreshToken = 1;
 }
 

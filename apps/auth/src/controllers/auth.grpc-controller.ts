@@ -1,7 +1,7 @@
 import { Controller } from '@nestjs/common';
 import {
-  AuthenticateAccessTokenMessage,
-  AuthenticateRefreshTokenMessage,
+  VerifyAccessTokenMessage,
+  VerifyRefreshTokenMessage,
   JwtPayloadMessage,
 } from '@app/common';
 import { GrpcMethod, RpcException } from '@nestjs/microservices';
@@ -13,9 +13,9 @@ import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 export class AuthGrpcController {
   constructor(private readonly jwtService: JwtHelperService) {}
 
-  @GrpcMethod('AuthService', 'AuthenticateAccessToken')
-  async authenticateAccessToken(
-    data: AuthenticateAccessTokenMessage,
+  @GrpcMethod('AuthService', 'VerifyAccessToken')
+  async verifyAccessToken(
+    data: VerifyAccessTokenMessage,
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
   ): Promise<JwtPayloadMessage> {
@@ -30,9 +30,9 @@ export class AuthGrpcController {
     }
   }
 
-  @GrpcMethod('AuthService', 'AuthenticateRefreshToken')
-  async authenticateRefreshToken(
-    data: AuthenticateRefreshTokenMessage,
+  @GrpcMethod('AuthService', 'VerifyRefreshToken')
+  async verifyRefreshToken(
+    data: VerifyRefreshTokenMessage,
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
   ): Promise<JwtPayloadMessage> {

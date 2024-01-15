@@ -1,3 +1,3 @@
-export type AuthenticateAccessTokenMessage = {
+export type VerifyAccessTokenMessage = {
   accessToken: string;
 };

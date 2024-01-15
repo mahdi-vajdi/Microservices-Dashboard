@@ -1,3 +1,3 @@
-export type AuthenticateRefreshTokenMessage = {
+export type VerifyRefreshTokenMessage = {
   refreshToken: string;
 };

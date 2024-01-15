@@ -47,7 +47,7 @@ export class RefreshTokenGuard implements CanActivate, OnModuleInit {
       context.getHandler(),
     );
 
-    return this.authService.authenticateRefreshToken({ refreshToken }).pipe(
+    return this.authService.verifyRefreshToken({ refreshToken }).pipe(
       tap((jwtPayload) => {
         // Get the method required method roles and see if user has them
         if (
