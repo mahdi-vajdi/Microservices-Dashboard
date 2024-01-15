@@ -1,12 +1,12 @@
 import {
-  SigninDto,
   JwtPayloadDto,
   SignupDto,
   RefreshTokensDto,
   SignoutDto,
   AuthSubjects,
+  AuthTokensDto,
+  SigninDto,
 } from '@app/common';
-import { AuthTokensDto } from '@app/common';
 import {
   Body,
   Controller,
@@ -20,6 +20,8 @@ import {
 import { Request, Response } from 'express';
 import { map } from 'rxjs';
 import { RefreshTokenGuard } from '../guards/refresh-token.guard';
+import { SignupDto as HtppSignupDto } from '../dto/auth/signup.dto';
+import { SigninDto as HtppSigninDto } from '../dto/auth/signin.dto';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { AccessTokenGuard } from '../guards/access-token.guard';
 
@@ -30,7 +32,7 @@ export class AuthHttpController {
   @Post('signup')
   signup(
     @Res({ passthrough: true }) res: Response,
-    @Body() signupDto: SignupDto,
+    @Body() signupDto: HtppSignupDto,
   ) {
     return this.natsClient
       .send<AuthTokensDto, SignupDto>({ cmd: AuthSubjects.SIGNUP }, signupDto)
@@ -52,7 +54,7 @@ export class AuthHttpController {
   @Post('signin')
   signin(
     @Res({ passthrough: true }) res: Response,
-    @Body() signinDto: SigninDto,
+    @Body() signinDto: HtppSigninDto,
   ) {
     return this.natsClient
       .send<AuthTokensDto, SigninDto>({ cmd: AuthSubjects.SIGNIN }, signinDto)

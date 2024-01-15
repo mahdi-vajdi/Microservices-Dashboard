@@ -1,7 +1,3 @@
-import { IsMongoId, IsNotEmpty } from 'class-validator';
-
-export class SignoutDto {
-  @IsMongoId()
-  @IsNotEmpty()
+export interface SignoutDto {
   agentId: string;
 }
