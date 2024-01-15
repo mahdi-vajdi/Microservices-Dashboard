@@ -1,11 +1,10 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { SignupDto } from '../dto/signup.dto';
-import { ClientGrpc, ClientProxy, RpcException } from '@nestjs/microservices';
+import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { JwtHelperService } from './jwt-helper.service';
 import {
-  NATS_AGENT,
   AccountServiceClient,
   AgentRole,
   AgentServiceClient,
@@ -32,7 +31,6 @@ export class AuthService implements OnModuleInit {
 
   constructor(
     private readonly natsClient: NatsJetStreamClientProxy,
-    @Inject(NATS_AGENT) private readonly agentCommandService: ClientProxy,
     @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
     @Inject(GRPC_ACCOUNT)
     private readonly accountGrpcClient: ClientGrpc,
@@ -95,7 +93,7 @@ export class AuthService implements OnModuleInit {
 
     // create a defualt agent for the new account
     await lastValueFrom(
-      this.agentCommandService.emit(AgentSubjects.CREATE_OWNER_AGENT, {
+      this.natsClient.emit(AgentSubjects.CREATE_OWNER_AGENT, {
         accountId: account.id,
         firstName: signupDto.firstName,
         lastName: signupDto.lastName,
@@ -125,7 +123,7 @@ export class AuthService implements OnModuleInit {
     );
 
     // update the refresh token for the agent
-    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
+    this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -163,7 +161,7 @@ export class AuthService implements OnModuleInit {
       AgentRole[agent.role],
     );
 
-    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
+    this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });
@@ -172,7 +170,7 @@ export class AuthService implements OnModuleInit {
   }
 
   signout(agentId: string): void {
-    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
+    this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agentId,
       newToken: null,
     });
@@ -210,7 +208,7 @@ export class AuthService implements OnModuleInit {
       AgentRole[agent.role],
     );
 
-    this.agentCommandService.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
+    this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agent.id,
       newToken: tokens.refreshToken,
     });

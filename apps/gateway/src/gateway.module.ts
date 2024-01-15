@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_AGENT, GRPC_AGENT, GRPC_AUTH, GRPC_CHANNEL } from '@app/common';
+import { GRPC_AGENT, GRPC_AUTH, GRPC_CHANNEL } from '@app/common';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as Joi from 'joi';
@@ -21,11 +21,14 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
         AGENT_GRPC_URL: Joi.string().required(),
       }),
     }),
-    NatsJetStreamTransport.register({
-      connectionOptions: {
-        servers: 'nats:4222',
-        name: 'gateway-publisher',
-      },
+    NatsJetStreamTransport.registerAsync({
+      useFactory: (configService: ConfigService) => ({
+        connectionOptions: {
+          servers: configService.getOrThrow<string>('NATS_URI'),
+          name: 'gateway-publisher',
+        },
+      }),
+      inject: [ConfigService],
     }),
     ClientsModule.registerAsync([
       {
@@ -48,17 +51,6 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
             package: GRPC_CHANNEL,
             protoPath: join(__dirname, '../../../proto/channel.proto'),
             url: configService.getOrThrow('CHANNEL_GRPC_URL'),
-          },
-        }),
-        inject: [ConfigService],
-      },
-      {
-        name: NATS_AGENT,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: NATS_AGENT,
           },
         }),
         inject: [ConfigService],

@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_AGENT, GRPC_ACCOUNT, GRPC_AGENT } from '@app/common';
+import { GRPC_ACCOUNT, GRPC_AGENT } from '@app/common';
 import { JwtHelperService } from './services/jwt-helper.service';
 import { AuthNatsController } from './controllers/auth.nats-controller';
 import { join } from 'path';
@@ -32,17 +32,6 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
       },
     }),
     ClientsModule.registerAsync([
-      {
-        name: NATS_AGENT,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: NATS_AGENT,
-          },
-        }),
-        inject: [ConfigService],
-      },
       {
         name: GRPC_AGENT,
         useFactory: (configService: ConfigService) => ({

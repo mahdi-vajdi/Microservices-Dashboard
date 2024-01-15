@@ -9,7 +9,6 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import {
-  NATS_AGENT,
   AgentRole,
   AgentServiceClient,
   AgentsResponse,
@@ -20,16 +19,17 @@ import {
 } from '@app/common';
 import { Request } from 'express';
 import { CreateAgentDto } from '../dto/agent/create-agent.dto';
-import { ClientGrpc, ClientProxy } from '@nestjs/microservices';
-import { Observable, defaultIfEmpty } from 'rxjs';
+import { ClientGrpc } from '@nestjs/microservices';
+import { Observable } from 'rxjs';
 import { AccessTokenGuard } from '../guards/access-token.guard';
+import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Controller('agent')
 export class AgentHttpController implements OnModuleInit {
   private agentQueryService: AgentServiceClient;
 
   constructor(
-    @Inject(NATS_AGENT) private readonly commandService: ClientProxy,
+    private readonly natsClient: NatsJetStreamClientProxy,
     @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
   ) {}
 
@@ -44,14 +44,16 @@ export class AgentHttpController implements OnModuleInit {
   createAgent(
     @Req() req: Request,
     @Body() dto: CreateAgentDto,
-  ): Observable<any> {
+  ): Observable<null> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
-    return this.commandService
-      .send(AgentSubjects.CREATE_AGENT, {
+    console.debug('jwtPayload', jwtPaylaod);
+    return this.natsClient.send<null>(
+      { cmd: AgentSubjects.CREATE_AGENT },
+      {
         requesterAccountId: jwtPaylaod.account,
         ...dto,
-      })
-      .pipe(defaultIfEmpty('Agent Created'));
+      },
+    );
   }
 
   @UseGuards(AccessTokenGuard)

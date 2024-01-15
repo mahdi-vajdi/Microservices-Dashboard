@@ -1,6 +1,7 @@
 import { Controller } from '@nestjs/common';
 import { CommandBus } from '@nestjs/cqrs';
 import {
+  Ctx,
   EventPattern,
   MessagePattern,
   Payload,
@@ -13,6 +14,7 @@ import { CreateOwnerAgentCommand } from '../Application/commands/impl/create-own
 import { CreateAgentCommand } from '../Application/commands/impl/create-agent.command';
 import { CreateAgentDto } from '../Application/dto/create-agent.dto';
 import { AgentSubjects } from '@app/common';
+import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Controller()
 export class AgentNatsController {
@@ -25,16 +27,17 @@ export class AgentNatsController {
     );
   }
 
-  @MessagePattern(AgentSubjects.CREATE_AGENT)
-  async createAgent(@Payload() dto: CreateAgentDto): Promise<void> {
+  @MessagePattern({ cmd: AgentSubjects.CREATE_AGENT })
+  async createAgent(@Payload() dto: CreateAgentDto) {
     try {
-      await this.commandBus.execute<CreateAgentCommand, void>(
+      await this.commandBus.execute<CreateAgentCommand, boolean>(
         new CreateAgentCommand(dto),
       );
+      return null; // null means operation was successfull
     } catch (error) {
       throw new RpcException({
         statusCode: 409,
-        message: 'Agent phone/email is duplicate.',
+        message: 'Agent already exists',
       });
     }
   }
@@ -42,9 +45,11 @@ export class AgentNatsController {
   @EventPattern(AgentSubjects.UPDATE_REFRESH_TOKEN)
   async updateRefreshToken(
     @Payload() { agentId: id, newToken: token }: UpdateRefreshTokenDto,
+    @Ctx() context: NatsJetStreamContext,
   ): Promise<void> {
     await this.commandBus.execute<UpdateRefreshTokenCommand, void>(
       new UpdateRefreshTokenCommand(id, token),
     );
+    context.message.ack();
   }
 }

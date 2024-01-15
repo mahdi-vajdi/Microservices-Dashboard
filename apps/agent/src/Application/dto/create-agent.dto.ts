@@ -3,9 +3,9 @@ import {
   IsArray,
   IsEmail,
   IsEnum,
+  IsMobilePhone,
   IsMongoId,
   IsNotEmpty,
-  IsPhoneNumber,
   IsString,
   IsStrongPassword,
   Length,
@@ -18,7 +18,7 @@ export class CreateAgentDto {
   @Length(5, 50)
   email: string;
 
-  @IsPhoneNumber()
+  @IsMobilePhone()
   phone: string;
 
   @IsString()

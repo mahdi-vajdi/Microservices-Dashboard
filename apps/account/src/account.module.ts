@@ -14,9 +14,8 @@ import { AccountEventHandlers } from './Application/events/handlers';
 import { AccountQueryRepository } from './Infrastructure/repositories/account.query-repo';
 import { AccountEntityRepositoryImpl } from './Infrastructure/repositories/impl-account.entity-repo';
 import { AccountEntityRepository } from './Domain/base-account.entity-repo';
-import { ClientsModule, Transport } from '@nestjs/microservices';
-import { NATS_AGENT } from '@app/common';
 import { AccountGrpcController } from './Presentation/account.grpc-controller';
+import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
 @Module({
   imports: [
@@ -38,19 +37,12 @@ import { AccountGrpcController } from './Presentation/account.grpc-controller';
     MongooseModule.forFeature([
       { name: ACCOUNT_DB_COLLECTION, schema: AccountSchema },
     ]),
-    ClientsModule.registerAsync([
-      {
-        name: NATS_AGENT,
-        useFactory: (configService: ConfigService) => ({
-          transport: Transport.NATS,
-          options: {
-            servers: [configService.getOrThrow('NATS_URI')],
-            queue: NATS_AGENT,
-          },
-        }),
-        inject: [ConfigService],
+    NatsJetStreamTransport.register({
+      connectionOptions: {
+        servers: 'nats:4222',
+        name: 'account-publisher',
       },
-    ]),
+    }),
   ],
   controllers: [AccountNatsController, AccountGrpcController],
   providers: [
