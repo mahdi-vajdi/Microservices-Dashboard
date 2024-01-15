@@ -6,7 +6,6 @@ import {
   IsMobilePhone,
   IsMongoId,
   IsNotEmpty,
-  IsPhoneNumber,
   IsString,
   IsStrongPassword,
   Length,
