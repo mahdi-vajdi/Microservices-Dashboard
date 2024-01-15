@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { AgentModule } from './agent.module';
 import { ConfigService } from '@nestjs/config';
-import { ValidationPipe } from '@nestjs/common';
 import {
   CustomStrategy,
   MicroserviceOptions,
@@ -14,8 +13,6 @@ import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-trans
 async function bootstrap() {
   const app = await NestFactory.create(AgentModule);
   const configService = app.get(ConfigService);
-
-  // app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   app.connectMicroservice<CustomStrategy>({
     strategy: new NatsJetStreamServer({
