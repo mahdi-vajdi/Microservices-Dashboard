@@ -46,7 +46,6 @@ export class AgentHttpController implements OnModuleInit {
     @Body() dto: CreateAgentDto,
   ): Observable<null> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
-    console.debug('jwtPayload', jwtPaylaod);
     return this.natsClient.send<null>(
       { cmd: AgentSubjects.CREATE_AGENT },
       {

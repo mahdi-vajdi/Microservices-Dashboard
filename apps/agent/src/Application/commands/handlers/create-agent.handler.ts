@@ -36,6 +36,5 @@ export class CreateAgentHandler
 
     await this.agentEntityRepo.add(agent);
     agent.commit();
-    console.debug('returning true');
   }
 }

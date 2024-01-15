@@ -4,11 +4,11 @@ import { ClientGrpc, RpcException } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { JwtHelperService } from './jwt-helper.service';
+import { AuthTokensDto } from '../dto/auth-tokens.dto';
 import {
   AccountServiceClient,
   AgentRole,
   AgentServiceClient,
-  AuthTokensDto,
   GRPC_ACCOUNT,
   GRPC_AGENT,
   SigninDto,
