@@ -1,7 +1,7 @@
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { SignupDto } from '../dto/signup.dto';
 import { SigninDto } from '../dto/signin.dto';
-import { ClientGrpc, RpcException } from '@nestjs/microservices';
+import { ClientGrpc } from '@nestjs/microservices';
 import { lastValueFrom, map } from 'rxjs';
 import * as bcrypt from 'bcryptjs';
 import { JwtHelperService } from './jwt-helper.service';
@@ -14,8 +14,11 @@ import {
   GRPC_AGENT,
   AccountSubjects,
   AgentSubjects,
+  DuplicateResourceError,
+  NotFoundError,
 } from '@app/common';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { ForbiddenAccessError } from '@app/common/errors/forbidden-access.error';
 
 export type AuthResponse = {
   email: string;
@@ -54,10 +57,7 @@ export class AuthService implements OnModuleInit {
     );
 
     if (accountExists)
-      throw new RpcException({
-        statusCode: 409,
-        message: 'Account already exists',
-      });
+      throw new DuplicateResourceError('Account already exists');
 
     // check if agent exists
     const { agentExists } = await lastValueFrom(
@@ -66,11 +66,7 @@ export class AuthService implements OnModuleInit {
         phone: signupDto.phone,
       }),
     );
-    if (agentExists)
-      throw new RpcException({
-        statusCode: 409,
-        message: 'Agent already exists',
-      });
+    if (agentExists) throw new DuplicateResourceError('Agent already exists');
 
     // create an account for the new signup
     await lastValueFrom(
@@ -85,11 +81,7 @@ export class AuthService implements OnModuleInit {
         email: signupDto.email,
       }),
     );
-    if (!account)
-      throw new RpcException({
-        statusCode: 404,
-        message: 'Could not retrieve Account',
-      });
+    if (!account) throw new NotFoundError('Could not retrieve Account');
 
     // create a defualt agent for the new account
     await lastValueFrom(
@@ -109,11 +101,7 @@ export class AuthService implements OnModuleInit {
         agentEmail: signupDto.email,
       }),
     );
-    if (!agent)
-      throw new RpcException({
-        statusCode: 404,
-        message: 'Could not retrieve Agent',
-      });
+    if (!agent) throw new NotFoundError('Could not retrieve Agent');
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -148,11 +136,7 @@ export class AuthService implements OnModuleInit {
       ),
     );
 
-    if (!agent)
-      throw new RpcException({
-        statusCode: 404,
-        message: 'Could not retrieve Agent',
-      });
+    if (!agent) throw new NotFoundError('Could not retrieve Agent');
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -187,19 +171,13 @@ export class AuthService implements OnModuleInit {
     );
 
     if (!agent || !agent.refreshToken)
-      throw new RpcException({
-        statusCode: 404,
-        message: 'Could not retrieve Agent or Its RefreshToken',
-      });
+      throw new NotFoundError('Could not retrieve Agent or Its RefreshToken');
 
     // const tokenMatches =  await bcrypt.compare(refreshToken, agent.refreshToken);
     const tokenMatches = refreshToken === agent.refreshToken;
 
     if (!tokenMatches)
-      throw new RpcException({
-        statusCode: 403,
-        message: 'Refresh Token is Invalid',
-      });
+      throw new ForbiddenAccessError('Refresh Token is Invalid');
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
