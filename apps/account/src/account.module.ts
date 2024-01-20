@@ -25,6 +25,7 @@ import { pinoDevConfig, pinoProdConfig } from '@app/common';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        NODE_ENV: Joi.string().required(),
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         ACCOUNT_GRPC_URL: Joi.string().required(),

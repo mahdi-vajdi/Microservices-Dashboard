@@ -22,6 +22,13 @@ import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { AgentExistsQuery } from '../Application/queries/impl/agent-exists-query';
 import { GetByEmailQuery } from '../Application/queries/impl/get-by-email.query';
 
+/**
+ * The Controller that handles the queries via grpc
+ *
+ * @export
+ * @class AgentHttpController
+ * @typedef {AgentHttpController}
+ */
 @Controller()
 export class AgentHttpController {
   constructor(private readonly queryBus: QueryBus) {}

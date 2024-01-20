@@ -85,14 +85,17 @@ export class AuthService implements OnModuleInit {
 
     // create a defualt agent for the new account
     await lastValueFrom(
-      this.natsClient.emit(AgentSubjects.CREATE_OWNER_AGENT, {
-        accountId: account.id,
-        firstName: signupDto.firstName,
-        lastName: signupDto.lastName,
-        email: signupDto.email,
-        phone: signupDto.phone,
-        password: await bcrypt.hash(signupDto.password, 10),
-      }),
+      this.natsClient.emit(
+        { cmd: AgentSubjects.CREATE_OWNER_AGENT },
+        {
+          accountId: account.id,
+          firstName: signupDto.firstName,
+          lastName: signupDto.lastName,
+          email: signupDto.email,
+          phone: signupDto.phone,
+          password: await bcrypt.hash(signupDto.password, 10),
+        },
+      ),
     );
 
     // get the create agent info

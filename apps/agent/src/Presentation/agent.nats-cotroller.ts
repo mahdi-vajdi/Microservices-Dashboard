@@ -16,11 +16,18 @@ import { CreateAgentDto } from '../Application/dto/create-agent.dto';
 import { AgentSubjects } from '@app/common';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
+/**
+ * The controller that handles commands via nats
+ *
+ * @export
+ * @class AgentNatsController
+ * @typedef {AgentNatsController}
+ */
 @Controller()
 export class AgentNatsController {
   constructor(private readonly commandBus: CommandBus) {}
 
-  @MessagePattern(AgentSubjects.CREATE_OWNER_AGENT)
+  @MessagePattern({ cmd: AgentSubjects.CREATE_OWNER_AGENT })
   async createOwnerAgent(@Payload() dto: CreateOwnerAgentDto): Promise<void> {
     await this.commandBus.execute<CreateOwnerAgentCommand, void>(
       new CreateOwnerAgentCommand(dto),

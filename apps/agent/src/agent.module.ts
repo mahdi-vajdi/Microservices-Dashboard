@@ -11,6 +11,8 @@ import { AgentCommandHandlers } from './Application/commands/handlers';
 import { AgentQueryHandlers } from './Application/queries/handlers';
 import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
 import { AgentNatsController } from './Presentation/agent.nats-cotroller';
+import { LoggerModule } from 'nestjs-pino';
+import { pinoDevConfig, pinoProdConfig } from '@app/common';
 
 @Module({
   imports: [
@@ -18,11 +20,19 @@ import { AgentNatsController } from './Presentation/agent.nats-cotroller';
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        NODE_ENV: Joi.string().required(),
         MONGODB_URI: Joi.string().required(),
         NATS_URI: Joi.string().required(),
         AUTH_GRPC_URL: Joi.string().required(),
         AGENT_GRPC_URL: Joi.string().required(),
       }),
+    }),
+    LoggerModule.forRootAsync({
+      useFactory: (configService: ConfigService) =>
+        configService.getOrThrow<string>('NODE_ENV') === 'production'
+          ? pinoProdConfig()
+          : pinoDevConfig(),
+      inject: [ConfigService],
     }),
     MongooseModule.forRootAsync({
       useFactory: (configService: ConfigService) => ({
