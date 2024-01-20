@@ -1,13 +1,16 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Logger } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { ACCOUNT_DB_COLLECTION, AccountModel } from '../models/account.model';
-import { Model } from 'mongoose';
+import { Model, MongooseError } from 'mongoose';
+import { DatabaseError } from '@app/common/errors/database.error';
 
 @Injectable()
 export class AccountQueryRepository {
+  private readonly logger = new Logger(AccountQueryRepository.name);
+
   constructor(
     @InjectModel(ACCOUNT_DB_COLLECTION)
-    private readonly account: Model<AccountModel>,
+    private readonly accountModel: Model<AccountModel>,
   ) {}
 
   /**
@@ -17,7 +20,15 @@ export class AccountQueryRepository {
    * @returns {Promise<AccountModel | null>} A Promise that resolves with the found account or null if not found.
    */
   async findOneById(id: string): Promise<AccountModel | null> {
-    return await this.account.findById(id, {}, { lean: true }).exec();
+    try {
+      return await this.accountModel.findById(id, {}, { lean: true }).exec();
+    } catch (error) {
+      this.logger.error(error);
+
+      if (error instanceof MongooseError)
+        throw new DatabaseError(error.message);
+      else throw new Error(error.message);
+    }
   }
 
   /**
@@ -27,6 +38,16 @@ export class AccountQueryRepository {
    * @returns {Promise<AccountModel | null>} A Promise that resolves with the found account or null if not found.
    */
   async findOneByEmail(email: string): Promise<AccountModel | null> {
-    return await this.account.findOne({ email }, {}, { lean: true }).exec();
+    try {
+      return await this.accountModel
+        .findOne({ email }, {}, { lean: true })
+        .exec();
+    } catch (error) {
+      this.logger.error(error);
+
+      if (error instanceof MongooseError)
+        throw new DatabaseError(error.message);
+      else throw new Error(error.message);
+    }
   }
 }

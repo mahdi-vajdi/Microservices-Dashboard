@@ -7,6 +7,7 @@ export const pinoDevConfig = function (): Params {
         targets: [
           {
             target: 'pino-pretty',
+            level: 'trace',
             options: {
               singleLine: true,
               colorize: true,
@@ -16,6 +17,7 @@ export const pinoDevConfig = function (): Params {
           },
           {
             target: 'pino/file',
+            level: 'trace',
             options: {
               destination: `./logs/dev.log`,
               mkdir: true,

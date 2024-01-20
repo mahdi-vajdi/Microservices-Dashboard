@@ -9,10 +9,14 @@ import {
 import { GRPC_ACCOUNT } from '@app/common';
 import { join } from 'path';
 import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AccountModule);
+  const app = await NestFactory.create(AccountModule, { bufferLogs: true });
+
   const configService = app.get(ConfigService);
+
+  app.useLogger(app.get(Logger));
 
   app.connectMicroservice<CustomStrategy>({
     strategy: new NatsJetStreamServer({

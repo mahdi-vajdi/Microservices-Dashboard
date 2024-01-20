@@ -15,10 +15,32 @@ import { GrpcMethod } from '@nestjs/microservices';
 import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 import { AccountModel } from '../Infrastructure/models/account.model';
 
+/**
+ * The class that contains grpc endpoints for account service
+ *
+ * @export
+ * @class AccountGrpcController
+ * @typedef {AccountGrpcController}
+ */
 @Controller()
 export class AccountGrpcController {
+  /**
+   * Creates an instance of AccountGrpcController.
+   *
+   * @constructor
+   * @param {QueryBus} queryBus
+   */
   constructor(private readonly queryBus: QueryBus) {}
 
+  /**
+   * Query an account by its ID
+   *
+   * @async
+   * @param {GetAccountByIdRequest} data
+   * @param {Metadata} metadata
+   * @param {ServerUnaryCall<any, any>} call
+   * @returns {Promise<AccountMessageResponse>}
+   */
   @GrpcMethod('AccountService', 'GetAccountById')
   async getAccountById(
     data: GetAccountByIdRequest,
@@ -37,6 +59,15 @@ export class AccountGrpcController {
     else return { account: undefined };
   }
 
+  /**
+   * Query an account by its Email field
+   *
+   * @async
+   * @param {GetAccountByEmailRequest} data
+   * @param {Metadata} metadata
+   * @param {ServerUnaryCall<any, any>} call
+   * @returns {Promise<AccountMessageResponse>}
+   */
   @GrpcMethod('AccountService', 'GetAccountByEmail')
   async getAccountByEmail(
     data: GetAccountByEmailRequest,
@@ -55,6 +86,15 @@ export class AccountGrpcController {
     else return { account: undefined };
   }
 
+  /**
+   * Check if an account with given fields exist.
+   *
+   * @async
+   * @param {AccountExistsRequest} data
+   * @param {Metadata} metadata
+   * @param {ServerUnaryCall<any, any>} call
+   * @returns {Promise<AccountExistsResponse>} will be true if account exists
+   */
   @GrpcMethod('AccountService', 'AccountExists')
   async accountExists(
     data: AccountExistsRequest,
@@ -68,6 +108,13 @@ export class AccountGrpcController {
     return { exists };
   }
 
+  /**
+   * Convert a database account model to grpc account message
+   *
+   * @private
+   * @param {AccountModel} model
+   * @returns {AccountMessage}
+   */
   private toAccountMessage(model: AccountModel): AccountMessage {
     return {
       id: model._id.toHexString(),
