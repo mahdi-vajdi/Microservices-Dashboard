@@ -9,6 +9,13 @@ import { Metadata, ServerUnaryCall } from '@grpc/grpc-js';
 import { JwtHelperService } from '../services/jwt-helper.service';
 import { JwtPayloadDto } from '../dto/jwt-payload.dto';
 
+/**
+ * The Controller that handles the queries via grpc
+ *
+ * @export
+ * @class AuthGrpcController
+ * @typedef {AuthGrpcController}
+ */
 @Controller()
 export class AuthGrpcController {
   constructor(private readonly jwtService: JwtHelperService) {}

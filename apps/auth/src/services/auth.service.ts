@@ -20,18 +20,40 @@ import {
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { ForbiddenAccessError } from '@app/common/errors/forbidden-access.error';
 
-export type AuthResponse = {
-  email: string;
-  agentId: string;
-  access_token: string;
-  refresh_token: string;
-};
-
+/**
+ * Main service class for handling authentication
+ *
+ * @export
+ * @class AuthService
+ * @typedef {AuthService}
+ * @implements {OnModuleInit}
+ */
 @Injectable()
 export class AuthService implements OnModuleInit {
+  /**
+   * The Grpc client methods for account service
+   *
+   * @private
+   * @type {AccountServiceClient}
+   */
   private accountQueryService: AccountServiceClient;
+  /**
+   * The Grpc client methods for agent service
+   *
+   * @private
+   * @type {AgentServiceClient}
+   */
   private agentQueryService: AgentServiceClient;
 
+  /**
+   * Creates an instance of AuthService.
+   *
+   * @constructor
+   * @param {NatsJetStreamClientProxy} natsClient
+   * @param {ClientGrpc} agentGrpcClient
+   * @param {ClientGrpc} accountGrpcClient
+   * @param {JwtHelperService} jwtUtils
+   */
   constructor(
     private readonly natsClient: NatsJetStreamClientProxy,
     @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
@@ -48,6 +70,12 @@ export class AuthService implements OnModuleInit {
       this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
   }
 
+  /**
+   *
+   * @async
+   * @param {SignupDto} signupDto
+   * @returns {Promise<AuthTokensDto>}
+   */
   async signup(signupDto: SignupDto): Promise<AuthTokensDto> {
     // check if account exists
     const { exists: accountExists } = await lastValueFrom(
@@ -122,6 +150,14 @@ export class AuthService implements OnModuleInit {
     return tokens;
   }
 
+  /**
+   *
+   * @async
+   * @param {SigninDto} param0
+   * @param {SigninDto} param0.email
+   * @param {SigninDto} param0.password
+   * @returns {Promise<AuthTokensDto>}
+   */
   async signin({ email, password }: SigninDto): Promise<AuthTokensDto> {
     const agent = await lastValueFrom(
       this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
@@ -156,6 +192,10 @@ export class AuthService implements OnModuleInit {
     return tokens;
   }
 
+  /**
+   *
+   * @param {string} agentId
+   */
   signout(agentId: string): void {
     this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agentId,
@@ -163,6 +203,14 @@ export class AuthService implements OnModuleInit {
     });
   }
 
+  /**
+   * Validate provided refresh token and genrate and return new tokens
+   *
+   * @async
+   * @param {string} agentId
+   * @param {string} refreshToken
+   * @returns {Promise<AuthTokensDto>}
+   */
   async refreshTokens(
     agentId: string,
     refreshToken: string,
@@ -196,26 +244,4 @@ export class AuthService implements OnModuleInit {
 
     return tokens;
   }
-
-  // async validateUser(
-  //   email: string,
-  //   password: string,
-  // ): Promise<AgentMessage | null> {
-  //   const agent = await lastValueFrom(
-  //     this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
-  //       map(async ({ agent }) => {
-  //         if (
-  //           agent &&
-  //           (await bcrypt.compare(password, agent.password)) &&
-  //           [AgentRole.OWNER, AgentRole.ADMIN].includes(AgentRole[agent.role])
-  //         )
-  //           return agent;
-  //         else return null;
-  //       }),
-  //     ),
-  //   );
-
-  //   if (!agent) return null;
-  //   else return { ...agent, role: AgentRole[agent.role] };
-  // }
 }

@@ -7,14 +7,16 @@ import {
 } from '@nestjs/microservices';
 import { GRPC_AUTH } from '@app/common';
 import { join } from 'path';
-import { ValidationPipe } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AuthModule);
+  const app = await NestFactory.create(AuthModule, { bufferLogs: true });
+
   const configService = app.get<ConfigService>(ConfigService);
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+
+  app.useLogger(app.get(Logger));
 
   app.connectMicroservice<CustomStrategy>({
     strategy: new NatsJetStreamServer({

@@ -5,17 +5,24 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import * as Joi from 'joi';
 import { ClientsModule, Transport } from '@nestjs/microservices';
-import { GRPC_ACCOUNT, GRPC_AGENT } from '@app/common';
+import {
+  GRPC_ACCOUNT,
+  GRPC_AGENT,
+  pinoDevConfig,
+  pinoProdConfig,
+} from '@app/common';
 import { JwtHelperService } from './services/jwt-helper.service';
 import { AuthNatsController } from './controllers/auth.nats-controller';
 import { join } from 'path';
 import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { LoggerModule } from 'nestjs-pino';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
       validationSchema: Joi.object({
+        NODE_ENV: Joi.string().required(),
         JWT_ACCESS_SECRET: Joi.string().required(),
         JWT_REFRESH_SECRET: Joi.string().required(),
         NATS_URI: Joi.string().required(),
@@ -23,6 +30,13 @@ import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-tr
         ACCOUNT_GRPC_URL: Joi.string().required(),
         AGENT_GRPC_URL: Joi.string().required(),
       }),
+    }),
+    LoggerModule.forRootAsync({
+      useFactory: (configService: ConfigService) =>
+        configService.getOrThrow<string>('NODE_ENV') === 'production'
+          ? pinoProdConfig()
+          : pinoDevConfig(),
+      inject: [ConfigService],
     }),
     JwtModule.register({}),
     NatsJetStreamTransport.registerAsync({

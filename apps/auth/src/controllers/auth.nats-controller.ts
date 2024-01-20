@@ -19,6 +19,13 @@ import {
 } from '@app/common';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { ForbiddenAccessError } from '@app/common/errors/forbidden-access.error';
+/**
+ * The controller that handles commands via nats
+ *
+ * @export
+ * @class AuthNatsController
+ * @typedef {AuthNatsController}
+ */
 @Controller()
 export class AuthNatsController {
   constructor(private readonly authService: AuthService) {}
