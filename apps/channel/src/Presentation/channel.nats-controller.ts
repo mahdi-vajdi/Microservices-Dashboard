@@ -8,6 +8,13 @@ import { Ctx, EventPattern, Payload } from '@nestjs/microservices';
 import { ChannelSubjects } from '@app/common';
 import { NatsJetStreamContext } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 
+/**
+ * The controller that handler commands to the service via nats
+ *
+ * @export
+ * @class ChannelNatsController
+ * @typedef {ChannelNatsController}
+ */
 @Controller()
 export class ChannelNatsController {
   constructor(private readonly commandBus: CommandBus) {}

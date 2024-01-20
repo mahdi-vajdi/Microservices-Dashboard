@@ -12,6 +12,13 @@ import { ChannelModel } from '../Infrastructure/models/channel.model';
 import { GetAccountChannelsQuery } from '../Application/queries/impl/get-account-cahnnels.query';
 import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { Controller } from '@nestjs/common';
+/**
+ * The controller that handler queries from the service via grpc
+ *
+ * @export
+ * @class ChannelGrpcController
+ * @typedef {ChannelGrpcController}
+ */
 @Controller()
 export class ChannelGrpcController {
   constructor(private readonly queryBus: QueryBus) {}

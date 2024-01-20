@@ -1,7 +1,6 @@
 import { NestFactory } from '@nestjs/core';
 import { ConfigService } from '@nestjs/config';
 import { ChannelModule } from './channel.module';
-import { ValidationPipe } from '@nestjs/common';
 import {
   CustomStrategy,
   MicroserviceOptions,
@@ -10,12 +9,14 @@ import {
 import { join } from 'path';
 import { GRPC_CHANNEL } from '@app/common';
 import { NatsJetStreamServer } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
+import { Logger } from 'nestjs-pino';
 
 async function bootstrap() {
-  const app = await NestFactory.create(ChannelModule);
+  const app = await NestFactory.create(ChannelModule, { bufferLogs: true });
+
   const configService = app.get(ConfigService);
 
-  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
+  app.useLogger(app.get(Logger));
 
   app.connectMicroservice<CustomStrategy>({
     strategy: new NatsJetStreamServer({
