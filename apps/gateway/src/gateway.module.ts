@@ -10,9 +10,9 @@ import {
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { join } from 'path';
 import * as Joi from 'joi';
-import { ChannelHttpController } from './http-controllers/channel.controller';
-import { AgentHttpController } from './http-controllers/agent.controller';
-import { AuthHttpController } from './http-controllers/auth.controller';
+import { ChannelHttpController } from './controllers/http/channel.controller';
+import { AgentHttpController } from './controllers/http/agent.controller';
+import { AuthHttpController } from './controllers/http/auth.controller';
 import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { LoggerModule } from 'nestjs-pino';
 

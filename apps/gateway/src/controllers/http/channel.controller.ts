@@ -22,12 +22,12 @@ import {
 import { ClientGrpc } from '@nestjs/microservices';
 import { Request } from 'express';
 import { Observable } from 'rxjs/internal/Observable';
-import { CreateChannelDto } from '../dto/channel/create-channel.dto';
+import { CreateChannelDto } from '../../dto/channel/create-channel.dto';
 import { lastValueFrom } from 'rxjs';
-import { UpdateChannelAgentsDto } from '../dto/channel/update-channel-agents.dto';
-import { AccessTokenGuard } from '../guards/access-token.guard';
+import { UpdateChannelAgentsDto } from '../../dto/channel/update-channel-agents.dto';
+import { AccessTokenGuard } from '../../guards/access-token.guard';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
+import { JwtPayloadDto } from '../../dto/auth/jwt-payload.dto';
 
 @Controller('channel')
 export class ChannelHttpController implements OnModuleInit {
