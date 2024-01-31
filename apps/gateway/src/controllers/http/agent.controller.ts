@@ -17,12 +17,12 @@ import {
   AgentSubjects,
 } from '@app/common';
 import { Request } from 'express';
-import { CreateAgentDto } from '../dto/agent/create-agent.dto';
+import { CreateAgentDto } from '../../dto/agent/create-agent.dto';
 import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
-import { AccessTokenGuard } from '../guards/access-token.guard';
+import { AccessTokenGuard } from '../../guards/access-token.guard';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
+import { JwtPayloadDto } from '../../dto/auth/jwt-payload.dto';
 
 @Controller('agent')
 export class AgentHttpController implements OnModuleInit {

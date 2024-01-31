@@ -1,41 +1,24 @@
 import {
-  SignupDto,
-  RefreshTokensDto,
-  SignoutDto,
   AuthSubjects,
   AuthTokensDto,
+  RefreshTokensDto,
   SigninDto,
+  SignoutDto,
+  SignupDto,
 } from '@app/common';
-import {
-  Body,
-  Controller,
-  Get,
-  InternalServerErrorException,
-  Post,
-  Req,
-  Res,
-  UseGuards,
-} from '@nestjs/common';
-import { Request, Response } from 'express';
-import { map } from 'rxjs';
-import { RefreshTokenGuard } from '../guards/refresh-token.guard';
-import { SignupDto as HtppSignupDto } from '../dto/auth/signup.dto';
-import { SigninDto as HtppSigninDto } from '../dto/auth/signin.dto';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { AccessTokenGuard } from '../guards/access-token.guard';
+import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import { Response } from 'express';
+import { map } from 'rxjs/operators';
 import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
 
-@Controller('auth')
-export class AuthHttpController {
+@Injectable()
+export class AuthService {
   constructor(private readonly natsClient: NatsJetStreamClientProxy) {}
 
-  @Post('signup')
-  signup(
-    @Res({ passthrough: true }) res: Response,
-    @Body() signupDto: HtppSignupDto,
-  ) {
+  signup(dto: SignupDto, res: Response) {
     return this.natsClient
-      .send<AuthTokensDto, SignupDto>({ cmd: AuthSubjects.SIGNUP }, signupDto)
+      .send<AuthTokensDto, SignupDto>({ cmd: AuthSubjects.SIGNUP }, dto)
       .pipe(
         map((tokens) => {
           if (tokens) {
@@ -51,13 +34,9 @@ export class AuthHttpController {
       );
   }
 
-  @Post('signin')
-  signin(
-    @Res({ passthrough: true }) res: Response,
-    @Body() signinDto: HtppSigninDto,
-  ) {
+  signin(dto: SigninDto, res: Response) {
     return this.natsClient
-      .send<AuthTokensDto, SigninDto>({ cmd: AuthSubjects.SIGNIN }, signinDto)
+      .send<AuthTokensDto, SigninDto>({ cmd: AuthSubjects.SIGNIN }, dto)
       .pipe(
         map((tokens) => {
           if (tokens) {
@@ -73,13 +52,7 @@ export class AuthHttpController {
       );
   }
 
-  @UseGuards(AccessTokenGuard)
-  @Post('signout')
-  signout(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
-  ): void {
-    const jwtPayload = req['user'] as JwtPayloadDto;
+  signout(jwtPayload: JwtPayloadDto, res: Response) {
     this.natsClient.emit<void, SignoutDto>(AuthSubjects.SIGNOUT, {
       agentId: jwtPayload.sub,
     });
@@ -87,20 +60,16 @@ export class AuthHttpController {
     res.clearCookie('refresh_token');
   }
 
-  @UseGuards(RefreshTokenGuard)
-  @Get('refresh')
-  async refreshTokens(
-    @Req() req: Request,
-    @Res({ passthrough: true }) res: Response,
+  refreshTokens(
+    refreshToken: string,
+    jwtPaylaod: JwtPayloadDto,
+    res: Response,
   ) {
-    // the refreshToken jwt has been validated by refreshTokenGuard
-    const refreshToken = req.cookies.refresh_token;
-    const jwtPayload = req['user'] as JwtPayloadDto;
     return this.natsClient
       .send<AuthTokensDto | null, RefreshTokensDto>(
         { cmd: AuthSubjects.REFRESH_TOKENS },
         {
-          agentId: jwtPayload.sub,
+          agentId: jwtPaylaod.sub,
           refreshToken,
         },
       )
