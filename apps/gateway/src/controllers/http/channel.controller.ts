@@ -20,7 +20,7 @@ import { CreateChannelDto } from '../../dto/channel/create-channel.dto';
 import { UpdateChannelAgentsDto } from '../../dto/channel/update-channel-agents.dto';
 import { AccessTokenGuard } from '../../guards/access-token.guard';
 import { JwtPayloadDto } from '../../dto/auth/jwt-payload.dto';
-import { ChannelService } from '../../services/cahnnel.service';
+import { ChannelService } from '../../services/channel.service';
 
 @Controller('channel')
 export class ChannelHttpController {
