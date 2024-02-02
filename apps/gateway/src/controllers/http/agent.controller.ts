@@ -1,42 +1,15 @@
-import {
-  Body,
-  Controller,
-  Get,
-  Inject,
-  OnModuleInit,
-  Post,
-  Req,
-  UseGuards,
-} from '@nestjs/common';
-import {
-  AgentRole,
-  AgentServiceClient,
-  AgentsResponse,
-  GRPC_AGENT,
-  Roles,
-  AgentSubjects,
-} from '@app/common';
+import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
+import { AgentRole, AgentsResponse, Roles } from '@app/common';
 import { Request } from 'express';
 import { CreateAgentDto } from '../../dto/agent/create-agent.dto';
-import { ClientGrpc } from '@nestjs/microservices';
 import { Observable } from 'rxjs';
 import { AccessTokenGuard } from '../../guards/access-token.guard';
-import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { JwtPayloadDto } from '../../dto/auth/jwt-payload.dto';
+import { AgentService } from '../../services/agent.service';
 
 @Controller('agent')
-export class AgentHttpController implements OnModuleInit {
-  private agentQueryService: AgentServiceClient;
-
-  constructor(
-    private readonly natsClient: NatsJetStreamClientProxy,
-    @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
-  ) {}
-
-  onModuleInit() {
-    this.agentQueryService =
-      this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
-  }
+export class AgentHttpController {
+  constructor(private readonly agentService: AgentService) {}
 
   @UseGuards(AccessTokenGuard)
   @Roles(AgentRole.OWNER)
@@ -46,13 +19,7 @@ export class AgentHttpController implements OnModuleInit {
     @Body() dto: CreateAgentDto,
   ): Observable<null> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
-    return this.natsClient.send<null>(
-      { cmd: AgentSubjects.CREATE_AGENT },
-      {
-        requesterAccountId: jwtPaylaod.account,
-        ...dto,
-      },
-    );
+    return this.agentService.createAgent(jwtPaylaod, dto);
   }
 
   @UseGuards(AccessTokenGuard)
@@ -60,8 +27,6 @@ export class AgentHttpController implements OnModuleInit {
   @Get()
   getAccountAgents(@Req() req: Request): Observable<AgentsResponse> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
-    return this.agentQueryService.getAccountAgents({
-      accountId: jwtPaylaod.account,
-    });
+    return this.agentService.getAccountAgents(jwtPaylaod);
   }
 }
