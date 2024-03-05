@@ -18,6 +18,7 @@ import { ChannelQueryRepository } from './Infrastructure/repositories/channel.qu
 import { join } from 'path';
 import { ChannelGrpcController } from './Presentation/channel.grpc-controller';
 import { LoggerModule } from 'nestjs-pino';
+import { ChannelService } from './Application/services/channel.service';
 
 @Module({
   imports: [
@@ -66,6 +67,7 @@ import { LoggerModule } from 'nestjs-pino';
   ],
   controllers: [ChannelNatsController, ChannelGrpcController],
   providers: [
+    ChannelService,
     { provide: ChannelEntityRepository, useClass: ChannelEntityRepositoryImpl },
     ChannelQueryRepository,
     ...ChannelChannelHandlers,
