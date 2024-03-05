@@ -22,16 +22,12 @@ export class ChannelEntityRepositoryImpl implements ChannelEntityRepository {
     private readonly channelModel: Model<ChannelModel>,
   ) {}
 
-  /**
-   * Create a new channel model in database
-   *
-   * @async
-   * @param {Channel} entity
-   * @returns {Promise<void>}
-   */
-  async add(entity: Channel): Promise<void> {
+  async add(entity: Channel): Promise<string> {
     try {
-      await this.channelModel.create(this.fromEntity(entity));
+      const createdChannel = await this.channelModel.create(
+        this.fromEntity(entity),
+      );
+      return createdChannel._id.toHexString();
     } catch (error) {
       this.logger.error(error);
 
@@ -41,13 +37,6 @@ export class ChannelEntityRepositoryImpl implements ChannelEntityRepository {
     }
   }
 
-  /**
-   * Update an existing channel model in the datavbase
-   *
-   * @async
-   * @param {Channel} entity
-   * @returns {Promise<void>}
-   */
   async save(entity: Channel): Promise<void> {
     try {
       await this.channelModel.findByIdAndUpdate(
@@ -64,13 +53,6 @@ export class ChannelEntityRepositoryImpl implements ChannelEntityRepository {
     }
   }
 
-  /**
-   * Find a channel model form database by its Id
-   *
-   * @async
-   * @param {string} id
-   * @returns {Promise<Channel | null>}
-   */
   async findById(id: string): Promise<Channel | null> {
     try {
       const channel = await this.channelModel
@@ -87,13 +69,6 @@ export class ChannelEntityRepositoryImpl implements ChannelEntityRepository {
     }
   }
 
-  /**
-   * Convert a channel entity to model
-   *
-   * @private
-   * @param {Channel} channel
-   * @returns {ChannelModel}
-   */
   private fromEntity(channel: Channel): ChannelModel {
     return {
       _id: new Types.ObjectId(channel.id),
@@ -109,13 +84,6 @@ export class ChannelEntityRepositoryImpl implements ChannelEntityRepository {
     };
   }
 
-  /**
-   * Convert a channel model to entity
-   *
-   * @private
-   * @param {ChannelModel} model
-   * @returns {Channel}
-   */
   private toEntity(model: ChannelModel): Channel {
     return new Channel(
       model._id.toHexString(),
