@@ -10,7 +10,7 @@ import { QueryBus } from '@nestjs/cqrs';
 import { GrpcMethod } from '@nestjs/microservices';
 import { ChannelModel } from '../Infrastructure/models/channel.model';
 import { GetAccountChannelsQuery } from '../Application/queries/impl/get-account-cahnnels.query';
-import { GetByIdQuery } from '../Application/queries/impl/get-by-id.query';
+import { GetChannelByIdQuery } from '../Application/queries/impl/get-by-id.query';
 import { Controller } from '@nestjs/common';
 /**
  * The controller that handler queries from the service via grpc
@@ -45,9 +45,10 @@ export class ChannelGrpcController {
     metadata: Metadata,
     call: ServerUnaryCall<any, any>,
   ): Promise<ChannelMessageResponse> {
-    const channel = await this.queryBus.execute<GetByIdQuery, ChannelModel>(
-      new GetByIdQuery(data.accountId, data.channelId),
-    );
+    const channel = await this.queryBus.execute<
+      GetChannelByIdQuery,
+      ChannelModel
+    >(new GetChannelByIdQuery(data.accountId, data.channelId));
 
     if (channel) return { channel: this.toGrpcModel(channel) };
     else return { channel: undefined };

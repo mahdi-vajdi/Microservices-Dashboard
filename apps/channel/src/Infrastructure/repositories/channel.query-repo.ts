@@ -5,11 +5,10 @@ import { Model, MongooseError } from 'mongoose';
 import { DatabaseError } from '@app/common/errors/database.error';
 
 /**
- * The repository for querying from database
+ * The repository for querying from MongoDb database
  *
  * @export
  * @class ChannelQueryRepository
- * @typedef {ChannelQueryRepository}
  */
 @Injectable()
 export class ChannelQueryRepository {
@@ -20,16 +19,14 @@ export class ChannelQueryRepository {
     private readonly channelModel: Model<ChannelModel>,
   ) {}
 
-  /**
-   * Get a channel model from database by its Id
-   *
-   * @async
-   * @param {string} id
-   * @returns {Promise<ChannelModel | null>}
-   */
-  async findOneById(id: string): Promise<ChannelModel | null> {
+  async findOneById(
+    accountId: string,
+    channelId: string,
+  ): Promise<ChannelModel | null> {
     try {
-      return this.channelModel.findById(id, {}, { lean: true }).exec();
+      return this.channelModel
+        .findOne({ _id: channelId, account: accountId }, {}, { lean: true })
+        .exec();
     } catch (error) {
       this.logger.error(error);
 
@@ -39,13 +36,6 @@ export class ChannelQueryRepository {
     }
   }
 
-  /**
-   * Get all the channel models for an account from database
-   *
-   * @async
-   * @param {string} accountId
-   * @returns {Promise<ChannelModel[]>}
-   */
   async findByAccount(accountId: string): Promise<ChannelModel[]> {
     try {
       return await this.channelModel

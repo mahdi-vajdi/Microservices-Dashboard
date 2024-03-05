@@ -4,19 +4,24 @@ import { ChannelEntityRepository } from 'apps/channel/src/Domain/base-channel.re
 
 @CommandHandler(UpdateChannelAgentsCommand)
 export class UpdateChannelAgentsHandler
-  implements ICommandHandler<UpdateChannelAgentsCommand, void>
+  implements ICommandHandler<UpdateChannelAgentsCommand, boolean>
 {
   constructor(private readonly channelRepo: ChannelEntityRepository) {}
 
-  async execute(command: UpdateChannelAgentsCommand): Promise<void> {
-    const channel = await this.channelRepo.findById(command.channelId);
+  async execute(command: UpdateChannelAgentsCommand): Promise<boolean> {
+    try {
+      const channel = await this.channelRepo.findById(command.channelId);
 
-    if (!channel || channel.account !== command.accountId) return;
+      if (!channel || channel.account !== command.accountId) return false;
 
-    if (channel && channel.account === command.accountId)
-      channel.updateAgents(command.agentIds);
+      if (channel && channel.account === command.accountId)
+        channel.updateAgents(command.agentIds);
 
-    await this.channelRepo.save(channel);
-    channel.commit();
+      await this.channelRepo.save(channel);
+      channel.commit();
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }
