@@ -11,20 +11,16 @@ export class CreateChannelHandler
   constructor(private readonly channelRepo: ChannelEntityRepository) {}
 
   async execute(command: CreateChannelCommand): Promise<void> {
-    try {
-      const channel = Channel.create(
-        new Types.ObjectId().toHexString(),
-        command.accountId,
-        command.title,
-        command.url,
-        command.token,
-        command.agents,
-      );
+    const channel = Channel.create(
+      new Types.ObjectId().toHexString(),
+      command.accountId,
+      command.title,
+      command.url,
+      command.token,
+      command.agents,
+    );
 
-      await this.channelRepo.add(channel);
-      channel.commit();
-    } catch (error) {
-      throw new Error(error);
-    }
+    await this.channelRepo.add(channel);
+    channel.commit();
   }
 }

@@ -3,7 +3,7 @@ import { Inject, Injectable, Logger, OnModuleInit } from '@nestjs/common';
 import { CreateChannelDto } from '../dto/create-channel.dto';
 import { CreateChannelCommand } from '../commands/impl/create-channel.command';
 import { lastValueFrom } from 'rxjs';
-import { AgentServiceClient, GRPC_AGENT } from '@app/common';
+import { AgentServiceClient, ApiResponse, GRPC_AGENT } from '@app/common';
 import { ClientGrpc } from '@nestjs/microservices';
 import { GetChannelByIdQuery } from '../queries/impl/get-by-id.query';
 import { ChannelModel } from '../../Infrastructure/models/channel.model';
@@ -26,7 +26,9 @@ export class ChannelService implements OnModuleInit {
       this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
   }
 
-  async create(dto: CreateChannelDto): Promise<ChannelModel | null> {
+  async create(
+    dto: CreateChannelDto,
+  ): Promise<ApiResponse<ChannelModel | null>> {
     try {
       // Get agents ids if caller wants
       const agents: string[] = [];
@@ -57,24 +59,57 @@ export class ChannelService implements OnModuleInit {
         ChannelModel | null
       >(new GetChannelByIdQuery(dto.accountId, channelId));
 
-      return channel;
+      return {
+        success: true,
+        data: channel,
+      };
     } catch (error) {
       this.logger.error(error.message, {
         function: 'create',
         date: new Date(),
         data: dto,
       });
-      return null;
+
+      return {
+        success: false,
+        error: {
+          code: 500,
+          message: error.message,
+        },
+      };
     }
   }
 
-  async updateAgentsList(dto: UpdateChannelAgentsDto): Promise<boolean> {
-    return await this.commandBus.execute<UpdateChannelAgentsCommand, boolean>(
-      new UpdateChannelAgentsCommand(
-        dto.requesterAccountId,
-        dto.channelId,
-        dto.agents,
-      ),
-    );
+  async updateAgentsList(
+    dto: UpdateChannelAgentsDto,
+  ): Promise<ApiResponse<boolean>> {
+    try {
+      await this.commandBus.execute<UpdateChannelAgentsCommand, boolean>(
+        new UpdateChannelAgentsCommand(
+          dto.requesterAccountId,
+          dto.channelId,
+          dto.agents,
+        ),
+      );
+
+      return {
+        success: true,
+        data: true,
+      };
+    } catch (error) {
+      this.logger.error(error.message, {
+        function: 'updateAgentsList',
+        date: new Date(),
+        data: dto,
+      });
+
+      return {
+        success: false,
+        error: {
+          code: 500,
+          message: error.message,
+        },
+      };
+    }
   }
 }
