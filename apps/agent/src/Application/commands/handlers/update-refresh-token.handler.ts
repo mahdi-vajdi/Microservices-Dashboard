@@ -12,9 +12,6 @@ export class UpdateRefreshTokenHandler
     const agent = await this.agnetRepo.findById(command.agentId);
     if (!agent) return;
 
-    // const hashedToken =
-    //   command.token !== null ? await bcrypt.hash(command.token, 10) : null;
-
     agent.changeRefreshToken(command.refreshToken);
     await this.agnetRepo.save(agent);
     agent.commit();

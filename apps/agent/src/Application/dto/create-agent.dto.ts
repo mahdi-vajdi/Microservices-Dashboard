@@ -1,6 +1,6 @@
 import { AgentRole } from '@app/common';
 export interface CreateAgentDto {
-  requesterAccountId: string;
+  accountId: string;
   email: string;
   phone: string;
   firstName: string;
