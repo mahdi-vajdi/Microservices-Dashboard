@@ -8,7 +8,7 @@ import { CreateAgentDto } from '../dto/create-agent.dto';
 import { AgentExistsQuery } from '../queries/impl/agent-exists-query';
 import { AgentRole, ApiResponse } from '@app/common';
 import { GetByEmailQuery } from '../queries/impl/get-by-email.query';
-import { ChannelModel } from 'apps/channel/src/Infrastructure/models/channel.model';
+import { AgentModel } from '../../Infrastructure/models/agent.model';
 
 @Injectable()
 export class AgentService {
@@ -19,12 +19,13 @@ export class AgentService {
 
   async createOwnerAgent(
     dto: CreateOwnerAgentDto,
-  ): Promise<ApiResponse<ChannelModel>> {
+  ): Promise<ApiResponse<AgentModel | null>> {
     try {
       // Check if the agent already exists
-      const agentExists = await this.queryBus.execute(
-        new AgentExistsQuery(dto.email, dto.phone),
-      );
+      const agentExists = await this.queryBus.execute<
+        AgentExistsQuery,
+        boolean
+      >(new AgentExistsQuery(dto.email, dto.phone));
       if (agentExists)
         return {
           success: false,
@@ -49,9 +50,11 @@ export class AgentService {
         ),
       );
 
-      const createdAgent = await this.queryBus.execute(
-        new GetByEmailQuery(dto.email),
-      );
+      // Get the created agent from db
+      const createdAgent = await this.queryBus.execute<
+        GetByEmailQuery,
+        AgentModel | null
+      >(new GetByEmailQuery(dto.email));
 
       return {
         success: true,
@@ -68,12 +71,15 @@ export class AgentService {
     }
   }
 
-  async createAgent(dto: CreateAgentDto): Promise<ApiResponse<ChannelModel>> {
+  async createAgent(
+    dto: CreateAgentDto,
+  ): Promise<ApiResponse<AgentModel | null>> {
     try {
       // Check if the agent already exists
-      const agentExists = await this.queryBus.execute(
-        new AgentExistsQuery(dto.email, dto.phone),
-      );
+      const agentExists = await this.queryBus.execute<
+        AgentExistsQuery,
+        boolean
+      >(new AgentExistsQuery(dto.email, dto.phone));
       if (agentExists)
         return {
           success: false,
@@ -98,9 +104,10 @@ export class AgentService {
         ),
       );
 
-      const createdAgent = await this.queryBus.execute(
-        new GetByEmailQuery(dto.email),
-      );
+      const createdAgent = await this.queryBus.execute<
+        GetByEmailQuery,
+        AgentModel | null
+      >(new GetByEmailQuery(dto.email));
 
       return {
         success: true,

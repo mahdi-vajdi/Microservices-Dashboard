@@ -5,7 +5,7 @@ import { CreateOwnerAgentDto } from '../Application/dto/create-owner-agent.dto';
 import { CreateAgentDto } from '../Application/dto/create-agent.dto';
 import { AgentSubjects, ApiResponse } from '@app/common';
 import { AgentService } from '../Application/services/agent.service';
-import { ChannelModel } from 'apps/channel/src/Infrastructure/models/channel.model';
+import { AgentModel } from '../Infrastructure/models/agent.model';
 
 /**
  * The controller that handles commands via nats
@@ -20,14 +20,14 @@ export class AgentNatsController {
   @MessagePattern({ cmd: AgentSubjects.CREATE_OWNER_AGENT })
   async createOwnerAgent(
     @Payload() dto: CreateOwnerAgentDto,
-  ): Promise<ApiResponse<ChannelModel>> {
+  ): Promise<ApiResponse<AgentModel | null>> {
     return await this.agentService.createOwnerAgent(dto);
   }
 
   @MessagePattern({ cmd: AgentSubjects.CREATE_AGENT })
   async createAgent(
     @Payload() dto: CreateAgentDto,
-  ): Promise<ApiResponse<ChannelModel>> {
+  ): Promise<ApiResponse<AgentModel | null>> {
     return await this.agentService.createAgent(dto);
   }
 
