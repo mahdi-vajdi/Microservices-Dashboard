@@ -14,46 +14,22 @@ import {
   GRPC_AGENT,
   AccountSubjects,
   AgentSubjects,
-  DuplicateResourceError,
   NotFoundError,
+  ApiResponse,
 } from '@app/common';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { ForbiddenAccessError } from '@app/common/errors/forbidden-access.error';
+import { AgentModel } from 'apps/agent/src/Infrastructure/models/agent.model';
 
 /**
  * Main service class for handling authentication
- *
- * @export
- * @class AuthService
- * @typedef {AuthService}
- * @implements {OnModuleInit}
  */
 @Injectable()
 export class AuthService implements OnModuleInit {
-  /**
-   * The Grpc client methods for account service
-   *
-   * @private
-   * @type {AccountServiceClient}
-   */
+  // The Grpc client methods for account and agent service
   private accountQueryService: AccountServiceClient;
-  /**
-   * The Grpc client methods for agent service
-   *
-   * @private
-   * @type {AgentServiceClient}
-   */
   private agentQueryService: AgentServiceClient;
 
-  /**
-   * Creates an instance of AuthService.
-   *
-   * @constructor
-   * @param {NatsJetStreamClientProxy} natsClient
-   * @param {ClientGrpc} agentGrpcClient
-   * @param {ClientGrpc} accountGrpcClient
-   * @param {JwtHelperService} jwtUtils
-   */
   constructor(
     private readonly natsClient: NatsJetStreamClientProxy,
     @Inject(GRPC_AGENT) private readonly agentGrpcClient: ClientGrpc,
@@ -70,13 +46,7 @@ export class AuthService implements OnModuleInit {
       this.agentGrpcClient.getService<AgentServiceClient>('AgentService');
   }
 
-  /**
-   *
-   * @async
-   * @param {SignupDto} signupDto
-   * @returns {Promise<AuthTokensDto>}
-   */
-  async signup(signupDto: SignupDto): Promise<AuthTokensDto> {
+  async signup(signupDto: SignupDto): Promise<ApiResponse<AuthTokensDto>> {
     // check if account exists
     const { exists: accountExists } = await lastValueFrom(
       this.accountQueryService.accountExists({
@@ -85,79 +55,51 @@ export class AuthService implements OnModuleInit {
     );
 
     if (accountExists)
-      throw new DuplicateResourceError('Account already exists');
-
-    // check if agent exists
-    const { agentExists } = await lastValueFrom(
-      this.agentQueryService.agentExists({
-        email: signupDto.email,
-        phone: signupDto.phone,
-      }),
-    );
-    if (agentExists) throw new DuplicateResourceError('Agent already exists');
+      return {
+        success: false,
+        error: {
+          code: 404,
+          message: 'Account already exists',
+        },
+      };
 
     // create an account for the new signup
-    await lastValueFrom(
-      this.natsClient.emit<void>(AccountSubjects.CREATE_ACCOUNT, {
-        email: signupDto.email,
-      }),
-    );
+    const { success: createAccountSuccess, data: createdAgent } =
+      await lastValueFrom(
+        this.natsClient.emit<ApiResponse<AgentModel | null>, SignupDto>(
+          AccountSubjects.CREATE_ACCOUNT,
+          signupDto,
+        ),
+      );
 
-    // get the created account
-    const { account } = await lastValueFrom(
-      this.accountQueryService.getAccountByEmail({
-        email: signupDto.email,
-      }),
-    );
-    if (!account) throw new NotFoundError('Could not retrieve Account');
-
-    // create a defualt agent for the new account
-    await lastValueFrom(
-      this.natsClient.emit(
-        { cmd: AgentSubjects.CREATE_OWNER_AGENT },
-        {
-          accountId: account.id,
-          firstName: signupDto.firstName,
-          lastName: signupDto.lastName,
-          email: signupDto.email,
-          phone: signupDto.phone,
-          password: await bcrypt.hash(signupDto.password, 10),
+    if (!createAccountSuccess || !createdAgent)
+      return {
+        success: false,
+        error: {
+          code: 404,
+          message: 'Could not create Account',
         },
-      ),
-    );
+      };
 
-    // get the create agent info
-    const { agent } = await lastValueFrom(
-      this.agentQueryService.getAgentByEmail({
-        agentEmail: signupDto.email,
-      }),
-    );
-    if (!agent) throw new NotFoundError('Could not retrieve Agent');
-
-    const tokens = await this.jwtUtils.generateTokens(
-      agent.id,
-      agent.email,
-      account.id,
-      AgentRole[agent.role],
+    const authTokens = await this.jwtUtils.generateTokens(
+      createdAgent._id.toHexString(),
+      createdAgent.email,
+      createdAgent.account.toHexString(),
+      createdAgent.role,
     );
 
     // update the refresh token for the agent
     this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
-      agentId: agent.id,
-      newToken: tokens.refreshToken,
+      agentId: createdAgent._id.toHexString(),
+      newToken: authTokens.refreshToken,
     });
 
-    return tokens;
+    return {
+      success: true,
+      data: authTokens,
+    };
   }
 
-  /**
-   *
-   * @async
-   * @param {SigninDto} param0
-   * @param {SigninDto} param0.email
-   * @param {SigninDto} param0.password
-   * @returns {Promise<AuthTokensDto>}
-   */
   async signin({ email, password }: SigninDto): Promise<AuthTokensDto> {
     const agent = await lastValueFrom(
       this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
@@ -192,10 +134,6 @@ export class AuthService implements OnModuleInit {
     return tokens;
   }
 
-  /**
-   *
-   * @param {string} agentId
-   */
   signout(agentId: string): void {
     this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agentId,
@@ -205,11 +143,6 @@ export class AuthService implements OnModuleInit {
 
   /**
    * Validate provided refresh token and genrate and return new tokens
-   *
-   * @async
-   * @param {string} agentId
-   * @param {string} refreshToken
-   * @returns {Promise<AuthTokensDto>}
    */
   async refreshTokens(
     agentId: string,
