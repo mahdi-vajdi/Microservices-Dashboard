@@ -8,9 +8,9 @@ import {
   RpcException,
 } from '@nestjs/microservices';
 import {
+  ApiResponse,
   AuthSubjects,
   AuthTokensDto,
-  DuplicateResourceError,
   NotFoundError,
   RefreshTokensDto,
   SigninDto,
@@ -24,33 +24,20 @@ import { ForbiddenAccessError } from '@app/common/errors/forbidden-access.error'
  *
  * @export
  * @class AuthNatsController
- * @typedef {AuthNatsController}
  */
 @Controller()
 export class AuthNatsController {
   constructor(private readonly authService: AuthService) {}
 
   @MessagePattern({ cmd: AuthSubjects.SIGNUP })
-  async signup(@Payload() signupDto: SignupDto): Promise<AuthTokensDto> {
-    try {
-      return await this.authService.signup(signupDto);
-    } catch (error) {
-      if (error instanceof DuplicateResourceError)
-        throw new RpcException({
-          statusCode: 409,
-          message: error.message,
-        });
-      else if (error instanceof NotFoundError)
-        throw new RpcException({
-          statusCode: 409,
-          message: error.message,
-        });
-      else throw new RpcException(error.message);
-    }
+  async signup(
+    @Payload() signupDto: SignupDto,
+  ): Promise<ApiResponse<AuthTokensDto>> {
+    return await this.authService.signup(signupDto);
   }
 
   @MessagePattern({ cmd: AuthSubjects.SIGNIN })
-  async signin(@Payload() dto: SigninDto): Promise<AuthTokensDto> {
+  async signin(@Payload() dto: SigninDto): Promise<ApiResponse<AuthTokensDto>> {
     try {
       return await this.authService.signin(dto);
     } catch (error) {
@@ -75,7 +62,7 @@ export class AuthNatsController {
   @MessagePattern({ cmd: AuthSubjects.REFRESH_TOKENS })
   async refresh(
     @Payload() { agentId, refreshToken }: RefreshTokensDto,
-  ): Promise<AuthTokensDto> {
+  ): Promise<ApiResponse<AuthTokensDto>> {
     try {
       return await this.authService.refreshTokens(agentId, refreshToken);
     } catch (error) {

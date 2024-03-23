@@ -3,6 +3,7 @@ import { AgentModel as AgentModel } from '../models/agent.model';
 import { Model, MongooseError, Types } from 'mongoose';
 import { Logger } from '@nestjs/common';
 import { DatabaseError } from '@app/common/errors/database.error';
+import { AgentDto } from '@app/common';
 /**
  * Repository for query side of the agent service
  *
@@ -44,14 +45,14 @@ export class AgentQueryRepository {
    *
    * @async
    * @param {string} email
-   * @returns {Promise<AgentModel | null>}
+   * @returns {Promise<AgentDto | null>}
    */
-  async findByEmail(email: string): Promise<AgentModel | null> {
+  async findByEmail(email: string): Promise<AgentDto | null> {
     try {
       const agent = await this.agentModel
         .findOne({ email }, {}, { lean: true })
         .exec();
-      if (agent) return agent;
+      if (agent) return this.toDto(agent);
       else return null;
     } catch (error) {
       this.logger.error(error);
@@ -137,5 +138,23 @@ export class AgentQueryRepository {
         throw new DatabaseError(error.message);
       else throw new Error(error.message);
     }
+  }
+
+  private toDto(agent: AgentModel): AgentDto {
+    return {
+      id: agent._id.toHexString(),
+      createdAt: agent.createdAt,
+      updatedAt: agent.updatedAt,
+      account: agent.account.toHexString(),
+      email: agent.email,
+      phone: agent.phone,
+      firstName: agent.firstName,
+      lastName: agent.lastName,
+      title: agent.title,
+      refreshToken: agent.refreshToken,
+      role: agent.role,
+      avatar: agent.avatar,
+      online: agent.online,
+    };
   }
 }

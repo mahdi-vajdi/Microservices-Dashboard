@@ -4,10 +4,9 @@ import { CreateAccountCommand } from '../commands/impl/create-account.command';
 import { GetByEmailQuery } from '../queries/impl/get-by-email.query';
 import { AccountModel } from '../../Infrastructure/models/account.model';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { AgentSubjects, ApiResponse } from '@app/common';
+import { AgentDto, AgentSubjects, ApiResponse } from '@app/common';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { lastValueFrom } from 'rxjs';
-import { AgentModel } from 'apps/agent/src/Infrastructure/models/agent.model';
 
 @Injectable()
 export class AccountService {
@@ -21,7 +20,7 @@ export class AccountService {
 
   async createAccount(
     dto: CreateAccountDto,
-  ): Promise<ApiResponse<AgentModel | null>> {
+  ): Promise<ApiResponse<AgentDto | null>> {
     try {
       // Create the account entity itself
       await this.commandBus.execute<CreateAccountCommand, void>(
@@ -51,7 +50,7 @@ export class AccountService {
 
       // Create the default agent that owns the account
       const createAgentResult = await lastValueFrom(
-        this.natsClient.send<ApiResponse<AgentModel | null>>(
+        this.natsClient.send<ApiResponse<AgentDto | null>>(
           { cmd: AgentSubjects.CREATE_OWNER_AGENT },
           {
             accountId: account._id,

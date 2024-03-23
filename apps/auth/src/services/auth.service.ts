@@ -14,11 +14,10 @@ import {
   GRPC_AGENT,
   AccountSubjects,
   AgentSubjects,
-  NotFoundError,
   ApiResponse,
+  AgentDto,
 } from '@app/common';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { ForbiddenAccessError } from '@app/common/errors/forbidden-access.error';
 import { AgentModel } from 'apps/agent/src/Infrastructure/models/agent.model';
 
 /**
@@ -66,8 +65,8 @@ export class AuthService implements OnModuleInit {
     // create an account for the new signup
     const { success: createAccountSuccess, data: createdAgent } =
       await lastValueFrom(
-        this.natsClient.emit<ApiResponse<AgentModel | null>, SignupDto>(
-          AccountSubjects.CREATE_ACCOUNT,
+        this.natsClient.send<ApiResponse<AgentDto | null>, SignupDto>(
+          { cmd: AccountSubjects.CREATE_ACCOUNT },
           signupDto,
         ),
       );
@@ -82,15 +81,15 @@ export class AuthService implements OnModuleInit {
       };
 
     const authTokens = await this.jwtUtils.generateTokens(
-      createdAgent._id.toHexString(),
+      createdAgent.id,
       createdAgent.email,
-      createdAgent.account.toHexString(),
+      createdAgent.account,
       createdAgent.role,
     );
 
     // update the refresh token for the agent
     this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
-      agentId: createdAgent._id.toHexString(),
+      agentId: createdAgent.id,
       newToken: authTokens.refreshToken,
     });
 
@@ -100,7 +99,10 @@ export class AuthService implements OnModuleInit {
     };
   }
 
-  async signin({ email, password }: SigninDto): Promise<AuthTokensDto> {
+  async signin({
+    email,
+    password,
+  }: SigninDto): Promise<ApiResponse<AuthTokensDto>> {
     const agent = await lastValueFrom(
       this.agentQueryService.getAgentByEmail({ agentEmail: email }).pipe(
         map(async ({ agent }) => {
@@ -117,7 +119,14 @@ export class AuthService implements OnModuleInit {
       ),
     );
 
-    if (!agent) throw new NotFoundError('Could not retrieve Agent');
+    if (!agent)
+      return {
+        success: false,
+        error: {
+          code: 404,
+          message: 'Agent not found',
+        },
+      };
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -131,14 +140,22 @@ export class AuthService implements OnModuleInit {
       newToken: tokens.refreshToken,
     });
 
-    return tokens;
+    return {
+      success: true,
+      data: tokens,
+    };
   }
 
-  signout(agentId: string): void {
+  signout(agentId: string): ApiResponse<null> {
     this.natsClient.emit<void>(AgentSubjects.UPDATE_REFRESH_TOKEN, {
       agentId: agentId,
       newToken: null,
     });
+
+    return {
+      success: true,
+      data: null,
+    };
   }
 
   /**
@@ -147,7 +164,7 @@ export class AuthService implements OnModuleInit {
   async refreshTokens(
     agentId: string,
     refreshToken: string,
-  ): Promise<AuthTokensDto> {
+  ): Promise<ApiResponse<AuthTokensDto>> {
     const { agent } = await lastValueFrom(
       this.agentQueryService.getAgentById({
         agentId,
@@ -155,13 +172,24 @@ export class AuthService implements OnModuleInit {
     );
 
     if (!agent || !agent.refreshToken)
-      throw new NotFoundError('Could not retrieve Agent or Its RefreshToken');
+      return {
+        success: false,
+        error: {
+          code: 404,
+          message: 'Could not retrieve Agent or its RefreshToken',
+        },
+      };
 
-    // const tokenMatches =  await bcrypt.compare(refreshToken, agent.refreshToken);
     const tokenMatches = refreshToken === agent.refreshToken;
 
     if (!tokenMatches)
-      throw new ForbiddenAccessError('Refresh Token is Invalid');
+      return {
+        success: false,
+        error: {
+          code: 403,
+          message: 'Refresh Token is Invalid',
+        },
+      };
 
     const tokens = await this.jwtUtils.generateTokens(
       agent.id,
@@ -175,6 +203,9 @@ export class AuthService implements OnModuleInit {
       newToken: tokens.refreshToken,
     });
 
-    return tokens;
+    return {
+      success: true,
+      data: tokens,
+    };
   }
 }

@@ -13,6 +13,7 @@ import { AgentEntityRepository } from './Domain/base-agent.entity-repo';
 import { AgentNatsController } from './Presentation/agent.nats-cotroller';
 import { LoggerModule } from 'nestjs-pino';
 import { pinoDevConfig, pinoProdConfig } from '@app/common';
+import { AgentService } from './Application/services/agent.service';
 
 @Module({
   imports: [
@@ -44,6 +45,7 @@ import { pinoDevConfig, pinoProdConfig } from '@app/common';
   ],
   controllers: [AgentHttpController, AgentNatsController],
   providers: [
+    AgentService,
     { provide: AgentEntityRepository, useClass: AgentEntityRepositoryImpl },
     AgentQueryRepository,
     ...AgentCommandHandlers,
