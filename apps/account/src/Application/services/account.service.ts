@@ -4,9 +4,18 @@ import { CreateAccountCommand } from '../commands/impl/create-account.command';
 import { GetByEmailQuery } from '../queries/impl/get-by-email.query';
 import { AccountModel } from '../../Infrastructure/models/account.model';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { AgentDto, AgentSubjects, ApiResponse } from '@app/common';
+import {
+  AccountExistsResponse,
+  AccountMessage,
+  AccountMessageResponse,
+  AgentDto,
+  AgentSubjects,
+  ApiResponse,
+} from '@app/common';
 import { CreateAccountDto } from '../dto/create-account.dto';
 import { lastValueFrom } from 'rxjs';
+import { GetByIdQuery } from '../queries/impl/get-by-id.query';
+import { AccountExistsQuery } from '../queries/impl/account-exists.query';
 
 @Injectable()
 export class AccountService {
@@ -97,5 +106,48 @@ export class AccountService {
         },
       };
     }
+  }
+
+  async getAccountById(accountId: string): Promise<AccountMessageResponse> {
+    const account = await this.queryBus.execute<
+      GetByIdQuery,
+      AccountModel | null
+    >(new GetByIdQuery(accountId));
+
+    if (account)
+      return {
+        account: this.toQueryModel(account),
+      };
+    else return { account: undefined };
+  }
+
+  async getAccountByEmail(email: string): Promise<AccountMessageResponse> {
+    const account = await this.queryBus.execute<
+      GetByEmailQuery,
+      AccountModel | null
+    >(new GetByEmailQuery(email));
+
+    if (account)
+      return {
+        account: this.toQueryModel(account),
+      };
+    else return { account: undefined };
+  }
+
+  async accountExists(email: string): Promise<AccountExistsResponse> {
+    const exists = await this.queryBus.execute<AccountExistsQuery, boolean>(
+      new AccountExistsQuery(email),
+    );
+
+    return { exists };
+  }
+
+  private toQueryModel(model: AccountModel): AccountMessage {
+    return {
+      id: model._id.toHexString(),
+      createdAt: model.createdAt.toISOString(),
+      updatedAt: model.updatedAt.toISOString(),
+      email: model.email,
+    };
   }
 }
