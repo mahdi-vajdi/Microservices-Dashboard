@@ -13,7 +13,6 @@ import { ChannelService } from '../Application/services/channel.service';
  *
  * @export
  * @class ChannelGrpcController
- * @typedef {ChannelGrpcController}
  */
 @Controller()
 export class ChannelGrpcController {
