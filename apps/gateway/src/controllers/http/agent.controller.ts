@@ -1,5 +1,11 @@
 import { Body, Controller, Get, Post, Req, UseGuards } from '@nestjs/common';
-import { AgentRole, AgentsResponse, Roles } from '@app/common';
+import {
+  AgentDto,
+  AgentRole,
+  AgentsResponse,
+  ApiResponse,
+  Roles,
+} from '@app/common';
 import { Request } from 'express';
 import { CreateAgentDto } from '../../dto/agent/create-agent.dto';
 import { Observable } from 'rxjs';
@@ -17,7 +23,7 @@ export class AgentHttpController {
   createAgent(
     @Req() req: Request,
     @Body() dto: CreateAgentDto,
-  ): Observable<null> {
+  ): Observable<ApiResponse<AgentDto | null>> {
     const jwtPaylaod = req['user'] as JwtPayloadDto;
     return this.agentService.createAgent(jwtPaylaod, dto);
   }
