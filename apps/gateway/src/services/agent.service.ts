@@ -1,4 +1,10 @@
-import { AgentServiceClient, AgentSubjects, GRPC_AGENT } from '@app/common';
+import {
+  AgentDto,
+  AgentServiceClient,
+  AgentSubjects,
+  ApiResponse,
+  GRPC_AGENT,
+} from '@app/common';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { Inject, Injectable, OnModuleInit } from '@nestjs/common';
 import { ClientGrpc } from '@nestjs/microservices';
@@ -20,7 +26,7 @@ export class AgentService implements OnModuleInit {
   }
 
   createAgent(user: JwtPayloadDto, dto: CreateAgentDto) {
-    return this.natsClient.send<null>(
+    return this.natsClient.send<ApiResponse<AgentDto | null>>(
       { cmd: AgentSubjects.CREATE_AGENT },
       {
         requesterAccountId: user.account,

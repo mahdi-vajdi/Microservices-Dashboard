@@ -18,7 +18,6 @@ import {
   AgentDto,
 } from '@app/common';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { AgentModel } from 'apps/agent/src/Infrastructure/models/agent.model';
 
 /**
  * Main service class for handling authentication

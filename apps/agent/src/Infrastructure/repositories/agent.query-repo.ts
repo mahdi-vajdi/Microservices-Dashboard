@@ -1,15 +1,13 @@
 import { InjectModel } from '@nestjs/mongoose';
-import { AgentModel as AgentModel } from '../models/agent.model';
+import { AgentModel } from '../models/agent.model';
 import { Model, MongooseError, Types } from 'mongoose';
 import { Logger } from '@nestjs/common';
 import { DatabaseError } from '@app/common/errors/database.error';
-import { AgentDto } from '@app/common';
 /**
  * Repository for query side of the agent service
  *
  * @export
  * @class AgentQueryRepository
- * @typedef {AgentQueryRepository}
  */
 export class AgentQueryRepository {
   private readonly logger = new Logger(AgentQueryRepository.name);
@@ -19,13 +17,6 @@ export class AgentQueryRepository {
     private readonly agentModel: Model<AgentModel>,
   ) {}
 
-  /**
-   * Get agent by its Id
-   *
-   * @async
-   * @param {string} agentId
-   * @returns {Promise<AgentModel | null>}
-   */
   async findById(agentId: string): Promise<AgentModel | null> {
     try {
       const agent = await this.agentModel.findById(agentId, {}, { lean: true });
@@ -40,19 +31,12 @@ export class AgentQueryRepository {
     }
   }
 
-  /**
-   * Get agent by its email
-   *
-   * @async
-   * @param {string} email
-   * @returns {Promise<AgentDto | null>}
-   */
-  async findByEmail(email: string): Promise<AgentDto | null> {
+  async findByEmail(email: string): Promise<AgentModel | null> {
     try {
       const agent = await this.agentModel
         .findOne({ email }, {}, { lean: true })
         .exec();
-      if (agent) return this.toDto(agent);
+      if (agent) return agent;
       else return null;
     } catch (error) {
       this.logger.error(error);
@@ -63,13 +47,6 @@ export class AgentQueryRepository {
     }
   }
 
-  /**
-   * Get all the agents for an account Id
-   *
-   * @async
-   * @param {string} accountId
-   * @returns {Promise<AgentModel[]>}
-   */
   async findByAccount(accountId: string): Promise<AgentModel[]> {
     try {
       const agents = await this.agentModel
@@ -86,13 +63,6 @@ export class AgentQueryRepository {
     }
   }
 
-  /**
-   * Get Ids for all the agents of an account
-   *
-   * @async
-   * @param {string} accountId
-   * @returns {Promise<string[]>}
-   */
   async findIdsByAccount(accountId: string): Promise<string[]> {
     try {
       const models = await this.agentModel.find(
@@ -111,16 +81,6 @@ export class AgentQueryRepository {
     }
   }
 
-  /**
-   * Check if anget exists whith the proviced info
-   *
-   * @async
-   * @param {string} email
-   * @param {string} phone
-   * @returns {Promise<{
-   *     _id: Types.ObjectId;
-   *   } | null>}
-   */
   async agentExists(
     email: string,
     phone: string,
@@ -138,23 +98,5 @@ export class AgentQueryRepository {
         throw new DatabaseError(error.message);
       else throw new Error(error.message);
     }
-  }
-
-  private toDto(agent: AgentModel): AgentDto {
-    return {
-      id: agent._id.toHexString(),
-      createdAt: agent.createdAt,
-      updatedAt: agent.updatedAt,
-      account: agent.account.toHexString(),
-      email: agent.email,
-      phone: agent.phone,
-      firstName: agent.firstName,
-      lastName: agent.lastName,
-      title: agent.title,
-      refreshToken: agent.refreshToken,
-      role: agent.role,
-      avatar: agent.avatar,
-      online: agent.online,
-    };
   }
 }
