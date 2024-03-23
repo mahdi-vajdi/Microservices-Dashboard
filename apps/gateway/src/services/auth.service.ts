@@ -1,4 +1,5 @@
 import {
+  ApiResponse,
   AuthSubjects,
   AuthTokensDto,
   RefreshTokensDto,
@@ -7,7 +8,11 @@ import {
   SignupDto,
 } from '@app/common';
 import { NatsJetStreamClientProxy } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
-import { Injectable, InternalServerErrorException } from '@nestjs/common';
+import {
+  HttpException,
+  Injectable,
+  InternalServerErrorException,
+} from '@nestjs/common';
 import { Response } from 'express';
 import { map } from 'rxjs/operators';
 import { JwtPayloadDto } from '../dto/auth/jwt-payload.dto';
@@ -18,42 +23,56 @@ export class AuthService {
 
   signup(dto: SignupDto, res: Response) {
     return this.natsClient
-      .send<AuthTokensDto, SignupDto>({ cmd: AuthSubjects.SIGNUP }, dto)
+      .send<ApiResponse<AuthTokensDto>, SignupDto>(
+        { cmd: AuthSubjects.SIGNUP },
+        dto,
+      )
       .pipe(
-        map((tokens) => {
-          if (tokens) {
-            this.setTokensToCookies(res, tokens);
-          } else {
+        map((response) => {
+          if (response.success && response.data) {
+            this.setTokensToCookies(res, response.data);
+            return response;
+          } else if (response.success && !response.data) {
             throw new InternalServerErrorException(
-              'Something went wrong issuing tokens. please sign in',
+              'Something went wrong issuing tokens. Please sign in again.',
+            );
+          } else if (!response.success) {
+            return new HttpException(
+              response.error?.message || 'Somthing Went Wrong',
+              response.error?.code || 500,
             );
           }
-
-          return null;
         }),
       );
   }
 
   signin(dto: SigninDto, res: Response) {
     return this.natsClient
-      .send<AuthTokensDto, SigninDto>({ cmd: AuthSubjects.SIGNIN }, dto)
+      .send<ApiResponse<AuthTokensDto>, SigninDto>(
+        { cmd: AuthSubjects.SIGNIN },
+        dto,
+      )
       .pipe(
-        map((tokens) => {
-          if (tokens) {
-            this.setTokensToCookies(res, tokens);
-          } else {
+        map((response) => {
+          if (response.success && response.data) {
+            this.setTokensToCookies(res, response.data);
+            return response;
+          } else if (response.success && !response.data) {
             throw new InternalServerErrorException(
-              'Something went wrong issuing tokens. please sign in',
+              'Something went wrong issuing tokens. Please sign in again.',
+            );
+          } else if (!response.success) {
+            return new HttpException(
+              response.error?.message || 'Somthing Went Wrong',
+              response.error?.code || 500,
             );
           }
-
-          return null;
         }),
       );
   }
 
   signout(jwtPayload: JwtPayloadDto, res: Response) {
-    this.natsClient.emit<void, SignoutDto>(AuthSubjects.SIGNOUT, {
+    this.natsClient.emit<ApiResponse<null>, SignoutDto>(AuthSubjects.SIGNOUT, {
       agentId: jwtPayload.sub,
     });
     res.clearCookie('access_token');
@@ -66,7 +85,7 @@ export class AuthService {
     res: Response,
   ) {
     return this.natsClient
-      .send<AuthTokensDto | null, RefreshTokensDto>(
+      .send<ApiResponse<AuthTokensDto>, RefreshTokensDto>(
         { cmd: AuthSubjects.REFRESH_TOKENS },
         {
           agentId: jwtPaylaod.sub,
@@ -74,16 +93,20 @@ export class AuthService {
         },
       )
       .pipe(
-        map((tokens) => {
-          if (tokens) {
-            this.setTokensToCookies(res, tokens);
-          } else {
+        map((response) => {
+          if (response.success && response.data) {
+            this.setTokensToCookies(res, response.data);
+            return response;
+          } else if (response.success && !response.data) {
             throw new InternalServerErrorException(
-              'Something went wrong issuing tokens. please sign in',
+              'Something went wrong issuing tokens. Please sign in again.',
+            );
+          } else if (!response.success) {
+            return new HttpException(
+              response.error?.message || 'Somthing Went Wrong',
+              response.error?.code || 500,
             );
           }
-
-          return null;
         }),
       );
   }
@@ -93,6 +116,7 @@ export class AuthService {
       maxAge: 1000 * 60 * 60,
       httpOnly: true,
     });
+
     res.cookie('refresh_token', tokens.refreshToken, {
       maxAge: 1000 * 60 * 60 * 24 * 7,
       httpOnly: true,

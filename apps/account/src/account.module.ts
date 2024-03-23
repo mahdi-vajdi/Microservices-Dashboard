@@ -18,6 +18,7 @@ import { AccountGrpcController } from './Presentation/account.grpc-controller';
 import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { LoggerModule } from 'nestjs-pino';
 import { pinoDevConfig, pinoProdConfig } from '@app/common';
+import { AccountService } from './Application/services/account.service';
 
 @Module({
   imports: [
@@ -59,6 +60,7 @@ import { pinoDevConfig, pinoProdConfig } from '@app/common';
   ],
   controllers: [AccountNatsController, AccountGrpcController],
   providers: [
+    AccountService,
     AccountQueryRepository,
     { provide: AccountEntityRepository, useClass: AccountEntityRepositoryImpl },
     ...AccountCommandHandlers,

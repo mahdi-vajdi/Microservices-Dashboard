@@ -15,9 +15,9 @@ import { AgentHttpController } from './controllers/http/agent.controller';
 import { AuthHttpController } from './controllers/http/auth.controller';
 import { NatsJetStreamTransport } from '@nestjs-plugins/nestjs-nats-jetstream-transport';
 import { LoggerModule } from 'nestjs-pino';
-import { AuthService } from 'apps/auth/src/services/auth.service';
 import { AgentService } from './services/agent.service';
 import { ChannelService } from './services/channel.service';
+import { AuthService } from './services/auth.service';
 
 @Module({
   imports: [

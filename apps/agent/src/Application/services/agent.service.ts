@@ -6,9 +6,8 @@ import { UpdateRefreshTokenCommand } from '../commands/impl/update-refresh-token
 import { CreateAgentCommand } from '../commands/impl/create-agent.command';
 import { CreateAgentDto } from '../dto/create-agent.dto';
 import { AgentExistsQuery } from '../queries/impl/agent-exists-query';
-import { AgentRole, ApiResponse } from '@app/common';
+import { AgentDto, AgentRole, ApiResponse } from '@app/common';
 import { GetByEmailQuery } from '../queries/impl/get-by-email.query';
-import { AgentModel } from '../../Infrastructure/models/agent.model';
 
 @Injectable()
 export class AgentService {
@@ -19,7 +18,7 @@ export class AgentService {
 
   async createOwnerAgent(
     dto: CreateOwnerAgentDto,
-  ): Promise<ApiResponse<AgentModel | null>> {
+  ): Promise<ApiResponse<AgentDto | null>> {
     try {
       // Check if the agent already exists
       const agentExists = await this.queryBus.execute<
@@ -53,7 +52,7 @@ export class AgentService {
       // Get the created agent from db
       const createdAgent = await this.queryBus.execute<
         GetByEmailQuery,
-        AgentModel | null
+        AgentDto | null
       >(new GetByEmailQuery(dto.email));
 
       return {
@@ -73,7 +72,7 @@ export class AgentService {
 
   async createAgent(
     dto: CreateAgentDto,
-  ): Promise<ApiResponse<AgentModel | null>> {
+  ): Promise<ApiResponse<AgentDto | null>> {
     try {
       // Check if the agent already exists
       const agentExists = await this.queryBus.execute<
@@ -106,7 +105,7 @@ export class AgentService {
 
       const createdAgent = await this.queryBus.execute<
         GetByEmailQuery,
-        AgentModel | null
+        AgentDto | null
       >(new GetByEmailQuery(dto.email));
 
       return {

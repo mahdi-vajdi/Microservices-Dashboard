@@ -8,10 +8,7 @@ import { AgentService } from '../Application/services/agent.service';
 import { AgentModel } from '../Infrastructure/models/agent.model';
 
 /**
- * The controller that handles commands via nats
- *
- * @export
- * @class AgentNatsController
+ * The controller that handles commands via NATS
  */
 @Controller()
 export class AgentNatsController {
