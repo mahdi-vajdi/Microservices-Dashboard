@@ -7,35 +7,14 @@ import { JwtService } from '@nestjs/jwt';
 
 /**
  * The helper class for jwt related logic
- *
- * @export
- * @class JwtHelperService
- * @typedef {JwtHelperService}
  */
 @Injectable()
 export class JwtHelperService {
-  /**
-   * Creates an instance of JwtHelperService.
-   *
-   * @constructor
-   * @param {JwtService} jwtService
-   * @param {ConfigService} configService
-   */
   constructor(
     private readonly jwtService: JwtService,
     private readonly configService: ConfigService,
   ) {}
 
-  /**
-   * genrate new tokens with provided payload
-   *
-   * @async
-   * @param {string} id
-   * @param {string} email
-   * @param {string} account
-   * @param {AgentRole} role
-   * @returns {Promise<AuthTokensDto>}
-   */
   async generateTokens(
     id: string,
     email: string,
@@ -65,10 +44,6 @@ export class JwtHelperService {
 
   /**
    * Verify provided access token
-   *
-   * @async
-   * @param {string} token
-   * @returns {unknown}
    */
   async verifyAccessToken(token: string) {
     return await this.jwtService.verifyAsync<JwtPayloadDto>(token, {
@@ -78,10 +53,6 @@ export class JwtHelperService {
 
   /**
    * Verify provided refresh token
-   *
-   * @async
-   * @param {string} token
-   * @returns {unknown}
    */
   async verifyRefreshToken(token: string) {
     return await this.jwtService.verifyAsync<JwtPayloadDto>(token, {
